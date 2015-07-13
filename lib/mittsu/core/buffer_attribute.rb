@@ -32,25 +32,25 @@ module Mittsu
       self
     end
 
-    def setX(index, x)
+    def set_x(index, x)
       @array[index * @item_size] = x
 
       self
     end
 
-    def setY(index, y)
+    def set_y(index, y)
       @array[index * @item_size + 1] = y
 
       self
     end
 
-    def setZ(index, z)
+    def set_z(index, z)
       @array[index * @item_size + 2] = z
 
       self
     end
 
-    def setXY(index, x, y)
+    def set_xy(index, x, y)
       index *= @item_size
 
       @array[index    ] = x
@@ -59,7 +59,7 @@ module Mittsu
       self
     end
 
-    def setXYZ(index, x, y, z)
+    def set_xyz(index, x, y, z)
       index *= @item_size
 
       @array[index    ] = x
@@ -69,13 +69,13 @@ module Mittsu
       self
     end
 
-    def setXYZW(index, x, y, z, w)
+    def set_xyzw(index, x, y, z, w)
       index *= @item_size
 
       @array[index    ] = x
       @array[index + 1] = y
       @array[index + 2] = z
-      @array[index + 3] = z
+      @array[index + 3] = w
 
       self
     end

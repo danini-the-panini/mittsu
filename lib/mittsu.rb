@@ -1,5 +1,5 @@
 require "mittsu/version"
+require "mittsu/core"
 
 module Mittsu
-  # Your code goes here...
 end
