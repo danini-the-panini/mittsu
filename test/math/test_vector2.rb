@@ -377,10 +377,11 @@ class TestVector2 < Minitest::Test
   def test_set_length
     a = Mittsu::Vector2.new(1.4, -3.4)
 
-    a.length = 2.3
+    result = a.set_length 2.3
 
     assert_in_delta(0.87572455208487, a.x, DELTA)
     assert_in_delta(-2.12675962649186, a.y, DELTA)
+    assert_same(result, a)
   end
 
   def test_lerp

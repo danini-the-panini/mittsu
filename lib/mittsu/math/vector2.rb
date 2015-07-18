@@ -181,11 +181,12 @@ module Mittsu
       dx * dx + dy * dy
     end
 
-    def length=(l)
+    def set_length(l)
       old_length = self.length
       if old_length != 0 && l != old_length
         self.multiply_scalar(l / old_length)
       end
+      self
     end
 
     def lerp(v, alpha)
