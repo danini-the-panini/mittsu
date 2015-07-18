@@ -1,5 +1,13 @@
+require 'mittsu/math/vector2'
+
+BuiltInMath = Math
+
 module Mittsu
   module Math
+    extend BuiltInMath
+    include BuiltInMath
+    BuiltInMath.methods.each { |m| public_class_method m }
+
     def self.sign(x)
       return Float::NAN unless x.is_a? Numeric
       return Float::NAN if x.to_f.nan?
