@@ -1,7 +1,6 @@
 require 'minitest_helper'
 
 class TestVector2 < Minitest::Test
-  DELTA = 0.000000000001
 
   def test_initialize
     a = Mittsu::Vector2.new(1.5, 2.3)

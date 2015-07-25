@@ -1,4 +1,21 @@
+require 'mittsu/math/box2'
+require 'mittsu/math/box3'
+require 'mittsu/math/color'
+require 'mittsu/math/color_keywords'
+# require 'mittsu/math/euler'
+# require 'mittsu/math/frustum'
+# require 'mittsu/math/line3'
+# require 'mittsu/math/matrix3'
+# require 'mittsu/math/matrix4'
+# require 'mittsu/math/plane'
+# require 'mittsu/math/quaternion'
+# require 'mittsu/math/ray'
+# require 'mittsu/math/sphere'
+# require 'mittsu/math/spline'
+# require 'mittsu/math/triangle'
 require 'mittsu/math/vector2'
+require 'mittsu/math/vector3'
+require 'mittsu/math/vector4'
 
 BuiltInMath = Math
 

@@ -14,7 +14,7 @@ module Mittsu
     end
 
     def y=(value)
-      @y = value
+      @y = value.to_f
     end
 
     def set(x, y)
