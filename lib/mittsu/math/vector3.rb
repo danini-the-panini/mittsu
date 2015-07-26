@@ -146,13 +146,13 @@ module Mittsu
     def apply_matrix4(m)
       # input: THREE.Matrix4 affine matrix
 
-      x = @x, y = @y, z = @z
+      xx, yy, zz = @x, @y, @z
 
       e = m.elements
 
-      @x = e[0] * x + e[4] * y + e[8]  * z + e[12]
-      @y = e[1] * x + e[5] * y + e[9]  * z + e[13]
-      @z = e[2] * x + e[6] * y + e[10] * z + e[14]
+      @x = e[0] * xx + e[4] * yy + e[8]  * zz + e[12]
+      @y = e[1] * xx + e[5] * yy + e[9]  * zz + e[13]
+      @z = e[2] * xx + e[6] * yy + e[10] * zz + e[14]
 
       self
     end

@@ -85,7 +85,7 @@ module Mittsu
       det = me[0] * te[0] + me[1] * te[3] + me[2] * te[6]
       # no inverse
       if det.zero?
-        msg = "Matrix3.inverse: can't invert matrix, determinant is 0"
+        msg = "Mittsu::Matrix3#inverse: can't invert matrix, determinant is 0"
         if throw_on_invertible
           raise Error.new(msg)
         else
