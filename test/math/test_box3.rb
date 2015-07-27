@@ -1,6 +1,18 @@
 require 'minitest_helper'
 
 class TestBox3 < Minitest::Test
+  def compare_box(a, b, threshold = 0.0001)
+    a.min.distanceTo(b.min) < threshold && a.max.distanceTo(b.max) < threshold
+  end
+
+  def assert_box_equal3(a, b, threshold = 0.0001)
+    assert(compare_box(a, b, threshold), "#{a} does not equal #{b}")
+  end
+
+  def refute_box_equal3(a, b, threshold = 0.0001)
+    refute(compare_box(a, b, threshold), "#{a} equals #{b}")
+  end
+
   def test_constructor
     a = Mittsu::Box3.new
     assert_equal(posInf3, a.min)
@@ -227,7 +239,7 @@ class TestBox3 < Minitest::Test
     c = Mittsu::Box3.new(one3.clone.negate, one3.clone)
 
     assert_equal(Mittsu::Sphere.new(zero3, 0), a.bounding_sphere)
-    assert_equal(new THREE.sphere(one3.clone.multiply_scalar(0.5), math.sqrt(3) * 0.5), b.bounding_sphere)
+    assert_equal(Mittsu::Sphere(one3.clone.multiply_scalar(0.5), math.sqrt(3) * 0.5), b.bounding_sphere)
     assert_equal(Mittsu::Sphere.new(zero3, Math.sqrt(12) * 0.5), c.bounding_sphere)
   end
 
@@ -262,7 +274,6 @@ class TestBox3 < Minitest::Test
   end
 
   def test_apply_matrix4
-    skip
     a = Mittsu::Box3.new(zero3.clone, zero3.clone)
     b = Mittsu::Box3.new(zero3.clone, one3.clone)
     c = Mittsu::Box3.new(one3.clone.negate, one3.clone)
@@ -271,10 +282,10 @@ class TestBox3 < Minitest::Test
     m = Mittsu::Matrix4.new.make_translation(1, -2, 1)
     t1 = Mittsu::Vector3.new(1, -2, 1)
 
-    ok(compareBox(a.clone.apply_matrix4(m), a.clone.translate(t1)), "Passed!")
-    ok(compareBox(b.clone.apply_matrix4(m), b.clone.translate(t1)), "Passed!")
-    ok(compareBox(c.clone.apply_matrix4(m), c.clone.translate(t1)), "Passed!")
-    ok(compareBox(d.clone.apply_matrix4(m), d.clone.translate(t1)), "Passed!")
+    assert_box_equal3(a.clone.apply_matrix4(m), a.clone.translate(t1))
+    assert_box_equal3(b.clone.apply_matrix4(m), b.clone.translate(t1))
+    assert_box_equal3(c.clone.apply_matrix4(m), c.clone.translate(t1))
+    assert_box_equal3(d.clone.apply_matrix4(m), d.clone.translate(t1))
   end
 
   def test_translate

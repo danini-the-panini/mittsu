@@ -2,7 +2,7 @@ require 'minitest_helper'
 
 class TestQuaternion < Minitest::Test
   ORDERS = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ]
-  # EULER_ANGLES = Mittsu::Euler.new(0.1, -0.3, 0.25)
+  EULER_ANGLES = Mittsu::Euler.new(0.1, -0.3, 0.25)
 
   def q_sub(a, b)
     result = Mittsu::Quaternion.new
@@ -86,7 +86,6 @@ class TestQuaternion < Minitest::Test
 
 
   def test_set_from_euler_set_from_quaternion
-    skip
     angles = [ Mittsu::Vector3.new(1, 0, 0), Mittsu::Vector3.new(0, 1, 0), Mittsu::Vector3.new(0, 0, 1) ]
 
     # ensure euler conversion to/from Quaternion matches.
@@ -101,11 +100,10 @@ class TestQuaternion < Minitest::Test
   end
 
   def test_set_from_euler_set_from_rotation_matrix
-    skip
     # ensure euler conversion for Quaternion matches that of Matrix4
     ORDERS.each do |order|
       q = Mittsu::Quaternion.new.set_from_euler(EULER_ANGLES, order)
-      m = Mittsu::Matrix4.new.make_rotation_from_euler(EULER_ANGLES, order)
+      m = Mittsu::Matrix4.new.make_rotation_from_euler(EULER_ANGLES)
       q2 = Mittsu::Quaternion.new.set_from_rotation_matrix(m)
 
       assert(q_sub(q, q2).length < 0.001, "Passed!" )
@@ -144,37 +142,35 @@ class TestQuaternion < Minitest::Test
 
 
   def test_multiply_quaternions_multiply
-    skip
     angles = [ Mittsu::Euler.new(1, 0, 0), Mittsu::Euler.new(0, 1, 0), Mittsu::Euler.new(0, 0, 1) ]
 
-    q1 = Mittsu::Quaternion.new.set_from_euler(angles[0], "XYZ")
-    q2 = Mittsu::Quaternion.new.set_from_euler(angles[1], "XYZ")
-    q3 = Mittsu::Quaternion.new.set_from_euler(angles[2], "XYZ")
+    q1 = Mittsu::Quaternion.new.set_from_euler(angles[0])
+    q2 = Mittsu::Quaternion.new.set_from_euler(angles[1])
+    q3 = Mittsu::Quaternion.new.set_from_euler(angles[2])
 
     q = Mittsu::Quaternion.new.multiply_quaternions(q1, q2).multiply(q3)
 
-    m1 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[0], "XYZ")
-    m2 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[1], "XYZ")
-    m3 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[2], "XYZ")
+    m1 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[0])
+    m2 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[1])
+    m3 = Mittsu::Matrix4.new.make_rotation_from_euler(angles[2])
 
     m = Mittsu::Matrix4.new.multiply_matrices(m1, m2).multiply(m3)
 
-    qFromM = Mittsu::Quaternion.new.set_from_rotation_matrix(m)
+    q_from_m = Mittsu::Quaternion.new.set_from_rotation_matrix(m)
 
-    ok(q_sub( q, qFromM).length < 0.001, "Passed!" )
+    assert(q_sub(q, q_from_m).length < 0.001, "Passed!" )
   end
 
   def test_multiply_vector3
-    skip
     angles = [ Mittsu::Euler.new(1, 0, 0), Mittsu::Euler.new(0, 1, 0), Mittsu::Euler.new(0, 0, 1) ]
 
     # ensure euler conversion for Quaternion matches that of Matrix4
     ORDERS.each do |order|
       angles.each do |angle|
-        q = Mittsu::Quaternion.new.set_from_euler(angle, order)
-        m = Mittsu::Matrix4.new.make_rotation_from_euler(angle, order)
+        q = Mittsu::Quaternion.new.set_from_euler(angle)
+        m = Mittsu::Matrix4.new.make_rotation_from_euler(angle)
 
-        v0 = Mittsu::Vector2.new(1, 0, 0)
+        v0 = Mittsu::Vector3.new(1, 0, 0)
         qv = v0.clone.apply_quaternion(q)
         mv = v0.clone.apply_matrix4(m)
 

@@ -115,25 +115,25 @@ module Mittsu
       m31 = te[2]; m32 = te[6]; m33 = te[10]
       trace = m11 + m22 + m33
       if trace > 0
-        s = 0.5 / math.sqrt(trace + 1.0)
+        s = 0.5 / Math.sqrt(trace + 1.0)
         @w = 0.25 / s
         @x = (m32 - m23) * s
         @y = (m13 - m31) * s
         @z = (m21 - m12) * s
       elsif m11 > m22 && m11 > m33
-        s = 2.0 * math.sqrt(1.0 + m11 - m22 - m33)
+        s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33)
         @w = (m32 - m23) / s
         @x = 0.25 * s
         @y = (m12 + m21) / s
         @z = (m13 + m31) / s
       elsif m22 > m33
-        s = 2.0 * math.sqrt(1.0 + m22 - m11 - m33)
+        s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33)
         @w = (m13 - m31) / s
         @x = (m12 + m21) / s
         @y = 0.25 * s
         @z = (m23 + m32) / s
       else
-        s = 2.0 * math.sqrt(1.0 + m33 - m11 - m22)
+        s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22)
         @w = (m21 - m12) / s
         @x = (m13 + m31) / s
         @y = (m23 + m32) / s
@@ -150,7 +150,7 @@ module Mittsu
       r = v_from.dot(v_to) + 1.0
       if r < EPS
         r = 0.0
-        if Math.abs(v_from.x) > math.abs(v_from.z)
+        if v_from.x.abs > v_from.z.abs
           v1.set(-v_from.y, v_from.x, 0.0)
         else
           v1.set(0.0, -v_from.z, v_from.y)
@@ -249,7 +249,7 @@ module Mittsu
       end
       half_theta = Math.acos(cos_half_theta)
       sin_half_theta = Math.sqrt(1.0 - cos_half_theta * cos_half_theta)
-      if Math.abs(sin_half_theta) < 0.001
+      if sin_half_theta.abs < 0.001
         @w = 0.5 * (_w + @w)
         @x = 0.5 * (_x + @x)
         @y = 0.5 * (_y + @y)

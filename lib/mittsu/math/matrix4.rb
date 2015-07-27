@@ -386,7 +386,7 @@ module Mittsu
 
     def scale(v)
       te = self.elements
-      x = v.x, y = v.y, z = v.z
+      x = v.x; y = v.y; z = v.z
       te[0] *= x; te[4] *= y; te[8]  *= z
       te[1] *= x; te[5] *= y; te[9]  *= z
       te[2] *= x; te[6] *= y; te[10] *= z
@@ -494,7 +494,7 @@ module Mittsu
       position.y = te[13]
       position.z = te[14]
       # scale the rotation part
-      matrix.elements.set(self.elements) # at self point matrix is incomplete so we can't use .copy
+      matrix.elements[0...15] = self.elements # at this point matrix is incomplete so we can't use .copy
       inv_sx = 1.0 / sx
       inv_sy = 1.0 / sy
       inv_sz = 1.0 / sz

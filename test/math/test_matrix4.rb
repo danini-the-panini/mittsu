@@ -256,7 +256,6 @@ class TestMatrix4 < Minitest::Test
 
 
   def test_compose_decompose
-    skip
     t_vlaues = [
       Mittsu::Vector3.new,
       Mittsu::Vector3.new(3, 0, 0),

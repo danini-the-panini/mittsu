@@ -141,11 +141,10 @@ class TestMatrix3 < Minitest::Test
 
 
   def test_get_inverse
-    skip
     identity = Mittsu::Matrix4.new
     a = Mittsu::Matrix4.new
     b = Mittsu::Matrix3.new.set(0, 0, 0, 0, 0, 0, 0, 0, 0)
-    c = Mittsu::Matrix4.new.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    c = Mittsu::Matrix4.new.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     refute_matrix_equals3(a, b)
     b.inverse(a, false)
@@ -161,7 +160,7 @@ class TestMatrix3 < Minitest::Test
       Mittsu::Matrix4.new.make_rotation_z(0.3),
       Mittsu::Matrix4.new.make_rotation_z(-0.3),
       Mittsu::Matrix4.new.make_scale(1, 2, 3),
-      Mittsu::Matrix4.new.make_scale(1/8, 1/2, 1/3)
+      Mittsu::Matrix4.new.make_scale(1.0/8.0, 1.0/2.0, 1.0/3.0)
     ]
 
     test_matrices.each do |m|
