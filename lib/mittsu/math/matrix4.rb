@@ -88,9 +88,9 @@ module Mittsu
       x, y, z = euler.x, euler.y, euler.z
       a, b = Math.cos(x), Math.sin(x)
       c, d = Math.cos(y), Math.sin(y)
-      e, e = Math.cos(z), Math.sin(z)
+      e, f = Math.cos(z), Math.sin(z)
       if euler.order == 'XYZ'
-        ae = a * e, af = a * f, be = b * e, bf = b * f
+        ae = a * e; af = a * f; be = b * e; bf = b * f
         te[0] = c * e
         te[4] = - c * f
         te[8] = d
@@ -101,7 +101,7 @@ module Mittsu
         te[6] = be + af * d
         te[10] = a * c
       elsif euler.order == 'YXZ'
-        ce = c * e, cf = c * f, de = d * e, df = d * f
+        ce = c * e; cf = c * f; de = d * e; df = d * f
         te[0] = ce + df * b
         te[4] = de * b - cf
         te[8] = a * d
@@ -112,7 +112,7 @@ module Mittsu
         te[6] = df + ce * b
         te[10] = a * c
       elsif euler.order == 'ZXY'
-        ce = c * e, cf = c * f, de = d * e, df = d * f
+        ce = c * e; cf = c * f; de = d * e; df = d * f
         te[0] = ce - df * b
         te[4] = - a * f
         te[8] = de + cf * b
@@ -123,7 +123,7 @@ module Mittsu
         te[6] = b
         te[10] = a * c
       elsif euler.order == 'ZYX'
-        ae = a * e, af = a * f, be = b * e, bf = b * f
+        ae = a * e; af = a * f; be = b * e; bf = b * f
         te[0] = c * e
         te[4] = be * d - af
         te[8] = ae * d + bf
@@ -134,7 +134,7 @@ module Mittsu
         te[6] = b * c
         te[10] = a * c
       elsif euler.order == 'YZX'
-        ac = a * c, ad = a * d, bc = b * c, bd = b * d
+        ac = a * c; ad = a * d; bc = b * c; bd = b * d
         te[0] = c * e
         te[4] = bd - ac * f
         te[8] = bc * f + ad
@@ -145,7 +145,7 @@ module Mittsu
         te[6] = ad * f + bc
         te[10] = ac - bd * f
       elsif euler.order == 'XZY'
-        ac = a * c, ad = a * d, bc = b * c, bd = b * d
+        ac = a * c; ad = a * d; bc = b * c; bd = b * d
         te[0] = c * e
         te[4] = - f
         te[8] = d * e
