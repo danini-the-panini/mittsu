@@ -8,7 +8,7 @@ module Mittsu
     attr_reader :x, :y, :z, :order
 
     def initialize(x = 0.0, y = 0.0, z = 0.0, order = DefaultOrder)
-      @x, @y, @z, @order = x, y, z, order
+      @x, @y, @z, @order = x.to_f, y.to_f, z.to_f, order
     end
 
     def set(x, y, z, order)
@@ -130,7 +130,7 @@ module Mittsu
     end
 
     def reorder(new_order)
-      # WARNING: self discards revolution information -bhouston
+      # WARNING: this discards revolution information -bhouston
       q = Mittsu::Quaternion.new.set_from_euler(self)
       self.set_from_quaternion(q, new_order)
     end

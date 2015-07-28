@@ -80,15 +80,15 @@ class TestEuler < Minitest::Test
 
     b = Mittsu::Euler.new.set_from_vector3(vec, "ZYX")
     # console.log(a, b)
-    assert_equal(b, a)
+    assert_equal(a, b)
 
     c = b.to_vector3
     # console.log(c, vec)
-    assert_equal(vec, c)
+    assert_equal(c, vec)
   end
 
   def test_quaternion_set_from_euler_euler_from_quaternion
-    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].each do |v|
+    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].map(&:clone).each do |v|
       q = Mittsu::Quaternion.new.set_from_euler(v)
 
       v2 = Mittsu::Euler.new.set_from_quaternion(q, v.order)
@@ -99,7 +99,7 @@ class TestEuler < Minitest::Test
 
 
   def test_matrix4_set_from_euler_euler_from_rotation_matrix
-    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].each do |v|
+    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].map(&:clone).each do |v|
       m = Mittsu::Matrix4.new.make_rotation_from_euler(v)
 
       v2 = Mittsu::Euler.new.set_from_rotation_matrix(m, v.order)
@@ -109,7 +109,7 @@ class TestEuler < Minitest::Test
   end
 
   def test_reorder
-    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].each do |v|
+    [EULER_ZERO, EULER_A_XYZ, EULER_A_ZYX].map(&:clone).each do |v|
       q = Mittsu::Quaternion.new.set_from_euler(v)
 
       v.reorder('YZX')
