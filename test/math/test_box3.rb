@@ -233,13 +233,12 @@ class TestBox3 < Minitest::Test
   end
 
   def test_get_bounding_sphere
-    skip
     a = Mittsu::Box3.new(zero3.clone, zero3.clone)
     b = Mittsu::Box3.new(zero3.clone, one3.clone)
     c = Mittsu::Box3.new(one3.clone.negate, one3.clone)
 
     assert_equal(Mittsu::Sphere.new(zero3, 0), a.bounding_sphere)
-    assert_equal(Mittsu::Sphere(one3.clone.multiply_scalar(0.5), math.sqrt(3) * 0.5), b.bounding_sphere)
+    assert_equal(Mittsu::Sphere.new(one3.clone.multiply_scalar(0.5), Math.sqrt(3) * 0.5), b.bounding_sphere)
     assert_equal(Mittsu::Sphere.new(zero3, Math.sqrt(12) * 0.5), c.bounding_sphere)
   end
 

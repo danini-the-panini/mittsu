@@ -81,7 +81,7 @@ module Mittsu
     end
 
     def ==(sphere)
-      sphere.center.equals(@center) && sphere.radius == @radius
+      sphere.center == (@center) && sphere.radius == @radius
     end
 
     def clone
