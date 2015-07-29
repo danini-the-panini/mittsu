@@ -46,19 +46,19 @@ module Mittsu
       self
     end
 
-    def extract_basis(xAxis, yAxis, zAxis)
+    def extract_basis(x_axis, y_axis, z_axis)
       te = self.elements
-      xAxis.set(te[0], te[1], te[2])
-      yAxis.set(te[4], te[5], te[6])
-      zAxis.set(te[8], te[9], te[10])
+      x_axis.set(te[0], te[1], te[2])
+      y_axis.set(te[4], te[5], te[6])
+      z_axis.set(te[8], te[9], te[10])
       self
     end
 
-    def make_basis(xAxis, yAxis, zAxis)
+    def make_basis(x_axis, y_axis, z_axis)
       self.set(
-        xAxis.x, yAxis.x, zAxis.x, 0.0,
-        xAxis.y, yAxis.y, zAxis.y, 0.0,
-        xAxis.z, yAxis.z, zAxis.z, 0.0,
+        x_axis.x, y_axis.x, z_axis.x, 0.0,
+        x_axis.y, y_axis.y, z_axis.y, 0.0,
+        x_axis.z, y_axis.z, z_axis.z, 0.0,
             0.0,     0.0,     0.0, 1.0
       )
       self
@@ -203,7 +203,7 @@ module Mittsu
       te = self.elements
       z.sub_vectors(eye, target).normalize
       if z.length.zero?
-        z.z = 1
+        z.z = 1.0
       end
       x.cross_vectors(up, z).normalize
       if x.length.zero?
@@ -277,9 +277,9 @@ module Mittsu
       i = 0
       j = offset
       while i < length
-        v1.x = array[j]
-        v1.y = array[j + 1]
-        v1.z = array[j + 2]
+        v1.x = array[j].to_f
+        v1.y = array[j + 1].to_f
+        v1.z = array[j + 2].to_f
         v1.apply_matrix4(self)
         array[j]     = v1.x
         array[j + 1] = v1.y
@@ -404,9 +404,9 @@ module Mittsu
 
     def make_translation(x, y, z)
       self.set(
-        1.0, 0.0, 0.0, x,
-        0.0, 1.0, 0.0, y,
-        0.0, 0.0, 1.0, z,
+        1.0, 0.0, 0.0, x.to_f,
+        0.0, 1.0, 0.0, y.to_f,
+        0.0, 0.0, 1.0, z.to_f,
         0.0, 0.0, 0.0, 1.0
       )
       self
