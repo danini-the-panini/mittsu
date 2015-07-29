@@ -124,28 +124,27 @@ class TestPlane < Minitest::Test
   end
 
   def test_is_interestion_line_intersect_line
-    skip
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), 0)
 
     l1 = Mittsu::Line3.new(Mittsu::Vector3.new(-10, 0, 0), Mittsu::Vector3.new(10, 0, 0))
-    assert(a.is_intersection_line(l1))
+    assert(a.intersection_line?(l1))
     assert_equal(Mittsu::Vector3.new(0, 0, 0), a.intersect_line(l1))
 
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), -3)
 
-    assert(a.is_intersection_line(l1))
+    assert(a.intersection_line?(l1))
     assert_equal(Mittsu::Vector3.new(3, 0, 0), a.intersect_line(l1))
 
 
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), -11)
 
-    assert(! a.is_intersection_line(l1))
-    assert_equal(undefined, a.intersect_line(l1))
+    refute(a.intersection_line?(l1))
+    assert_equal(nil, a.intersect_line(l1))
 
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), 11)
 
-    assert(! a.is_intersection_line(l1))
-    assert_equal(undefined, a.intersect_line(l1))
+    refute(a.intersection_line?(l1))
+    assert_equal(nil, a.intersect_line(l1))
 
   end
 

@@ -74,8 +74,8 @@ module Mittsu
 
     def intersection_line?(line)
       # Note: self tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-      start_sign = self.distance_to_point(line.start)
-      end_sign = self.distance_to_point(line.end)
+      start_sign = self.distance_to_point(line.start_point)
+      end_sign = self.distance_to_point(line.end_point)
       (start_sign < 0 && end_sign > 0) || (end_sign < 0 && start_sign > 0)
     end
 
@@ -85,15 +85,15 @@ module Mittsu
       denominator = @normal.dot(direction)
       if denominator.zero?
         # line is coplanar, return origin
-        if self.distance_to_point(line.start).zero?
-          return target.copy(line.start)
+        if self.distance_to_point(line.start_point).zero?
+          return target.copy(line.start_point)
         end
         # Unsure if this is the correct method to handle this case.
         return nil
       end
-      t = -(line.start.dot(@normal) + @constant) / denominator
+      t = -(line.start_point.dot(@normal) + @constant) / denominator
       return nil if t < 0 || t > 1
-      target.copy(direction).multiply_scalar(t).add(line.start)
+      target.copy(direction).multiply_scalar(t).add(line.start_point)
     end
 
     def coplanar_point(target = Mittsu::Vector3.new)
