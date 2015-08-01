@@ -364,7 +364,7 @@ module Mittsu
     end
 
     def cross(v)
-      x = @x, y = @y, z = @z
+      x, y, z = @x, @y, @z
       @x = y * v.z - z * v.y
       @y = z * v.x - x * v.z
       @z = x * v.y - y * v.x

@@ -22,7 +22,7 @@ module Mittsu
 
     def set_from_normal_and_coplanar_point(normal, point)
       @normal.copy(normal)
-      @constant = -point.dot(@normal)  # must be @normal, not normal, as @normal is normalized
+      @constant = -point.dot(@normal) # must be @normal, not normal, as @normal is normalized
       self
     end
 
