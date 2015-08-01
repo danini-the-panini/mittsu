@@ -1,7 +1,10 @@
 require 'securerandom'
+require 'mittsu/core/event_dispatcher'
 
 module Mittsu
   class BufferGeometry
+    include Mittsu::EventDispatcher
+
     DrawCall = Struct.new(:start, :count, :index)
 
     attr_reader :id, :name, :type, :uuid, :attributes, :draw_calls, :bounding_box, :bounding_sphere
@@ -657,8 +660,7 @@ module Mittsu
     end
 
     def dispose
-      # self.dispatch_event type: 'dispose'
-      # XXX ????????
+      self.dispatch_event type: :dispose
     end
 
     private
