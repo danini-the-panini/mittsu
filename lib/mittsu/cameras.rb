@@ -1,0 +1,1 @@
+require 'mittsu/cameras/camera'

@@ -1,6 +1,7 @@
 require "mittsu/version"
 require "mittsu/math"
 require "mittsu/core"
+require "mittsu/cameras"
 
 module Mittsu
   MOUSE_LEFT = 0
