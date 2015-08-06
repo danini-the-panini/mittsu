@@ -8,9 +8,11 @@ module Mittsu
     MorphNormal = Struct.new(:face_normals, :vertex_normals)
     Normal = Struct.new(:a, :b, :c)
 
-    attr_accessor :name, :type, :vertices, :colors, :faces, :face_vertex_uvs, :morph_targets, :morph_colors, :morpth_normals, :skin_weights, :skin_indices, :line_distances, :bounding_box, :bounding_sphere, :has_tangents, :dynamic
+    attr_accessor :name, :vertices, :colors, :faces, :face_vertex_uvs, :morph_targets, :morph_colors, :morpth_normals, :skin_weights, :skin_indices, :line_distances, :bounding_box, :bounding_sphere, :has_tangents, :dynamic
 
     attr_accessor(*%w(vertices elements uvs normals tangents colors line_distances groups).map { |s| "#{s}_need_update".to_sym })
+
+    attr_reader :id, :uuid, :type
 
     def initialize()
       @id = (@@id ||= 1).tap { @@id += 1 }
