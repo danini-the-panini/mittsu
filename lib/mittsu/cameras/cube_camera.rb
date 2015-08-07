@@ -5,7 +5,7 @@ module Mittsu
     attr_accessor :render_target
 
     def initialize(near, far, cube_resolution)
-      super
+      super()
 
       @type = 'CubeCamera'
 

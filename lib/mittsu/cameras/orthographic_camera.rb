@@ -5,7 +5,7 @@ module Mittsu
     attr_accessor :zoom, :left, :right, :top, :bottom, :near, :far
 
     def initialize(left, right, top, bottom, near = 0.1, far = 2000.0)
-      super
+      super()
 
       @type = 'OrthographicCamera'
 
@@ -19,7 +19,7 @@ module Mittsu
       @near = near.to_f
       @far = far.to_f
 
-      self.update_projection_matrix
+      update_projection_matrix
     end
 
     def update_projection_matrix
@@ -46,6 +46,7 @@ module Mittsu
       camera.far = far
 
       camera.projection_matrix.copy()
+
       camera
     end
   end

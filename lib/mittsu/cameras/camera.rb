@@ -2,6 +2,8 @@ require 'mittsu'
 
 module Mittsu
   class Camera < Mittsu::Object3D
+    attr_accessor :projection_matrix, :matrix_world_inverse
+
     def initialize
       super
 
