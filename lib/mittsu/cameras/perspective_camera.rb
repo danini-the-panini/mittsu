@@ -73,7 +73,7 @@ module Mittsu
     end
 
     def update_projection_matrix
-      fov = Math.rad_to_def(2.0 * Math.atan(Math.tan(Math.deg_to_rad(fov) * 0.5) / zoom))
+      fov = Math.rad_to_deg(2.0 * Math.atan(Math.tan(Math.deg_to_rad(@fov) * 0.5) / zoom))
 
       if @full_width
         aspect = @full_width / @full_height

@@ -9,6 +9,8 @@ module Mittsu
 
     attr_reader :id, :uuid, :type
 
+    DefaultUp = Mittsu::Vector3.new(0.0, 1.0, 0.0)
+
     def initialize
       @id = (@@id ||= 1).tap { @@id += 1 }
 
