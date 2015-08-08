@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'mittsu'
+require 'mittsu/core/event_dispatcher'
 
 module Mittsu
   class BufferGeometry

@@ -1,6 +1,7 @@
 module Mittsu
   module EventDispatcher
     Event = Struct.new(:type, :target)
+
     def add_event_listener(type, listener)
       @_listeners ||= {}
       @_listeners[type] ||= []
