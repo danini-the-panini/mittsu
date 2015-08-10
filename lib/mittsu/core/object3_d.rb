@@ -3,13 +3,13 @@ require 'mittsu'
 
 module Mittsu
   class Object3D
-    include Mittsu::EventDispatcher
+    include EventDispatcher
 
-    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data
+    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent
 
     attr_reader :id, :uuid, :type
 
-    DefaultUp = Mittsu::Vector3.new(0.0, 1.0, 0.0)
+    DefaultUp = Vector3.new(0.0, 1.0, 0.0)
 
     def initialize
       @id = (@@id ||= 1).tap { @@id += 1 }
@@ -23,10 +23,10 @@ module Mittsu
 
       @up = DefaultUp.clone
 
-      @position = Mittsu::Vector3.new
-      @rotation = Mittsu::Euler.new
-      @quaternion = Mittsu::Quaternion.new
-      @scale = Mittsu::Vector3.new(1.0, 1.0, 1.0)
+      @position = Vector3.new
+      @rotation = Euler.new
+      @quaternion = Quaternion.new
+      @scale = Vector3.new(1.0, 1.0, 1.0)
 
       @rotation.on_change do
         @quaternion.set_from_euler(rotation, false)
@@ -38,8 +38,8 @@ module Mittsu
 
       @rotation_auto_updaste = true
 
-      @matrix = Mittsu::Matrix4.new
-      @matrix_world = Mittsu::Matrix4.new
+      @matrix = Matrix4.new
+      @matrix_world = Matrix4.new
 
       @matrix_auto_update = true
       @matrix_world_needs_update = false
@@ -82,48 +82,48 @@ module Mittsu
     def rotate_on_axis(axis, angle)
       # rotate object on axis in object space
       # axis is assumed to be normalized
-      @_q1 ||= Mittsu::Quaternion.new
+      @_q1 ||= Quaternion.new
       @_q1.set_from_axis_angle(axis, angle)
       @quaternion.multiply(q1)
       self
     end
 
     def rotate_x(angle)
-      @_v1 ||= Mittsu::Vector3.new(1, 0, 0)
+      @_v1 ||= Vector3.new(1, 0, 0)
       self.rotate_on_axis(@_v1, angle)
     end
 
     def rotate_y(angle)
-      @_v1 ||= Mittsu::Vector3.new(0, 1, 0)
+      @_v1 ||= Vector3.new(0, 1, 0)
       self.rotate_on_axis(@_v1, angle)
     end
 
     def rotate_z(angle)
-      @_v1 ||= Mittsu::Vector3.new(0, 0, 1)
+      @_v1 ||= Vector3.new(0, 0, 1)
       self.rotate_on_axis(@_v1, angle)
     end
 
     def translate_on_axis(axis, distance)
       # translate object by distance along axis in object space
       # axis is assumed to be normalized
-      @_v1 ||= Mittsu::Vector3.new
+      @_v1 ||= Vector3.new
       @_v1.copy(axis).apply_quaternion(@quaternion)
       @position.add(@_v1.multiply_scalar(distance))
       self
     end
 
     def translate_x(distance)
-      @_v1 ||= Mittsu::Vector3.new(1, 0, 0)
+      @_v1 ||= Vector3.new(1, 0, 0)
       self.translate_on_axis(@_v1, distance)
     end
 
     def translate_y(distance)
-      @_v1 ||= Mittsu::Vector3.new(0, 1, 0)
+      @_v1 ||= Vector3.new(0, 1, 0)
       self.translate_on_axis(@_v1, distance)
     end
 
     def translate_z(distance)
-      @_v1 ||= Mittsu::Vector3.new(0, 0, 1)
+      @_v1 ||= Vector3.new(0, 0, 1)
       self.translate_on_axis(@_v1, distance)
     end
 
@@ -132,13 +132,13 @@ module Mittsu
     end
 
     def world_to_local(vector)
-      @_m1 ||= Mittsu::Matrix4.new
+      @_m1 ||= Matrix4.new
       vector.apply_matrix4(@_m1.get_inverse(@matrix_world))
     end
 
     def look_at(vector)
       # This routine does not support objects with rotated and/or translated parent(s)
-      @_m1 ||= Mittsu::Matrix4.new
+      @_m1 ||= Matrix4.new
       @_m1.look_at(vector, @position, self.up)
       @quaternion.set_from_rotation_matrix(@_m1)
     end
@@ -155,13 +155,13 @@ module Mittsu
         puts("ERROR: Mittsu::Object3D#add: object can't be added as a child of itself.", object.inspect)
         return self
       end
-      if object.class == Mittsu::Object3D
+      if object.class == Object3D
         object.parent.remove(object) unless object.parent.nil?
         object.parent = self
         object.dispatch_event type: :added
         @children << object
       else
-        puts('ERROR: Mittsu::Object3D#add: object not an instance of Mittsu::Object3D.', object.inspect)
+        puts('ERROR: Mittsu::Object3D#add: object not an instance of Object3D.', object.inspect)
       end
       self
     end
@@ -199,35 +199,35 @@ module Mittsu
       nil
     end
 
-    def get_world_position(target = Mittsu::Vector3.new)
+    def get_world_position(target = Vector3.new)
       self.update_matrix_world(true)
       target.set_from_matrix_position(@matrix_world)
     end
 
-    def get_world_quaternion(target = Mittsu::Quaternion.new)
-      @_position ||= Mittsu::Vector3.new
-      @_scale ||= Mittsu::Vector3.new
+    def get_world_quaternion(target = Quaternion.new)
+      @_position ||= Vector3.new
+      @_scale ||= Vector3.new
       self.update_matrix_world(true)
       @matrix_world.decompose(@_position, target, @_scale)
       target
     end
 
-    def get_world_rotation(target = Mittsu::Euler.new)
-      @_quaternion ||= Mittsu::Quaternion.new
+    def get_world_rotation(target = Euler.new)
+      @_quaternion ||= Quaternion.new
       self.get_world_quaternion(quaternion)
       target.set_from_quaternion(quaternion, @rotation.order, false)
     end
 
-    def get_world_scale(target = Mittsu::Vector3.new)
-      @_position ||= Mittsu::Vector3.new
-      @_quaternion ||= Mittsu::Quaternion.new
+    def get_world_scale(target = Vector3.new)
+      @_position ||= Vector3.new
+      @_quaternion ||= Quaternion.new
       self.update_matrix_world(true)
       @matrix_world.decompose(@_position, @_quaternion, target)
       target
     end
 
-    def get_world_direction(target = Mittsu::Vector3.new)
-      @_quaternion ||= Mittsu::Quaternion.new
+    def get_world_direction(target = Vector3.new)
+      @_quaternion ||= Quaternion.new
       self.get_world_quaternion(@_quaternion)
       target.set(0.0, 0.0, 1.0).apply_quaternion(@_quaternion)
     end
@@ -292,7 +292,7 @@ module Mittsu
       @_output
     end
 
-    def clone(object = Mittsu::Object3D.new, recursive = true)
+    def clone(object = Object3D.new, recursive = true)
       object.name = @name
       object.up.copy(@up)
       object.position.copy(@position)
@@ -347,43 +347,43 @@ module Mittsu
       data[:name] = object.name unless object.name.nil? || object.name.empty?
       data.user_data = object.user_data unless object.user_data.nil? || object.user_data.empty?
       data[:visible] = object.visible unless object.visible
-      if object.class == Mittsu::PerspectiveCamera
+      if object.class == PerspectiveCamera
         data[:fov] = object.fov
         data[:aspect] = object.aspect
         data[:near] = object.near
         data[:far] = object.far
-      elsif object.class == Mittsu::OrthographicCamera
+      elsif object.class == OrthographicCamera
         data[:left] = object.left
         data[:right] = object.right
         data[:top] = object.top
         data[:bottom] = object.bottom
         data[:near] = object.near
         data[:far] = object.far
-      elsif object.class == Mittsu::AmbientLight
+      elsif object.class == AmbientLight
         data[:color] = object.color.get_hex
-      elsif object.class == Mittsu::DirectionalLight
+      elsif object.class == DirectionalLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
-      elsif object.class == Mittsu::PointLight
+      elsif object.class == PointLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
         data[:distance] = object.distance
         data[:decay] = object.decay
-      elsif object.class == Mittsu::SpotLight
+      elsif object.class == SpotLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
         data[:distance] = object.distance
         data[:angle] = object.angle
         data[:exponent] = object.exponent
         data[:decay] = object.decay
-      elsif object.class == Mittsu::HemisphereLight
+      elsif object.class == HemisphereLight
         data[:color] = object.color.get_hex
         data[:ground_color] = object.ground_color.get_hex
-      elsif object.class == Mittsu::Mesh || object.class == Mittsu::Line || object.class == Mittsu::PointCloud
+      elsif object.class == Mesh || object.class == Line || object.class == PointCloud
         data[:geometry] = parse_geometry(object.geometry)
         data[:material] = parse_material(object.material)
-        data[:mode] = object.mode if object.class == Mittsu::Line
-      elsif object.class == Mittsu::Sprite
+        data[:mode] = object.mode if object.class == Line
+      elsif object.class == Sprite
         data[:material] = parse_material(object.material)
       end
       data[:matrix] = object.matrix.to_a

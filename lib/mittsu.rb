@@ -2,6 +2,7 @@ require "mittsu/version"
 require "mittsu/math"
 require "mittsu/core"
 require "mittsu/cameras"
+require "mittsu/renderers"
 require "mittsu/scenes"
 
 module Mittsu
