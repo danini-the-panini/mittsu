@@ -3,6 +3,7 @@ require "mittsu/math"
 require "mittsu/core"
 require "mittsu/cameras"
 require "mittsu/extras"
+require "mittsu/materials"
 require "mittsu/renderers"
 require "mittsu/scenes"
 
