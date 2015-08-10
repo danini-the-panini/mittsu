@@ -36,6 +36,12 @@ module Mittsu
   BackSide = 1
   DoubleSide = 2
 
+  # shading
+
+  NoShading = 0
+  FlatShading = 1
+  SmoothShading = 2
+
   # colors
 
   NoColors = 0
@@ -45,7 +51,7 @@ module Mittsu
   # blending modes
 
   NoBlending = 0
-  NoprmalBlending = 1
+  NormalBlending = 1
   AdditiveBlending = 2
   SubtractiveBlending = 3
   MultiplyBlending = 4

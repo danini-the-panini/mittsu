@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'mittsu'
 
 module Mittsu
   class Material
@@ -6,9 +7,7 @@ module Mittsu
 
     attr_reader :id, :uuid, :type
 
-    KEYS = [:name, :side, :opacity, :transparent, :blending, :blend_src, :blend_dst, :blend_equation, :blend_src_alpha, :blend_dst_alpha, :blend_equation_alpha, :depth_test, :depth_write, :color_write, :polygon_offset, :polygon_offset_factor, :polygon_offset_units, :alpha_test, :overdraw, :visible]
-
-    attr_accessor(*KEYS)
+    attr_accessor :name, :side, :opacity, :transparent, :blending, :blend_src, :blend_dst, :blend_equation, :blend_src_alpha, :blend_dst_alpha, :blend_equation_alpha, :depth_test, :depth_write, :color_write, :polygon_offset, :polygon_offset_factor, :polygon_offset_units, :alpha_test, :overdraw, :visible
 
     def initialize
       @id = (@@id ||= 1).tap { @@id += 1 }
@@ -69,11 +68,11 @@ module Mittsu
           next
         end
 
-        if KEYS.include? key
+        if has_property? key
           current_value = get_property(key)
 
           if current_value.is_a? Color
-            current_value.set(value)
+            current_value.set(new_value)
           elsif current_value.is_a?(Vector3) && new_value.is_a?(Vector3)
             current_value.copy(new_value)
           else
@@ -134,6 +133,11 @@ module Mittsu
     end
 
     private
+
+    def has_property?(key)
+      sym = "@#{key}".to_sym
+      self.instance_variable_defined?(sym)
+    end
 
     def set_property(key, value)
       sym = "@#{key}".to_sym
