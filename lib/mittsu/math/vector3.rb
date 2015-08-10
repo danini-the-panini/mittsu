@@ -10,10 +10,6 @@ module Mittsu
       @z = z.to_f
     end
 
-    class Vector3
-      attr_reader :x, :y, :z
-    end
-
     def x=(value)
       @x = value.to_f
     end
@@ -34,16 +30,16 @@ module Mittsu
     end
 
     def []=(index, value)
-      return @x = value.to_f if index == 0
-      return @y = value.to_f if index == 1
-      return @z = value.to_f if index == 2
+      return @x = value.to_f if index == 0 || index == :x
+      return @y = value.to_f if index == 1 || index == :y
+      return @z = value.to_f if index == 2 || index == :z
       raise IndexError
     end
 
     def [](index)
-      return @x if index == 0
-      return @y if index == 1
-      return @z if index == 2
+      return @x if index == 0 || index == :x
+      return @y if index == 1 || index == :y
+      return @z if index == 2 || index == :z
       raise IndexError
     end
 

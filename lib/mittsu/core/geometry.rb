@@ -403,9 +403,9 @@ module Mittsu
       vertices_map = {} # Hashmap for looking up vertice by position coordinates (and making sure they are unique)
       unique = []; changes = []
       precision_points = 4 # number of decimal points, eg. 4 for epsilon of 0.0001
-      precision = Math.pow(10, precision_points)
+      precision = 10 ** precision_points
       @vertices.each_with_index do |v, i|
-        key = (v.x * precision).round + '_' + (v.y * precision).round + '_' + (v.z * precision).round
+        key = "#{(v.x * precision).round}_#{(v.y * precision).round}_#{(v.z * precision).round}"
         if vertices_map[key].nil?
           vertices_map[key] = i
           unique << v
