@@ -54,8 +54,8 @@ module Mittsu
       sphere = Mittsu::Sphere.new
       geometry = object.geometry
       geometry.compute_bounding_sphere if geometry.bounding_sphere.nil?
-      sphere.copy(geometry.boundingSphere)
-      sphere.apply_matrix4(object.matrixWorld)
+      sphere.copy(geometry.bounding_sphere)
+      sphere.apply_matrix4(object.matrix_world)
       self.intersects_sphere?(sphere)
     end
 

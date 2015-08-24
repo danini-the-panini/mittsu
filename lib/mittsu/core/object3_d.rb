@@ -1,8 +1,9 @@
 require 'securerandom'
 require 'mittsu'
+require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Object3D
+  class Object3D < HashObject
     include EventDispatcher
 
     attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent
@@ -12,6 +13,7 @@ module Mittsu
     DefaultUp = Vector3.new(0.0, 1.0, 0.0)
 
     def initialize
+      super
       @id = (@@id ||= 1).tap { @@id += 1 }
 
       @uuid = SecureRandom.uuid
@@ -155,7 +157,7 @@ module Mittsu
         puts("ERROR: Mittsu::Object3D#add: object can't be added as a child of itself.", object.inspect)
         return self
       end
-      if object.class == Object3D
+      if object.is_a? Object3D
         object.parent.remove(object) unless object.parent.nil?
         object.parent = self
         object.dispatch_event type: :added
@@ -347,43 +349,45 @@ module Mittsu
       data[:name] = object.name unless object.name.nil? || object.name.empty?
       data.user_data = object.user_data unless object.user_data.nil? || object.user_data.empty?
       data[:visible] = object.visible unless object.visible
-      if object.class == PerspectiveCamera
+
+      case object
+      when PerspectiveCamera
         data[:fov] = object.fov
         data[:aspect] = object.aspect
         data[:near] = object.near
         data[:far] = object.far
-      elsif object.class == OrthographicCamera
+      when OrthographicCamera
         data[:left] = object.left
         data[:right] = object.right
         data[:top] = object.top
         data[:bottom] = object.bottom
         data[:near] = object.near
         data[:far] = object.far
-      elsif object.class == AmbientLight
+      when AmbientLight
         data[:color] = object.color.get_hex
-      elsif object.class == DirectionalLight
+      when DirectionalLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
-      elsif object.class == PointLight
+      when PointLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
         data[:distance] = object.distance
         data[:decay] = object.decay
-      elsif object.class == SpotLight
+      when SpotLight
         data[:color] = object.color.get_hex
         data[:intensity] = object.intensity
         data[:distance] = object.distance
         data[:angle] = object.angle
         data[:exponent] = object.exponent
         data[:decay] = object.decay
-      elsif object.class == HemisphereLight
+      when HemisphereLight
         data[:color] = object.color.get_hex
         data[:ground_color] = object.ground_color.get_hex
-      elsif object.class == Mesh || object.class == Line || object.class == PointCloud
+      when Mesh, Line, PointCloud
         data[:geometry] = parse_geometry(object.geometry)
         data[:material] = parse_material(object.material)
-        data[:mode] = object.mode if object.class == Line
-      elsif object.class == Sprite
+        data[:mode] = object.mode if object.is_a? Line
+      when Sprite
         data[:material] = parse_material(object.material)
       end
       data[:matrix] = object.matrix.to_a

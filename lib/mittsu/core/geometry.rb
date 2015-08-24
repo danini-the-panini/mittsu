@@ -1,20 +1,23 @@
 require 'securerandom'
 require 'mittsu'
+require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Geometry
+  class Geometry < HashObject
     include Mittsu::EventDispatcher
 
     MorphNormal = Struct.new(:face_normals, :vertex_normals)
     Normal = Struct.new(:a, :b, :c)
 
-    attr_accessor :name, :vertices, :colors, :faces, :face_vertex_uvs, :morph_targets, :morph_colors, :morpth_normals, :skin_weights, :skin_indices, :line_distances, :bounding_box, :bounding_sphere, :has_tangents, :dynamic
+    attr_accessor :name, :vertices, :colors, :faces, :face_vertex_uvs, :morph_targets, :morph_colors, :morph_normals, :skin_weights, :skin_indices, :line_distances, :bounding_box, :bounding_sphere, :has_tangents, :dynamic
 
-    attr_accessor(*%w(vertices elements uvs normals tangents colors line_distances groups).map { |s| "#{s}_need_update".to_sym })
+    attr_accessor(*%w(vertices morph_targets elements uvs normals tangents colors line_distances groups).map { |s| "#{s}_need_update".to_sym })
 
     attr_reader :id, :uuid, :type
 
-    def initialize()
+    def initialize
+      super
+      
       @id = (@@id ||= 1).tap { @@id += 1 }
 
       @name = ''
@@ -39,6 +42,7 @@ module Mittsu
       @has_tangents = false
 
       @vertices_need_update = false
+      @morph_targets_need_update = false
       @elements_need_update = false
       @uvs_need_update = false
       @normals_need_update = false
@@ -339,7 +343,7 @@ module Mittsu
     end
 
     def merge(geometry, matrix = nil, material_index_offset = nil)
-      if geometry.class != Mittsu::Geometry
+      if !geometry.is_a? Mittsu::Geometry
         puts('ERROR: Mittsu::Geometry#merge: geometry not an instance of Mittsu::Geometry.', geometry.inspect)
         return
       end

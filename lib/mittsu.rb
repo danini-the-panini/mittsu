@@ -4,6 +4,7 @@ require "mittsu/core"
 require "mittsu/cameras"
 require "mittsu/extras"
 require "mittsu/materials"
+require "mittsu/objects"
 require "mittsu/renderers"
 require "mittsu/scenes"
 

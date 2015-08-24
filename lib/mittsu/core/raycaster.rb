@@ -30,10 +30,10 @@ module Mittsu
     def set_from_camera(coords, camera)
       # camera is assumed _not_ to be a child of a transformed object
 
-      if camera.class == Mittsu::PerspectiveCamera
+      if camera.is_a? Mittsu::PerspectiveCamera
         @ray.origin.copy(camera.position)
         @ray.direction.set(coords.x, coords.y, 0.5).unproject(camera).sub(camera.position).normalize
-      elsif camera.class == Mittsu::OrthographicCamera
+      elsif camera.is_a? Mittsu::OrthographicCamera
         @ray.origin.set(coords.x, coords.y, -1.0).unproject(camera)
         @ray.direction.set(0.0, 0.0, -1.0).transform_direction(camera.matrix_world)
       else
@@ -51,7 +51,7 @@ module Mittsu
 
     def intersect_objects(objects, recursive)
       intersects = []
-      if objects.class != Array
+      if !objects.is_a? Array
         puts 'WARNING: Mittsu::Raycaster#intersect_objects: objects is not an array'
         return intersects
       end

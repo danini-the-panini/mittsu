@@ -528,7 +528,7 @@ module Mittsu
     end
 
     def merge(geometry, offset = 0)
-      if geometry.class != Mittsu::BufferGeometry
+      if !geometry.is_a? Mittsu::BufferGeometry
         puts "ERROR: Mittsu::BufferGeometry#merge: geometry not an instance of Mittsu::BufferGeometry. #{geometry.inspect}"
         return
       end

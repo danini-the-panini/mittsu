@@ -11,8 +11,8 @@ renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT
 
 geometry = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0);
 material = Mittsu::MeshBasicMaterial.new(color: 0x00ff00);
-# cube = Mittsu::Mesh.new(geometry, material);
-# scene.add(cube);
+cube = Mittsu::Mesh.new(geometry, material);
+scene.add(cube);
 
 camera.position.z = 5.0
 

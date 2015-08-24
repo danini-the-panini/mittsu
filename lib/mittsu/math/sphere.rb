@@ -24,7 +24,7 @@ module Mittsu
       end
       max_radius_sq = 0.0
       points.each do |point|
-        max_radius_sq = Math.max(max_radius_sq, c.distance_to_squared(point))
+        max_radius_sq = [max_radius_sq, c.distance_to_squared(point)].max
       end
       @radius = Math.sqrt(max_radius_sq)
       self

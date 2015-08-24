@@ -25,12 +25,12 @@ module Mittsu
       height_half = height / 2.0
       depth_half = depth / 2.0
 
-      build_plane(:z, :y, -1, -1, depth.to_f, height.to_f, width_half, 0) # px
-      build_plane(:z, :y,   1, -1, depth.to_f, height.to_f, -width_half, 1) # nx
-      build_plane(:x, :z,   1,   1, width.to_f, depth.to_f, height_half, 2) # py
-      build_plane(:x, :z,   1, -1, width.to_f, depth.to_f, -height_half, 3) # ny
-      build_plane(:x, :y,   1, -1, width.to_f, height.to_f, depth_half, 4) # pz
-      build_plane(:x, :y, -1, -1, width.to_f, height.to_f, -depth_half, 5) # nz
+      build_plane(:z, :y, -1, -1, depth.to_f, height.to_f, width_half,   0) # px
+      build_plane(:z, :y,  1, -1, depth.to_f, height.to_f, -width_half,  1) # nx
+      build_plane(:x, :z,  1,  1, width.to_f, depth.to_f,  height_half,  2) # py
+      build_plane(:x, :z,  1, -1, width.to_f, depth.to_f,  -height_half, 3) # ny
+      build_plane(:x, :y,  1, -1, width.to_f, height.to_f, depth_half,   4) # pz
+      build_plane(:x, :y, -1, -1, width.to_f, height.to_f, -depth_half,  5) # nz
 
       merge_vertices
     end

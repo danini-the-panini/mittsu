@@ -156,14 +156,14 @@ module Mittsu
     def apply_projection(m)
       # input: THREE.Matrix4 projection matrix
 
-      x = @x, y = @y, z = @z
+      _x, _y, _z = @x, @y, @z
 
       e = m.elements
-      d = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]) # perspective divide
+      d = 1.0 / (e[3] * _x + e[7] * _y + e[11] * _z + e[15]) # perspective divide
 
-      @x = (e[0] * x + e[4] * y + e[8]  * z + e[12]) * d
-      @y = (e[1] * x + e[5] * y + e[9]  * z + e[13]) * d
-      @z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * d
+      @x = (e[0] * _x + e[4] * _y + e[8]  * _z + e[12]) * d
+      @y = (e[1] * _x + e[5] * _y + e[9]  * _z + e[13]) * d
+      @z = (e[2] * _x + e[6] * _y + e[10] * _z + e[14]) * d
 
       self
     end
