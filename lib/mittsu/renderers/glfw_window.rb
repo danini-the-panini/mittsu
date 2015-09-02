@@ -12,15 +12,16 @@ module Mittsu
       def initialize(width, height, title)
         glfwInit
 
+        glfwWindowHint GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE
+        glfwWindowHint GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE
+        glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR, 3
+        glfwWindowHint GLFW_CONTEXT_VERSION_MINOR, 3
+        glfwWindowHint GLFW_CONTEXT_REVISION, 0
+
         @width, @height, @title = width, height, title
         @handle = glfwCreateWindow(@width, @height, @title, nil, nil)
         glfwMakeContextCurrent @handle
         glfwSwapInterval 1
-
-        glfwWindowHint GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE
-        glfwWindowHint GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE
-        glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR, 3
-        glfwWindowHint GLFW_CONTEXT_VERSION_MINOR, 2
       end
 
       def run
@@ -32,6 +33,12 @@ module Mittsu
         end
         glfwDestroyWindow @handle
         glfwTerminate
+      end
+
+      def get_framebuffer_size
+        width, height = ' '*8, ' '*8
+        glfwGetFramebufferSize(@handle, width, height)
+        [width.unpack('L')[0], height.unpack('L')[0]]
       end
     end
   end

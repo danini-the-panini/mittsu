@@ -5,8 +5,6 @@ module Mittsu
     attr_reader :shader
 
     def initialize(type, string)
-      File.write("shader#{type}.glsl", string)
-
       @shader = glCreateShader(type)
 
       string_pointer = Fiddle::Pointer[string]

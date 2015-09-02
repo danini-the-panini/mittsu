@@ -93,7 +93,7 @@ module Mittsu
           far
         )
       else
-        projection_matrix.make_perspective(fov, aspect, near, far)
+        projection_matrix.make_perspective(@fov, @aspect, @near, @far)
       end
     end
 

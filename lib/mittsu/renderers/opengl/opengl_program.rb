@@ -76,6 +76,7 @@ module Mittsu
         prefix_fragment = ''
       else
         prefix_vertex = [
+          '#version 330',
           # TODO: do we need precision for an OpenGL program?
           # "precision #{parameters[:precision]} float;",
           # "precision #{parameters[:precision]} int;",
@@ -136,37 +137,37 @@ module Mittsu
           'uniform mat3 normalMatrix;',
           'uniform vec3 cameraPosition;',
 
-          'attribute vec3 position;',
-          'attribute vec3 normal;',
-          'attribute vec2 uv;',
-          'attribute vec2 uv2;',
+          'in vec3 position;',
+          'in vec3 normal;',
+          'in vec2 uv;',
+          'in vec2 uv2;',
 
           '#ifdef USE_COLOR',
 
-          '  attribute vec3 color;',
+          '  in vec3 color;',
 
           '#endif',
 
           '#ifdef USE_MORPHTARGETS',
 
-          '  attribute vec3 morphTarget0;',
-          '  attribute vec3 morphTarget1;',
-          '  attribute vec3 morphTarget2;',
-          '  attribute vec3 morphTarget3;',
+          '  in vec3 morphTarget0;',
+          '  in vec3 morphTarget1;',
+          '  in vec3 morphTarget2;',
+          '  in vec3 morphTarget3;',
 
           '  #ifdef USE_MORPHNORMALS',
 
-          '    attribute vec3 morphNormal0;',
-          '    attribute vec3 morphNormal1;',
-          '    attribute vec3 morphNormal2;',
-          '    attribute vec3 morphNormal3;',
+          '    in vec3 morphNormal0;',
+          '    in vec3 morphNormal1;',
+          '    in vec3 morphNormal2;',
+          '    in vec3 morphNormal3;',
 
           '  #else',
 
-          '    attribute vec3 morphTarget4;',
-          '    attribute vec3 morphTarget5;',
-          '    attribute vec3 morphTarget6;',
-          '    attribute vec3 morphTarget7;',
+          '    in vec3 morphTarget4;',
+          '    in vec3 morphTarget5;',
+          '    in vec3 morphTarget6;',
+          '    in vec3 morphTarget7;',
 
           '  #endif',
 
@@ -174,13 +175,14 @@ module Mittsu
 
           '#ifdef USE_SKINNING',
 
-          '  attribute vec4 skinIndex;',
-          '  attribute vec4 skinWeight;',
+          '  in vec4 skinIndex;',
+          '  in vec4 skinWeight;',
 
           '#endif',
         ].reject(&:empty?).join("\n") + "\n"
 
         prefix_fragment = [
+          '#version 330',
           # TODO: do we need precision for an OpenGL program?
           # "precison #{parameters[:precision]} float;",
           # "precison #{parameters[:precision]} int;",

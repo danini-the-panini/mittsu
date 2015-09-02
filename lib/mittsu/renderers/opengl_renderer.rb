@@ -4,6 +4,7 @@ require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
 require 'opengl'
+require 'mittsu/renderers/opengl/opengl_debug'
 require 'glfw'
 require 'mittsu/renderers/glfw_window'
 require 'fiddle'
@@ -117,8 +118,6 @@ module Mittsu
       @_used_texture_units = 0
       @_viewport_x = 0
       @_viewport_y = 0
-      @_viewport_width = 0 # TODO: _canvas.width???
-      @_viewport_height = 0 # TODO: ...height???
       @_current_width = 0
       @_current_height = 0
 
@@ -170,8 +169,10 @@ module Mittsu
         #   preserve_drawing_buffer: _preserve_drawing_buffer
         # }
 
-        # TODO: create a window...???
         @window = GLFW::Window.new(@width, @height, @title)
+
+        @_viewport_width, @_viewport_height = *(@window.get_framebuffer_size)
+
         # TODO: handle losing opengl context??
       rescue => error
         puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
@@ -180,15 +181,8 @@ module Mittsu
       # TODO: get shader precision format???
       # TODO: load extensions??
 
-      # glfwWindowHint GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE
-      # glfwWindowHint GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE
-      # glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR, 3
-      # glfwWindowHint GLFW_CONTEXT_VERSION_MINOR, 3
-      # glfwWindowHint GLFW_CONTEXT_REVISION, 0
-
       set_default_gl_state
 
-      # @context = _gl ???
       # @state = state .... ???
 
       # GPU capabilities
@@ -351,8 +345,35 @@ module Mittsu
       # state.reset # TODO: ???
     end
 
-    def set_render_target(render_taget = nil)
-      # TODO: LOOONG-ASS METHOD!!
+    def set_render_target(render_target = nil)
+      # TODO: when OpenGLRenderTargetCube exists
+      # is_cube = render_target.is_a? OpenGLRenderTargetCube
+
+      if render_target && render_target[:_opengl_frame_buffer].nil?
+        puts 'TODO (render_target)'
+      end
+
+      if render_target
+        puts 'TODO (render_target again)'
+      else
+        framebuffer = nil
+
+        width = @_viewport_width
+        height = @_viewport_height
+
+        vx = @_viewport_x
+        vy = @_viewport_y
+      end
+
+      if framebuffer != @_current_framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+        glViewport(vx, vy, width, height)
+
+        @_current_framebuffer = framebuffer
+      end
+
+      @_current_width = width
+      @_current_height = height
     end
 
     def render(scene, camera, render_target = nil, force_clear = false)
@@ -416,8 +437,8 @@ module Mittsu
 
       set_render_target(render_target)
 
-      if auto_clear || force_clear
-        clear(auto_clear_color, auto_clear_depth, auto_clear_stencil)
+      if @auto_clear || force_clear
+        clear(@auto_clear_color, @auto_clear_depth, @auto_clear_stencil)
       end
 
       # set matrices for immediate objects
@@ -460,13 +481,11 @@ module Mittsu
       # lens_flare_plugin.render(scene, camera, @_current_width, @_current_height)
 
       # generate mipmap if we're using any kind of mipmap filtering
-
       if render_target && render_target.generate_mipmaps && render_target.min_filter != NearestFilter && render_target.min_filter != LinearFilter
         update_render_target_mipmap(render_target)
       end
 
       # endure depth buffer writing is enabled so it can be cleared on next render
-
       # TODO: state object again ????
       # state.set_depth_test(true)
       # state.set_depth_write(true)
@@ -483,6 +502,9 @@ module Mittsu
 
     def render_buffer(camera, lights, fog, material, geometry_group, object)
       return unless material.visible
+
+      # TODO: place to put this ???
+      glBindVertexArray(geometry_group[:_opengl_vertex_array])
 
       update_object(object)
 
@@ -503,14 +525,15 @@ module Mittsu
       # state.init_attributes if update_buffers
 
       # vertices
-      if !material.morph_targets && attributes[:position] && attributes[:position] >= 0
+      if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
         if update_buffers
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_vertex_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.position)
+          # state.enable_attribute(attributes['position'])
+          glEnableVertexAttribArray attributes['position']
 
-          glVertexAttribPointer(attributes.position, 3, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['position'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         end
       elsif object.morph_target_base
         setup_morph_targets(material, geometry_group, object)
@@ -527,101 +550,110 @@ module Mittsu
               glBindBuffer(GL_ARRAY_BUFFER, attribute.buffer)
 
               # TODO
-              # state.enable_attribute(attributes[attribute.buffer.bbelongs_to_attribute])
+              # state.enable_attribute(attributes[attribute.buffer.belongs_to_attribute]
+              glEnableVertexAttribArray attributes[attribute.buffer.belongs_to_attribute]
 
-              glVertexAttribPointer(attributes[attribute.buffer.belongbbelongs_to_attribute], attribute.size, GL_FLOAT, false, 0, 0)
+              glVertexAttribPointer(attributes[attribute.buffer.belongs_to_attribute], attribute.size, GL_FLOAT, GL_FALSE, 0, 0)
             end
           end
         end
 
         # colors
 
-        if attributes[:color] && attributes[:color] >= 0
+        if attributes['color'] && attributes['color'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_color_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.color)
+          # state.enable_attribute(attributes['color'])
+          glEnableVertexAttribArray attributes['color']
 
-          glVertexAttribPointer(attributes.color, 3, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['color'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         elsif !material.default_attribute_values.nil?
-          glVertexAttrib3fv(attributes.color, material.default_attribute_values.color)
+          glVertexAttrib3fv(attributes['color'], material.default_attribute_values.color)
         end
 
         # normals
 
-        if attributes[:normal] && attributes[:normal] >= 0
+        if attributes['normal'] && attributes['normal'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_normal_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.normal)
+          # state.enable_attribute(attributes['normal'])
+          glEnableVertexAttribArray attributes['normal']
 
-          glVertexAttribPointer(attributes.normal, 3, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['normal'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         end
 
         # tangents
 
-        if attributes[:tangent] && attributes[:tangent] >= 0
+        if attributes['tangent'] && attributes['tangent'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_tangent_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.tangent)
+          # state.enable_attribute(attributes['tangent'])
+          glEnableVertexAttribArray attributes['tangent']
 
-          glVertexAttribPointer(attributes.tangent, 4, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['tangent'], 4, GL_FLOAT, GL_FALSE, 0, 0)
         end
 
         # uvs
 
-        if attributes[:uv] && attributes[:uv] >= 0
+        if attributes['uv'] && attributes['uv'] >= 0
           if object.geometry.face_vertex_uvs[0]
             glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv_buffer])
 
             # TODO
-            # state.enable_attribute(attributes.uv)
+            # state.enable_attribute(attributes['uv'])
+            glEnableVertexAttribArray attributes['uv']
 
-            glVertexAttribPointer(attributes.uv, 2, GL_FLOAT, false, 0, 0)
+            glVertexAttribPointer(attributes['uv'], 2, GL_FLOAT, GL_FALSE, 0, 0)
           elsif !material.default_attribute_values.nil?
-            glVertexAttrib2fv(attributes.uv, material.default_attribute_values.uv)
+            glVertexAttrib2fv(attributes['uv'], material.default_attribute_values.uv)
           end
         end
 
-        if attributes[:uv2] && attributes[:uv2] >= 0
+        if attributes['uv2'] && attributes['uv2'] >= 0
           if object.geometry.face_vertex_uvs[1]
             glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv2_buffer])
 
             # TODO
-            # state.enable_attribute(attributes.uv2)
+            # state.enable_attribute(attributes['uv2'])
+            glEnableVertexAttribArray attributes['uv2']
 
-            glVertexAttribPointer(attributes.uv2, 2, GL_FLOAT, false, 0, 0)
+            glVertexAttribPointer(attributes['uv2'], 2, GL_FLOAT, GL_FALSE, 0, 0)
           elsif !material.default_attribute_values.nil?
-            glVertexAttrib2fv(attributes.uv2, material.default_attribute_values.uv2)
+            glVertexAttrib2fv(attributes['uv2'], material.default_attribute_values.uv2)
           end
         end
 
-        if material.skinning && attributes.skin_index >= 0 && attributes.skin_weight >= 0
+        if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_indices_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.skin_index)
+          # state.enable_attribute(attributes['skin_index'])
+          glEnableVertexAttribArray attributes['skin_index']
 
-          glVertexAttribPointer(attributes.skin_index, 4, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['skin_index'], 4, GL_FLOAT, GL_FALSE, 0, 0)
 
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_weight_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.skin_weight)
+          # state.enable_attribute(attributes['skin_weight'])
+          glEnableVertexAttribArray attributes['skin_weight']
 
-          glVertexAttribPointer(attributes.skin_weight, 4, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['skin_weight'], 4, GL_FLOAT, GL_FALSE, 0, 0)
         end
 
         # line distances
 
-        if attributes[:line_distances] && attributes[:line_distances] >= 0
+        if attributes['line_distances'] && attributes['line_distances'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_line_distance_buffer])
 
           # TODO
-          # state.enable_attribute(attributes.line_distance)
+          # state.enable_attribute(attributes['line_distance'])
+          glEnableVertexAttribArray attributes['line_distance']
 
-          glVertexAttribPointer(attributes.line_distance, 1, GL_FLOAT, false, 0, 0)
+          glVertexAttribPointer(attributes['line_distance'], 1, GL_FLOAT, GL_FALSE, 0, 0)
         end
       end
 
@@ -635,10 +667,9 @@ module Mittsu
         type = GL_UNSIGNED_INT # geometry_group[:_type_array] == Uint32Array ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT
 
         # wireframe
-
         if material.wireframe
           # TODO
-          state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
+          # state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
 
           glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_line_buffer]) if update_buffers
           glDrawElements(GL_LINES, geometry_group[:_opengl_line_count], type, 0)
@@ -1041,6 +1072,8 @@ module Mittsu
     end
 
     def create_mesh_buffers(geometry_group)
+      geometry_group[:_opengl_vertex_array] = glCreateVertexArray
+
       geometry_group[:_opengl_vertex_buffer] = glCreateBuffer
       geometry_group[:_opengl_normal_buffer] = glCreateBuffer
       geometry_group[:_opengl_tangent_buffer] = glCreateBuffer
@@ -1083,25 +1116,28 @@ module Mittsu
       @_b.unpack('L')[0]
     end
 
+    def glCreateVertexArray
+      @_b = ' '*8
+      glGenVertexArrays(1, @_b)
+      @_b.unpack('L')[0]
+    end
+
     def array_to_ptr_easy(data)
       size_of_element = data.first.is_a?(Float) ? Fiddle::SIZEOF_FLOAT : Fiddle::SIZEOF_INT
-      format_of_element = data.first.is_a?(Float) ? 'f' : 'i'
+      format_of_element = data.first.is_a?(Float) ? 'F' : 'L'
       size = data.length * size_of_element
       array_to_ptr(data, size, format_of_element)
     end
 
     def array_to_ptr(data, size, format)
       ptr = Fiddle::Pointer.malloc(size)
-      ptr[0,size] = data.pack(format)
+      ptr[0,size] = data.pack(format * data.length)
       ptr
     end
 
     def glBufferData_easy(target, data, usage)
-      size_of_element = data.first.is_a?(Float) ? Fiddle::SIZEOF_FLOAT : Fiddle::SIZEOF_INT
-      format_of_element = data.first.is_a?(Float) ? 'f' : 'i'
-      size = data.length * size_of_element
-      ptr = array_to_ptr(data, size, format_of_element)
-      glBufferData(target, size, ptr, usage)
+      ptr = array_to_ptr_easy(data)
+      glBufferData(target, ptr.size, ptr, usage)
     end
 
     def init_mesh_buffers(geometry_group, object)
@@ -1205,6 +1241,9 @@ module Mittsu
       geometry = object.geometry
 
       if geometry.is_a? BufferGeometry
+        # TODO: geomertry vertex array ?????
+        # glBindVertexArray geometry.vertex_array
+
         geometry.attributes.each do |(key, attribute)|
           buffer_type = (key == 'index') ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER
 
@@ -1219,8 +1258,9 @@ module Mittsu
             if attribute.update_range.nil? || attribute.update_range.count == -1 # Not using update ranged
               glBufferSubData(buffer_type, 0, attribute.array)
             elsif attribute.udpate_range.count.zero?
-              puts 'ERROR: Mittsu::OpenGLRenderer#update_object: using update_range for Mittsu::DynamicBufferAttribute and marked as needs_update but count is -, ensure you are using set methods or updating manually.'
+              puts 'ERROR: Mittsu::OpenGLRenderer#update_object: using update_range for Mittsu::DynamicBufferAttribute and marked as needs_update but count is 0, ensure you are using set methods or updating manually.'
             else
+              # TODO: make a glBufferSubData_easy method
               glBufferSubData(buffer_type, attribute.update_range.offset * attribute.array.BYTES_PER_ELEMENT, attribute.array.subarray(attribute.update_range.offset, attribute.update_range.offset + attribute.update_range.count))
               attribute.update_range.count = 0 # reset range
             end
@@ -1238,6 +1278,8 @@ module Mittsu
 
         material = nil
         geometry_groups_list.each do |geometry_group|
+          # TODO: place to put this???
+          # glBindVertexArray(geometry_group[:_opengl_vertex_array])
           material = get_buffer_material(object, geometry_group)
 
           custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
@@ -1257,6 +1299,7 @@ module Mittsu
 
         material.attributes && clear_custom_attributes(material)
       elsif (object.is_a? Line)
+        # TODO: glBindVertexArray ???
         material = get_buffer_material(object, geometry)
         custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
@@ -1270,6 +1313,7 @@ module Mittsu
 
         material.attributes && clear_custom_attributes(material)
       elsif object.is_A? PointCloud
+        # TODO: glBindVertexArray ???
         material = get_buffer_material(object, geometry)
         custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
@@ -1992,11 +2036,11 @@ module Mittsu
 
       if material.skinning
         if object.bind_matrix && !p_uniforms.bind_matrix.nil?
-          glUniformMatrix4fv(p_uniforms.bind_matrix, false, object.bind_matrix.elements)
+          glUniformMatrix4fv(p_uniforms.bind_matrix, GL_FALSE, object.bind_matrix.elements)
         end
 
         if object.bind_matrix_inverse && !p_uniforms.bind_matrix_inverse.nil?
-          glUniformMatrix4fv(p_uniforms.bind_matrix_inverse, false, object.bind_matrix_inverse.elements)
+          glUniformMatrix4fv(p_uniforms.bind_matrix_inverse, GL_FALSE, object.bind_matrix_inverse.elements)
         end
 
         if _supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
@@ -2016,7 +2060,7 @@ module Mittsu
           end
         elsif object.skeleton && object.skeleton.bone_matrices
           if !p_uniforms.bone_global_matrices.nil?
-            glUniformMatrix4fv(p_uniforms.bone_global_matrices, false, object.skeleton.bone_matrices)
+            glUniformMatrix4fv(p_uniforms.bone_global_matrices, GL_FALSE, object.skeleton.bone_matrices)
           end
         end
       end
@@ -2302,7 +2346,7 @@ module Mittsu
       #  - limit here is ANGLE's 254 max uniform vectors
       #    (up to 54 should be safe)
 
-      n_vertex_uniforms = get_gl_parameter(GL_MAX_VERTEX_UNIFORM_VECTORS)
+      n_vertex_uniforms = (get_gl_parameter(GL_MAX_VERTEX_UNIFORM_COMPONENTS) / 4.0).floor
       n_vertex_matrices = ((n_vertex_uniforms - 20) / 4.0).floor
 
       max_bones = n_vertex_matrices
@@ -2508,8 +2552,8 @@ module Mittsu
           end
 
           glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform[:_array]))
+        when :t
       # TODO: when Texture is defined
-      #     case 't':
       #       // single THREE.Texture (2d or cube)
       #
       #       texture = value;
@@ -2536,7 +2580,7 @@ module Mittsu
       #
       #       break;
       #
-      #     case 'tv':
+        when :tv
       #
       #       // array of THREE.Texture (2d)
       #

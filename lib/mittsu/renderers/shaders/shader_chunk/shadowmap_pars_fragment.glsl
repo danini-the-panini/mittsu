@@ -6,7 +6,7 @@
 	uniform float shadowDarkness[ MAX_SHADOWS ];
 	uniform float shadowBias[ MAX_SHADOWS ];
 
-	varying vec4 vShadowCoord[ MAX_SHADOWS ];
+	in vec4 vShadowCoord[ MAX_SHADOWS ];
 
 	float unpackDepth( const in vec4 rgba_depth ) {
 

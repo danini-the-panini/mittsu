@@ -75,6 +75,8 @@ module Mittsu
         ShaderChunk[:specularmap_pars_fragment],
         ShaderChunk[:logdepthbuf_pars_fragment],
 
+        "out vec4 fragColor;",
+
         "void main() {",
 
         "  vec3 outgoingLight = vec3( 0.0 );",  # outgoing light does not have an alpha, the surface does
@@ -97,7 +99,7 @@ module Mittsu
 
           ShaderChunk[:fog_fragment],
 
-        "  gl_FragColor = vec4( outgoingLight, diffuseColor.a );",  # TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+        "  fragColor = vec4( outgoingLight, diffuseColor.a );",  # TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
         "}"
 

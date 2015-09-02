@@ -39,7 +39,7 @@ uniform vec3 ambientLightColor;
 
 #if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )
 
-	varying vec3 vWorldPosition;
+	in vec3 vWorldPosition;
 
 #endif
 
@@ -49,10 +49,10 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-varying vec3 vViewPosition;
+in vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
 
-	varying vec3 vNormal;
+	in vec3 vNormal;
 
 #endif

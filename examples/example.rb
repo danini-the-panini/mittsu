@@ -16,6 +16,11 @@ scene.add(cube);
 
 camera.position.z = 5.0
 
+x = 0
 renderer.window.run do
+  # break if x == 1
   renderer.render(scene, camera)
+  x += 1
 end
+
+# puts OpenGL.glGetError

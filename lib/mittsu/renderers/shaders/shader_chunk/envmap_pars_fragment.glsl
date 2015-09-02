@@ -14,7 +14,7 @@
 
 	#else
 
-		varying vec3 vReflect;
+		in vec3 vReflect;
 
 	#endif
 
