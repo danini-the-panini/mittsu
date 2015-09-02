@@ -16,11 +16,9 @@ scene.add(cube);
 
 camera.position.z = 5.0
 
-x = 0
 renderer.window.run do
-  # break if x == 1
-  renderer.render(scene, camera)
-  x += 1
-end
+  cube.rotation.x += 0.1
+  cube.rotation.y += 0.1
 
-# puts OpenGL.glGetError
+  renderer.render(scene, camera)
+end
