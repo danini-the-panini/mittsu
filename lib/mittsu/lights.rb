@@ -1,0 +1,7 @@
+require 'mittsu/lights/light'
+require 'mittsu/lights/ambient_light'
+require 'mittsu/lights/area_light'
+require 'mittsu/lights/directional_light'
+require 'mittsu/lights/hemisphere_light'
+require 'mittsu/lights/point_light'
+require 'mittsu/lights/spot_light'
