@@ -2,7 +2,7 @@ require 'mittsu/lights/light'
 
 module Mittsu
   class AmbientLight < Light
-    def initialize
+    def initialize(color)
       super
       @type = 'AmbientLight'
     end

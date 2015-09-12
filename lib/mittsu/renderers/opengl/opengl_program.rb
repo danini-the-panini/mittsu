@@ -89,7 +89,7 @@ module Mittsu
           renderer.gamma_output ? '#define GAMMA_OUTPUT' : '',
           "#define GAMMA_FACTOR #{gamma_factor_define}",
 
-          "#define MAX_DIR_LIGHTS #{parameters[:max_dir_light]}",
+          "#define MAX_DIR_LIGHTS #{parameters[:max_dir_lights]}",
           "#define MAX_POINT_LIGHTS #{parameters[:max_point_lights]}",
           "#define MAX_SPOT_LIGHTS #{parameters[:max_spot_lights]}",
           "#define MAX_HEMI_LIGHTS #{parameters[:max_hemi_lights]}",
@@ -237,6 +237,8 @@ module Mittsu
 
           'uniform mat4 viewMatrix;',
           'uniform vec3 cameraPosition;',
+
+          "out vec4 fragColor;"
         ].reject(&:empty?).join("\n") + "\n"
       end
 

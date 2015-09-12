@@ -36,9 +36,9 @@ module Mittsu
   #   fog: <bool>
   # }
 
-  attr_accessor :emissive, :shading, :wireframe_linewidth, :wireframe_linecap, :wireframe_linejoin
-
   class MeshLambertMaterial < Material
+    attr_accessor :emissive, :shading, :wireframe_linewidth, :wireframe_linecap, :wireframe_linejoin
+
     def initialize(parameters = {})
       super()
 

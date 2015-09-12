@@ -3,7 +3,7 @@ require 'mittsu/materials'
 
 module Mittsu
   class Mesh < Object3D
-    attr_accessor :geometry, :material, :morph_target_base
+    attr_accessor :material, :morph_target_base
 
     def initialize(geometry = Geometry.new, material = MeshBasicMaterial.new(color: rand * 0xffffff))
       super()

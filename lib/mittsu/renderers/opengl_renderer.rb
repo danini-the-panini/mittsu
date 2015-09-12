@@ -150,7 +150,7 @@ module Mittsu
         # MeshDepthMaterial => :depth, # TODO...
         # MeshNormalMaterial => :normal, # TODO...
         MeshBasicMaterial => :basic,
-        # MeshLambertMaterial => :lambert, # TODO...
+        MeshLambertMaterial => :lambert,
         # MeshPhongMaterial => :phong, # TODO...
         # LineBasicMaterial => :basic, # TODO...
         # LineDashedMaterial => :dashed, # TODO...
@@ -774,13 +774,13 @@ module Mittsu
         # skip
       else
         init_object(object)
-        # if object.is_a? Light #TODO
-        #   @lights << object
+        if object.is_a? Light
+          @lights << object
         # if object.is_a? Sprite # TODO
         #   @sprites << object
         # if object.is_a? LensFlare # TODO
         #   @lens_flares << object
-        # else
+        else
           opengl_objects = @_opengl_objects[object.id]
           if opengl_objects && (!object.frustum_culled || @_frustum.intersects_object?(object))
             opengl_objects.each do |opengl_object|
@@ -794,7 +794,7 @@ module Mittsu
               end
             end
           end
-        #end
+        end
       end
 
       object.children.each do |child|
@@ -2025,9 +2025,9 @@ module Mittsu
           end
         end
 
-        # TODO: when (MeshPhong|MeshLambert|Shader)Material is defined
+        # TODO: when (MeshPhong|Shader)Material is defined
         # if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.is_a?(ShaderMaterial) || material.skinning
-        if material.is_a?(MeshBasicMaterial) || material.skinning
+        if material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.skinning
           if !p_uniforms['viewMatrix'].nil?
             glUniformMatrix4fv(p_uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
           end
@@ -2069,9 +2069,9 @@ module Mittsu
         if fog && material.fog
         end
 
-        # TODO: when Mesh(Phong|Lambert)Material is defined
+        # TODO: when MeshPhongMaterial is defined
         # if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
-        if material.lights
+        if material.is_a?(MeshLambertMaterial) || material.lights
           if @_lights_need_update
             refresh_lights = true
             setup_lights(lights)
@@ -2086,16 +2086,16 @@ module Mittsu
           end
         end
 
-        # TODO: when Mesh(Phong|Lambert)Material is defined
+        # TODO: when MeshPhongMaterial is defined
         # if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshPhongMaterial)
-        if material.is_a?(MeshBasicMaterial)
+        if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial)
           refresh_uniforms_common(m_uniforms, material)
         end
 
         # refresh single material specific uniforms
 
         # TODO: when all of these things exist
-        # case material
+        case material
         # when LineBasicMaterial
         #   refresh_uniforms_line(m_uniforms, material)
         # when LineDashedMaterial
@@ -2105,15 +2105,15 @@ module Mittsu
         #   refresh_uniforms_particle(m_uniforms, material)
         # when MeshPhongMaterial
         #   refresh_uniforms_phong(m_uniforms, material)
-        # when MeshLambertMaterial
-        #   refresh_uniforms_lambert(m_uniforms, material)
+        when MeshLambertMaterial
+          refresh_uniforms_lambert(m_uniforms, material)
         # when MeshDepthMaterial
         #   m_uniforms.m_near.value = camera.near
         #   m_uniforms.m_far.value = camera.far
         #   m_uniforms.opacity.value = material.opacity
         # when MeshNormalMaterial
         #   m_uniforms.opactity.value = material.opacity
-        # end
+        end
 
         if object.receive_shadow && !material._shadow_pass
           refresh_uniforms_shadow(m_uniforms, lights)
@@ -2622,7 +2622,250 @@ module Mittsu
       glUniformMatrix4fv(uniforms['modelViewMatrix'], 1, GL_FALSE, array_to_ptr_easy(object[:_model_view_matrix].elements))
 
       if uniforms['normalMatrix']
-        glUniformMatrix4fv(uniforms['normalMatrix'], 1, GL_FALSE, array_to_ptr_easy(object[:_normal_matrix].elements))
+        glUniformMatrix3fv(uniforms['normalMatrix'], 1, GL_FALSE, array_to_ptr_easy(object[:_normal_matrix].elements))
+      end
+    end
+
+    def setup_lights(lights)
+      r, g, b = 0.0, 0.0, 0.0
+
+      zlights = @_lights
+
+      dir_colors = zlights[:directional][:colors]
+      dir_positions = zlights[:directional][:positions]
+
+      point_colors = zlights[:point][:colors]
+      point_positions = zlights[:point][:positions]
+      point_distances = zlights[:point][:distances]
+      point_decays = zlights[:point][:decays]
+
+      spot_colors = zlights[:spot][:colors]
+      spot_positions = zlights[:spot][:positions]
+      spot_distances = zlights[:spot][:distances]
+      spot_directions = zlights[:spot][:directions]
+      spot_angles_cos = zlights[:spot][:angles_cos]
+      spot_exponents = zlights[:spot][:exponents]
+      spot_decays = zlights[:spot][:decays]
+
+      hemi_sky_colors = zlights[:hemi][:sky_colors]
+      hemi_ground_colors = zlights[:hemi][:ground_colors]
+      hemi_positions = zlights[:hemi][:positions]
+
+      dir_length = 0
+      point_length = 0
+      spot_length = 0
+      hemi_length = 0
+
+      dir_count = 0
+      point_count = 0
+      spot_count = 0
+      hemi_count = 0
+
+      dir_offset = 0
+      point_offset = 0
+      spot_offset = 0
+      hemi_offset = 0
+
+      lights.each do |light|
+
+        next if light.only_shadow
+
+        color = light.color
+        intensity = light.intensity
+        distance = light.distance
+
+        if light.is_a? AmbientLight
+
+          next unless light.visible
+
+          r += color.r
+          g += color.g
+          b += color.b
+
+        elsif light.is_a? DirectionalLight
+
+          dir_count += 1
+
+          next unless light.visible
+
+          @_direction.set_from_matrix_position(light.matrix_world)
+          @_vector3.set_from_matrix_position(light.target.matrix_world)
+          @_direction.sub(@_vector3)
+          @_direction.normalize
+
+          dir_offset = dir_length * 3
+
+          dir_positions[dir_offset]     = @_direction.x
+          dir_positions[dir_offset + 1] = @_direction.y
+          dir_positions[dir_offset + 2] = @_direction.z
+
+          set_color_linear(dir_colors, dir_offset, color, intensity)
+
+          dir_length += 1
+
+        elsif light.is_a? PointLight
+
+          point_count += 1
+
+          next unless light.visible
+
+          point_offset = point_length * 3;
+
+          set_color_linear(point_colors, point_offset, color, intensity)
+
+          @_vector3.set_from_matrix_position(light.matrix_world)
+
+          point_positions[point_offset]     = @_vector3.x
+          point_positions[point_offset + 1] = @_vector3.y
+          point_positions[point_offset + 2] = @_vector3.z
+
+          # distance is 0 if decay is 0, because there is no attenuation at all.
+          point_distances[point_length] = distance
+          point_decays[point_length] = light.distance.zero? ? 0.0 : light.decay
+
+          point_length += 1
+
+        elsif light.is_a? SpotLight
+
+          spot_count += 1
+
+          next unless light.visible
+
+          spot_offset = spot_length * 3
+
+          set_color_linear(spot_colors, spot_offset, color, intensity)
+
+          @_direction.set_from_matrix_position(light.matrix_world)
+
+          spot_positions[spotOffset]     = @_direction.x
+          spot_positions[spotOffset + 1] = @_direction.y
+          spot_positions[spotOffset + 2] = @_direction.z
+
+          spot_distances[spot_length] = distance
+
+          @_vector3.set_from_matrix_position(light.target.matrix_world)
+          @_direction.sub(@_vector3)
+          @_direction.normalize
+
+          spot_directions[spotOffset]     = @_direction.x
+          spot_directions[spotOffset + 1] = @_direction.y
+          spot_directions[spotOffset + 2] = @_direction.z
+
+          spot_angles_cos[spot_length] = Math.cos(light.angle)
+          spot_exponents[spot_length] = light.exponent;
+          spot_decays[spot_length] = light.distance.zero? ? 0.0 : light.decay
+
+          spot_length += 1;
+
+        elsif light.is_a? HemisphereLight
+
+          hemi_count += 1
+
+          next unless light.visible
+
+          @_direction.set_from_matrix_position(light.matrix_world)
+          @_direction.normalize
+
+          hemi_offset = hemi_length * 3
+
+          hemi_positions[hemi_offset]     = @_direction.x
+          hemi_positions[hemi_offset + 1] = @_direction.y
+          hemi_positions[hemi_offset + 2] = @_direction.z
+
+          sky_color = light.color
+          ground_color = light.ground_color
+
+          set_color_linear(hemi_sky_colors, hemi_offset, sky_color, intensity )
+          set_color_linear(hemi_ground_colors, hemi_offset, ground_color, intensity)
+
+          hemi_length += 1
+
+        end
+
+      end
+
+      # null eventual remains from removed lights
+      # (this is to avoid if in shader)
+
+      (dir_length * 3).upto([dir_colors.length, dir_count * 3].max - 1).each { |i|
+        dir_colors[i] = 0.0
+      }
+      (point_length * 3).upto([point_colors.length, point_count * 3].max - 1).each { |i|
+        point_colors[i] = 0.0
+      }
+      (spot_length * 3).upto([spot_colors.length, spot_count * 3].max - 1).each { |i|
+        spot_colors[i] = 0.0
+      }
+      (hemi_length * 3).upto([hemi_ground_colors.length, hemi_count * 3].max - 1).each { |i|
+        hemi_ground_colors[i] = 0.0
+      }
+      (hemi_length * 3).upto([hemi_sky_colors.length, hemi_count * 3].max - 1).each { |i|
+        hemi_sky_colors[i] = 0.0
+      }
+
+      zlights[:directional][:length] = dir_length
+      zlights[:point][:length] = point_length
+      zlights[:spot][:length] = spot_length
+      zlights[:hemi][:length] = hemi_length
+
+      zlights[:ambient][0] = r
+      zlights[:ambient][1] = g
+      zlights[:ambient][2] = b
+    end
+
+    def refresh_uniforms_lights(uniforms, lights)
+      uniforms['ambientLightColor'].value = lights[:ambient]
+
+      uniforms['directionalLightColor'].value = lights[:directional][:colors]
+      uniforms['directionalLightDirection'].value = lights[:directional][:positions]
+
+      uniforms['pointLightColor'].value = lights[:point][:colors]
+      uniforms['pointLightPosition'].value = lights[:point][:positions]
+      uniforms['pointLightDistance'].value = lights[:point][:distances]
+      uniforms['pointLightDecay'].value = lights[:point][:decays]
+
+      uniforms['spotLightColor'].value = lights[:spot][:colors]
+      uniforms['spotLightPosition'].value = lights[:spot][:positions]
+      uniforms['spotLightDistance'].value = lights[:spot][:distances]
+      uniforms['spotLightDirection'].value = lights[:spot][:directions]
+      uniforms['spotLightAngleCos'].value = lights[:spot][:angles_cos]
+      uniforms['spotLightExponent'].value = lights[:spot][:exponents]
+      uniforms['spotLightDecay'].value = lights[:spot][:decays]
+
+      uniforms['hemisphereLightSkyColor'].value = lights[:hemi][:sky_colors]
+      uniforms['hemisphereLightGroundColor'].value = lights[:hemi][:ground_colors]
+      uniforms['hemisphereLightDirection'].value = lights[:hemi][:positions]
+    end
+
+    def mark_uniforms_lights_needs_update(uniforms, value)
+      uniforms['ambientLightColor'].needs_update = value
+
+      uniforms['directionalLightColor'].needs_update = value
+      uniforms['directionalLightDirection'].needs_update = value
+
+      uniforms['pointLightColor'].needs_update = value
+      uniforms['pointLightPosition'].needs_update = value
+      uniforms['pointLightDistance'].needs_update = value
+      uniforms['pointLightDecay'].needs_update = value
+
+      uniforms['spotLightColor'].needs_update = value
+      uniforms['spotLightPosition'].needs_update = value
+      uniforms['spotLightDistance'].needs_update = value
+      uniforms['spotLightDirection'].needs_update = value
+      uniforms['spotLightAngleCos'].needs_update = value
+      uniforms['spotLightExponent'].needs_update = value
+      uniforms['spotLightDecay'].needs_update = value
+
+      uniforms['hemisphereLightSkyColor'].needs_update = value
+      uniforms['hemisphereLightGroundColor'].needs_update = value
+      uniforms['hemisphereLightDirection'].needs_update = value
+    end
+
+    def refresh_uniforms_lambert(uniforms, material)
+      uniforms['emissive'].value = material.emissive
+
+      if material.wrap_around
+        uniforms['wrapRGB'].value.copy(material.wrap_rgb)
       end
     end
   end

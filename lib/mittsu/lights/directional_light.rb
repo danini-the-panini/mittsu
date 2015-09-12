@@ -3,9 +3,7 @@ require 'mittsu/lights/light'
 module Mittsu
   class DirectionalLight < Light
     attr_accessor :target,
-                  :intensity,
                   :cast_shadow,
-                  :only_shadow,
                   :shadow_camera_near,
                   :shadow_camera_far,
                   :shadow_camera_left,

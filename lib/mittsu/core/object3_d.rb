@@ -6,7 +6,7 @@ module Mittsu
   class Object3D < HashObject
     include EventDispatcher
 
-    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent
+    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry
 
     attr_reader :id, :uuid, :type
 

@@ -75,7 +75,7 @@ module Mittsu
       'spotLightPosition' => Uniform.new(:fv, []),
       'spotLightDirection' => Uniform.new(:fv, []),
       'spotLightDistance' => Uniform.new(:fv, []),
-      'spotLightAngleCode' => Uniform.new(:fv, []),
+      'spotLightAngleCos' => Uniform.new(:fv, []),
       'spotLightExponent' => Uniform.new(:fv, []),
       'spotLightDecay' => Uniform.new(:fv, [])
     },

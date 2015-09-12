@@ -3,13 +3,10 @@ require 'mittsu/lights/light'
 module Mittsu
   class SpotLight < Light
     attr_accessor :target,
-                  :intensity,
-                  :distance,
                   :angle,
                   :exponent,
                   :decay,
                   :cast_shadow,
-                  :only_shadow,
                   :shadow_camera_near,
                   :shadow_camera_far,
                   :shadow_camera_fov,

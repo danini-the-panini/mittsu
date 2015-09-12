@@ -3,10 +3,10 @@ require 'mittsu/math/color'
 
 module Mittsu
   class Light < Object3D
-    attr_accessor :color
+    attr_accessor :color, :only_shadow, :intensity, :distance
 
     def initialize(color = nil)
-      super
+      super()
       @type = 'Light'
       @color = Color.new(color)
     end
