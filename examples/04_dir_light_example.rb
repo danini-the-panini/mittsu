@@ -14,15 +14,17 @@ material = Mittsu::MeshLambertMaterial.new(color: 0x00ff00)
 cube = Mittsu::Mesh.new(geometry, material)
 scene.add(cube)
 
-light = Mittsu::DirectionalLight.new(0xffffff, 0.5) # while, half intensity
-light.position.set(0.0, 1.0, 0.0)
-scene.add(light)
+light = Mittsu::DirectionalLight.new(0xffffff, 0.5) # white, half intensity
+light.position.set(0.5, 1.0, 0.0)
+light_object = Mittsu::Object3D.new
+light_object.add(light)
+scene.add(light_object)
 
 camera.position.z = 5.0
 
 renderer.window.run do
-  cube.rotation.x += 0.1
-  cube.rotation.y += 0.1
+  light_object.rotation.x += 0.1
+  light_object.rotation.y += 0.1
 
   renderer.render(scene, camera)
 end
