@@ -14,7 +14,8 @@ material = Mittsu::MeshLambertMaterial.new(color: 0x00ff00)
 cube = Mittsu::Mesh.new(geometry, material)
 scene.add(cube)
 
-light = Mittsu::AmbientLight.new(0x404040) # soft white light
+light = Mittsu::DirectionalLight.new(0xffffff, 0.5) # while, half intensity
+light.position.set(0.0, 1.0, 0.0)
 scene.add(light)
 
 camera.position.z = 5.0
@@ -24,5 +25,4 @@ renderer.window.run do
   cube.rotation.y += 0.1
 
   renderer.render(scene, camera)
-  # break
 end
