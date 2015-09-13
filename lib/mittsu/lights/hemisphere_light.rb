@@ -1,9 +1,10 @@
 require 'mittsu/lights/light'
 
 module Mittsu
-  attr_accessor :ground_color, :intensity
 
   class HemisphereLight < Light
+    attr_accessor :ground_color, :intensity
+
     def initialize(sky_color = nil, ground_color = nil, intensity = 1.0)
       super(sky_color)
 
