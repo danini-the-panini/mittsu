@@ -16,7 +16,7 @@ include GLFW
 
 module Mittsu
   class OpenGLRenderer
-    attr_accessor :context, :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height
+    attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height
 
     attr_reader :prevision
 
@@ -55,7 +55,7 @@ module Mittsu
       # public properties
 
       # @dom_element = _canvas
-      @context = nil
+      # @context = nil
 
       # clearing
 
@@ -2867,6 +2867,12 @@ module Mittsu
       if material.wrap_around
         uniforms['wrapRGB'].value.copy(material.wrap_rgb)
       end
+    end
+
+    def set_color_linear(array, offset, color, intensity)
+      array[offset]     = color.r * intensity
+      array[offset + 1] = color.g * intensity
+      array[offset + 2] = color.b * intensity
     end
   end
 end
