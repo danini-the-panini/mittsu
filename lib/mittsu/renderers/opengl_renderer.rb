@@ -741,14 +741,14 @@ module Mittsu
     end
 
     def painter_sort_stable(a, b)
-      if a.object.render_order != b.object.render_order
-        a.object.render_order - b.object.render_order
-      elsif a.material.id != b.material.id
-        a.material.id - b.material.id
-      elsif a.z != b.z
-        a.z - b.z
+      if a[:object].render_order != b[:object].render_order
+        a[:object].render_order - b[:object].render_order
+      elsif a[:material].id != b[:material].id
+        a[:material].id - b[:material].id
+      elsif a[:z] != b[:z]
+        a[:z] - b[:z]
       else
-        a.id - b.id
+        a[:id] - b[:id]
       end
     end
 

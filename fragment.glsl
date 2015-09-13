@@ -1,5 +1,5 @@
 #version 330
-#define MAX_DIR_LIGHTS 1
+#define MAX_DIR_LIGHTS 0
 #define MAX_POINT_LIGHTS 0
 #define MAX_SPOT_LIGHTS 0
 #define MAX_HEMI_LIGHTS 0
@@ -11,12 +11,7 @@ uniform mat4 viewMatrix;
 uniform vec3 cameraPosition;
 out vec4 fragColor;
 uniform vec3 diffuse;
-uniform vec3 emissive;
 uniform float opacity;
-in vec3 vLightFront;
-#ifdef DOUBLE_SIDED
-  in vec3 vLightBack;
-#endif
 #define PI 3.14159
 #define PI2 6.28318
 #define RECIPROCAL_PI2 0.15915494
@@ -227,14 +222,7 @@ float specularStrength;
 	specularStrength = 1.0;
 
 #endif
-  #ifdef DOUBLE_SIDED
-    if ( gl_FrontFacing )
-      outgoingLight += diffuseColor.rgb * vLightFront + emissive;
-    else
-      outgoingLight += diffuseColor.rgb * vLightBack + emissive;
-  #else
-    outgoingLight += diffuseColor.rgb * vLightFront + emissive;
-  #endif
+  outgoingLight = diffuseColor.rgb;
 #ifdef USE_LIGHTMAP
 
 	outgoingLight *= diffuseColor.xyz * texture2D( lightMap, vUv2 ).xyz;
@@ -550,5 +538,5 @@ float specularStrength;
 	outgoingLight = mix( outgoingLight, fogColor, fogFactor );
 
 #endif
-  fragColor = vec4(outgoingLight, diffuseColor.a);
+  fragColor = vec4( outgoingLight, diffuseColor.a );
 }
