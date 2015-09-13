@@ -6,8 +6,8 @@ module Mittsu
 
     def initialize(type, string)
       @shader = glCreateShader(type)
-      filename = type == GL_VERTEX_SHADER ? 'vertex.glsl' : 'fragment.glsl'
-      File.write filename, string
+      # filename = type == GL_VERTEX_SHADER ? 'vertex.glsl' : 'fragment.glsl'
+      # File.write filename, string
 
       string_pointer = Fiddle::Pointer[string]
       string_length = Fiddle::Pointer[string.length]
