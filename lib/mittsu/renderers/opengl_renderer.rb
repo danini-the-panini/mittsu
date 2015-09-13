@@ -2737,9 +2737,9 @@ module Mittsu
 
           @_direction.set_from_matrix_position(light.matrix_world)
 
-          spot_positions[spotOffset]     = @_direction.x
-          spot_positions[spotOffset + 1] = @_direction.y
-          spot_positions[spotOffset + 2] = @_direction.z
+          spot_positions[spot_offset]     = @_direction.x
+          spot_positions[spot_offset + 1] = @_direction.y
+          spot_positions[spot_offset + 2] = @_direction.z
 
           spot_distances[spot_length] = distance
 
@@ -2747,9 +2747,9 @@ module Mittsu
           @_direction.sub(@_vector3)
           @_direction.normalize
 
-          spot_directions[spotOffset]     = @_direction.x
-          spot_directions[spotOffset + 1] = @_direction.y
-          spot_directions[spotOffset + 2] = @_direction.z
+          spot_directions[spot_offset]     = @_direction.x
+          spot_directions[spot_offset + 1] = @_direction.y
+          spot_directions[spot_offset + 2] = @_direction.z
 
           spot_angles_cos[spot_length] = Math.cos(light.angle)
           spot_exponents[spot_length] = light.exponent;

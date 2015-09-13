@@ -20,13 +20,13 @@ module Mittsu
                   :shadow_camera,
                   :shadow_matrix
 
-    def initialize(color = nil, intensity = 1.0, distance = 0.0, angle = (Math::PI / 2.0), exponent = 10.0, decay = 1.0)
+    def initialize(color = nil, intensity = 1.0, distance = 0.0, angle = (Math::PI / 3.0), exponent = 10.0, decay = 1.0)
       super(color)
 
       @type = 'SpotLight'
 
       @position.set( 0, 1, 0 )
-      @target = new THREE.Object3D()
+      @target = Object3D.new
 
       @intensity = intensity
       @distance = distance
