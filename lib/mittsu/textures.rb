@@ -1,0 +1,1 @@
+require 'mittsu/textures/texture'

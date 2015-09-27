@@ -8,6 +8,7 @@ require "mittsu/materials"
 require "mittsu/objects"
 require "mittsu/renderers"
 require "mittsu/scenes"
+require "mittsu/textures"
 
 module Mittsu
   MOUSE_LEFT = 0
