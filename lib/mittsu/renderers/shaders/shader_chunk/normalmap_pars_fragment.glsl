@@ -17,7 +17,7 @@
 		vec3 T = normalize( -q0 * st1.s + q1 * st0.s );
 		vec3 N = normalize( surf_norm );
 
-		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+		vec3 mapN = texture( normalMap, vUv ).xyz * 2.0 - 1.0;
 		mapN.xy = normalScale * mapN.xy;
 		mat3 tsn = mat3( S, T, N );
 		return normalize( tsn * mapN );

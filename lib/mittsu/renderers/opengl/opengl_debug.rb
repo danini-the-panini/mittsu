@@ -27,7 +27,7 @@ module OpenGLDebug
   OpenGL.instance_methods.each do |m|
     define_method m do |*args|
       r = OpenGLProxy.send(m, *args)
-      call = "#{m}(#{args})"
+      call = "#{m}(#{args.map { |s| s.to_s[0..20] }})"
       ret = r.nil? ? '' : " => #{r}"
       puts "#{call}#{ret}"
       e = OpenGLProxy.glGetError

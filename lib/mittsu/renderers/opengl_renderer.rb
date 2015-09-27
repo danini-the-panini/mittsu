@@ -704,6 +704,92 @@ module Mittsu
       end
     end
 
+    def set_texture(texture, slot)
+      glActiveTexture(GL_TEXTURE0 + slot)
+
+      if texture.needs_update?
+        upload_texture(texture)
+      else
+        glBindTexture(GL_TEXTURE_2D, texture[:_opengl_texture])
+      end
+    end
+
+    def upload_texture(texture)
+      if texture[:_opengl_init].nil?
+        texture[:_opengl_init] = true
+        texture.add_event_listener :dispose, @on_texture_dispose
+        texture[:_opengl_texture] = glCreateTexture
+        @info[:memory][:textures] += 1
+      end
+
+      glBindTexture(GL_TEXTURE_2D, texture[:_opengl_texture])
+
+      # glPixelStorei(GL_UNPACK_FLIP_Y_WEBGL, texture.flip_y) ???
+      # glPixelStorei(GL_UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiply_alpha) ???
+      glPixelStorei(GL_UNPACK_ALIGNMENT, texture.unpack_alignment)
+
+      texture.image = clamp_to_max_size(texture.image, @_max_texture_size)
+
+      image = texture.image
+      is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
+      gl_format = param_mittsu_to_gl(texture.format)
+      gl_type = param_mittsu_to_gl(texture.type)
+
+      set_texture_parameters(GL_TEXTURE_2D, texture, is_image_power_of_two)
+
+      mipmaps = texture.mipmaps
+
+      if texture.is_a?(DataTexture)
+        # use manually created mipmaps if available
+        # if there are no manual mipmaps
+        # set 0 level mipmap and then use GL to generate other mipmap levels
+
+        if !mipmaps.empty? && is_image_power_of_two
+          mipmaps.each_with_index do |mipmap, i|
+            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
+          end
+        else
+          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, image.width, image.height, 0, gl_format, gl_type, image.data)
+        end
+      elsif texture.is_a?(CompressedTexture)
+        mipmaps.each_with_index do |mipmap, i|
+          if texture.format != RGBAFormat && texture.format != RGBFormat
+            if get_compressed_texture_formats.index(gl_format)
+              glCompressedTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, mipmap.data)
+            else
+              puts 'WARNING: Mittsu::OpenGLRenderer: Attempt to load unsupported compressed texture format in #upload_texture'
+            end
+          else
+            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
+          end
+        end
+      else # regular texture (image, video, canvas)
+        # use manually created mipmaps if available
+        # if there are no manual mipmaps
+        # set 0 level mipmap and then use GL to generate other mipmap levels
+
+        if !mipmaps.empty? && is_image_power_of_two
+          mipmaps.each_with_index do |mipmap, i|
+            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
+          end
+
+          texture.generate_mipmaps = false
+        else
+          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, texture.image.width, texture.image.height, 0, gl_format, gl_type, texture.image.data)
+        end
+      end
+
+      if texture.generate_mipmaps && is_image_power_of_two
+        glGenerateMipmap(GL_TEXTURE_2D)
+      end
+
+      texture.needs_update = false
+
+      if texture.on_update
+        texture.on_update.()
+      end
+    end
+
     private
 
     def clear_color(r, g, b, a)
@@ -1113,6 +1199,12 @@ module Mittsu
     def glCreateBuffer
       @_b ||= ' '*8
       glGenBuffers(1, @_b)
+      @_b.unpack('L')[0]
+    end
+
+    def glCreateTexture
+      @_b ||= ' '*8
+      glGenTextures(1, @_b)
       @_b.unpack('L')[0]
     end
 
@@ -1965,7 +2057,7 @@ module Mittsu
     end
 
     def set_program(camera, lights, fog, material, object)
-      _used_texture_units = 0
+      @_used_texture_units = 0
 
       if material.needs_update?
         deallocate_material(material) if material.program
@@ -2045,7 +2137,7 @@ module Mittsu
 
         if _supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
           if !p_uniforms.bone_texture.nil?
-            texture_unit = getTextureUnit
+            texture_unit = get_texture_unit
 
             glUniform1i(p_uniforms.bone_texture, texture_unit)
             self.set_texture(object.skeleton.bone_texture, texture_unit)
@@ -2553,67 +2645,41 @@ module Mittsu
 
           glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform[:_array]))
         when :t
-      # TODO: when Texture is defined
-      #       // single THREE.Texture (2d or cube)
-      #
-      #       texture = value;
-      #       textureUnit = getTextureUnit();
-      #
-      #       _gl.uniform1i( location, textureUnit );
-      #
-      #       if ( ! texture ) continue;
-      #
-      #       if ( texture instanceof THREE.CubeTexture ||
-      #          ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
-      #
-      #         setCubeTexture( texture, textureUnit );
-      #
-      #       } else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-      #
-      #         setCubeTextureDynamic( texture, textureUnit );
-      #
-      #       } else {
-      #
-      #         _this.setTexture( texture, textureUnit );
-      #
-      #       }
-      #
-      #       break;
-      #
+          # single Mittsu::Texture (2d or cube)
+          texture = value
+          texture_unit = get_texture_unit
+
+          glUniform1i(location, texture_unit)
+
+          next unless texture
+
+          if texture.is_a?(CubeTexture) || (texture.is_a?(Array) && texture.image.length == 6)
+            set_cube_texture(texture, texture_unit)
+          # TODO: when OpenGLRenderTargetCube is defined
+          # elsif texture.is_a?(OpenGLRenderTargetCube)
+            # set_cube_texture_dynamic(texture, texture_unit)
+          else
+            set_texture(texture, texture_unit)
+          end
         when :tv
-      #
-      #       // array of THREE.Texture (2d)
-      #
-      #       if ( uniform._array === undefined ) {
-      #
-      #         uniform._array = [];
-      #
-      #       }
-      #
-      #       for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-      #
-      #         uniform._array[ i ] = getTextureUnit();
-      #
-      #       }
-      #
-      #       _gl.uniform1iv( location, uniform._array );
-      #
-      #       for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
-      #
-      #         texture = uniform.value[ i ];
-      #         textureUnit = uniform._array[ i ];
-      #
-      #         if ( ! texture ) continue;
-      #
-      #         _this.setTexture( texture, textureUnit );
-      #
-      #       }
-      #
-      #       break;
-      #
+          # array of Mittsu::Texture (2d)
+          uniform[:_array] ||= []
+
+          uniform.value.each_index do |i|
+            uniform[:_array][i] = get_texture_unit
+          end
+
+          glUniform1iv(location, array_to_ptr_easy(uniform[:_array]))
+
+          uniform.value.each_with_index do |tex, i|
+            tex_unit = uniform[:_array][i]
+
+            next unless tex
+
+            set_texture(tex, tex_unit)
+          end
         else
           puts "WARNING: Mittsu::OpenGLRenderer: Unknown uniform type: #{type}"
-
         end
       end
     end
@@ -2873,6 +2939,104 @@ module Mittsu
       array[offset]     = color.r * intensity
       array[offset + 1] = color.g * intensity
       array[offset + 2] = color.b * intensity
+    end
+
+    def get_texture_unit
+      texture_unit = @_used_texture_units
+
+      if texture_unit >= @_max_textures
+        puts "WARNING: OpenGLRenderer: trying to use #{texture_unit} texture units while this GPU supports only #{@_max_textures}"
+      end
+
+      @_used_texture_units += 1
+      texture_unit
+    end
+
+    def clamp_to_max_size(image, max_size)
+      if image.width > max_size || image.height > max_size
+        # TODO: scale the image ...
+
+        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{image.width} x #{image.height}). Resized to ??? x ???"
+      end
+      image
+    end
+
+    def param_mittsu_to_gl(p)
+      case p
+      when RepeatWrapping then GL_REPEAT
+      when ClampToEdgeWrapping then GL_CLAMP_TO_EDGE
+      when MirroredRepeatWrapping then GL_MIRRORED_REPEAT
+
+      when NearestFilter then GL_NEAREST
+      when NearestMipMapNearestFilter then GL_NEAREST_MIPMAP_NEAREST
+      when NearestMipMapLinearFilter then GL_NEAREST_MIPMAP_LINEAR
+
+      when LinearFilter then GL_LINEAR
+      when LinearMipMapNearestFilter then GL_LINEAR_MIPMAP_NEAREST
+      when LinearMipMapLinearFilter then GL_LINEAR_MIPMAP_LINEAR
+
+      when UnsignedByteType then GL_UNSIGNED_BYTE
+      when UnsignedShort4444Type then GL_UNSIGNED_SHORT_4_4_4_4
+      when UnsignedShort5551Type then GL_UNSIGNED_SHORT_5_5_5_1
+      when UnsignedShort565Type then GL_UNSIGNED_SHORT_5_6_5
+
+      when ByteType then GL_BYTE
+      when ShortType then GL_SHORT
+      when UnsignedShortType then GL_UNSIGNED_SHORT
+      when IntType then GL_INT
+      when UnsignedIntType then GL_UNSIGNED_INT
+      when FloatType then GL_FLOAT
+
+      when AlphaFormat then GL_ALPHA
+      when RGBFormat then GL_RGB
+      when RGBAFormat then GL_RGBA
+      when LuminanceFormat then GL_LUMINANCE
+      when LuminanceAlphaFormat then GL_LUMINANCE_ALPHA
+
+      when AddEquation then GL_FUNC_ADD
+      when SubtractEquation then GL_FUNC_SUBTRACT
+      when ReverseSubtractEquation then GL_FUNC_REVERSE_SUBTRACT
+
+      when ZeroFactor then GL_ZERO
+      when OneFactor then GL_ONE
+      when SrcColorFactor then GL_SRC_COLOR
+      when OneMinusSrcColorFactor then GL_ONE_MINUS_SRC_COLOR
+      when SrcAlphaFactor then GL_SRC_ALPHA
+      when OneMinusSrcAlphaFactor then GL_ONE_MINUS_SRC_ALPHA
+      when DstAlphaFactor then GL_DST_ALPHA
+      when OneMinusDstAlphaFactor then GL_ONE_MINUS_DST_ALPHA
+
+      when DstColorFactor then GL_DST_COLOR
+      when OneMinusDstColorFactor then GL_ONE_MINUS_DST_COLOR
+      when SrcAlphaSaturateFactor then GL_SRC_ALPHA_SATURATE
+      else 0
+      end
+    end
+
+    def set_texture_parameters(texture_type, texture, is_image_power_of_two)
+      if is_image_power_of_two
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, param_mittsu_to_gl(texture.wrap_s))
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, param_mittsu_to_gl(texture.wrap_t))
+
+        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, param_mittsu_to_gl(texture.mag_filter))
+        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, param_mittsu_to_gl(texture.min_filter))
+      else
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+        if texture.wrap_s != ClampToEdgeWrapping || texture.wrap_t != ClampToEdgeWrapping
+          puts "WARNING: Mittsu::OpenGLRenderer: Texture is not power of two. Texture.wrap_s and Texture.wrap_t should be set to Mittsu::ClampToEdgeWrapping. (#{texture.source_file})"
+        end
+
+        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, filter_fallback(texture.mag_filter))
+        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, filter_fallback(texture.min_filter))
+
+        if texture.min_filter != NearestFilter && texture.min_filter != LinearFilter
+          puts "WARNING: Mittsu::OpenGLRenderer: Texture is not a power of two. Texture.min_filter should be set to Mittsu::NearestFilter or Mittsu::LinearFilter. (#{texture.source_file})"
+        end
+
+        # TODO: anisotropic extension ???
+      end
     end
   end
 end

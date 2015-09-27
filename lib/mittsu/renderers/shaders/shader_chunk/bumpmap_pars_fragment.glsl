@@ -13,9 +13,9 @@
 		vec2 dSTdx = dFdx( vUv );
 		vec2 dSTdy = dFdy( vUv );
 
-		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;
+		float Hll = bumpScale * texture( bumpMap, vUv ).x;
+		float dBx = bumpScale * texture( bumpMap, vUv + dSTdx ).x - Hll;
+		float dBy = bumpScale * texture( bumpMap, vUv + dSTdy ).x - Hll;
 
 		return vec2( dBx, dBy );
 

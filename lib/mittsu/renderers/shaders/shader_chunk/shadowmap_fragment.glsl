@@ -64,10 +64,10 @@
 				for ( float y = -1.25; y <= 1.25; y += 1.25 )
 					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {
 
-						vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
+						vec4 rgbaDepth = texture( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
 
-								// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup
-								//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );
+								// doesn't seem to produce any noticeable visual difference compared to simple texture lookup
+								//vec4 rgbaDepth = textureProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );
 
 						float fDepth = unpackDepth( rgbaDepth );
 
@@ -90,31 +90,31 @@
 				float dx1 = 1.25 * xPixelOffset;
 				float dy1 = 1.25 * yPixelOffset;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
 				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );
@@ -138,15 +138,15 @@
 				mat3 shadowKernel;
 				mat3 depthKernel;
 
-				depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
-				depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
-				depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
-				depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
-				depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );
-				depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
-				depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
-				depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
-				depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
+				depthKernel[0][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
+				depthKernel[0][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
+				depthKernel[0][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
+				depthKernel[1][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
+				depthKernel[1][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy ) );
+				depthKernel[1][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
+				depthKernel[2][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
+				depthKernel[2][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
+				depthKernel[2][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
 
 				vec3 shadowZ = vec3( shadowCoord.z );
 				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));
@@ -175,7 +175,7 @@
 
 			#else
 
-				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );
+				vec4 rgbaDepth = texture( shadowMap[ i ], shadowCoord.xy );
 				float fDepth = unpackDepth( rgbaDepth );
 
 				if ( fDepth < shadowCoord.z )
