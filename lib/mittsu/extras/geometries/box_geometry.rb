@@ -80,9 +80,9 @@ module Mittsu
           c = (ix + 1) + grid_x1 * (iy + 1)
           d = (ix + 1) + grid_x1 * iy
 
-          uva = Vector2.new(ix / grid_x.to_f, 1.0 - iy / grid_y.to_f)
+          uva = Vector2.new(1.0 - ix / grid_x.to_f, iy / grid_y.to_f)
           uvb = Vector2.new(ix / grid_x.to_f, 1.0 - (iy + 1.0) / grid_y.to_f)
-          uvc = Vector2.new((ix + 1.0) / grid_x.to_f, 1.0 - (iy + 1.0) / grid_y.to_f)
+          uvc = Vector2.new(1.0 - (ix + 1.0) / grid_x.to_f, (iy + 1.0) / grid_y.to_f)
           uvd = Vector2.new((ix + 1.0) / grid_x.to_f, 1.0 - iy / grid_y.to_f)
 
           face = Face3.new(a + offset, b + offset, d + offset)
