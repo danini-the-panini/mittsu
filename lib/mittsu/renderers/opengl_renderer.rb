@@ -1,5 +1,6 @@
 require 'mittsu'
 require 'mittsu/renderers/opengl/opengl_program'
+require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
@@ -178,12 +179,12 @@ module Mittsu
         puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
       end
 
+      @state = OpenGLState.new(self.method(:param_mittsu_to_gl))
+
       # TODO: get shader precision format???
       # TODO: load extensions??
 
       set_default_gl_state
-
-      # @state = state .... ???
 
       # GPU capabilities
 
@@ -342,7 +343,7 @@ module Mittsu
 
       @_lights_need_update = true
 
-      # state.reset # TODO: ???
+      @state.reset
     end
 
     def set_render_target(render_target = nil)
@@ -463,7 +464,7 @@ module Mittsu
       else
         # opaque pass (front-to-back order)
 
-        # state.set_blending(NoBlending) # TODO: what is this "State?"
+        @state.set_blending(NoBlending)
 
         render_objects(@opaque_objects, camera, @lights, fog, nil)
         render_objects_immediate(@_opengl_objects_immediate, :opaque, camera, @lights, fog, nil)
@@ -486,18 +487,16 @@ module Mittsu
       end
 
       # endure depth buffer writing is enabled so it can be cleared on next render
-      # TODO: state object again ????
-      # state.set_depth_test(true)
-      # state.set_depth_write(true)
-      # state.set_color_write(true)
+      @state.set_depth_test(true)
+      @state.set_depth_write(true)
+      @state.set_color_write(true)
 
       #glFinish ??????
     end
 
     def set_material_faces(material)
-      # TODO
-      # state.set_double_sided(material.side == DoubleSide)
-      # state.set_flip_sided(material.side = BackSide)
+      @state.set_double_sided(material.side == DoubleSide)
+      @state.set_flip_sided(material.side == BackSide)
     end
 
     def render_buffer(camera, lights, fog, material, geometry_group, object)
@@ -521,17 +520,14 @@ module Mittsu
         update_buffers = true
       end
 
-      # TODO
-      # state.init_attributes if update_buffers
+      @state.init_attributes if update_buffers
 
       # vertices
       if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
         if update_buffers
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_vertex_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['position'])
-          glEnableVertexAttribArray attributes['position']
+          @state.enable_attribute(attributes['position'])
 
           glVertexAttribPointer(attributes['position'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         end
@@ -549,9 +545,7 @@ module Mittsu
             if attributes[attribute.buffer.belongs_to_attribute] >= 0
               glBindBuffer(GL_ARRAY_BUFFER, attribute.buffer)
 
-              # TODO
-              # state.enable_attribute(attributes[attribute.buffer.belongs_to_attribute]
-              glEnableVertexAttribArray attributes[attribute.buffer.belongs_to_attribute]
+              @state.enable_attribute(attributes[attribute.buffer.belongs_to_attribute])
 
               glVertexAttribPointer(attributes[attribute.buffer.belongs_to_attribute], attribute.size, GL_FLOAT, GL_FALSE, 0, 0)
             end
@@ -563,9 +557,7 @@ module Mittsu
         if attributes['color'] && attributes['color'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_color_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['color'])
-          glEnableVertexAttribArray attributes['color']
+          @state.enable_attribute(attributes['color'])
 
           glVertexAttribPointer(attributes['color'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         elsif !material.default_attribute_values.nil?
@@ -577,9 +569,7 @@ module Mittsu
         if attributes['normal'] && attributes['normal'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_normal_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['normal'])
-          glEnableVertexAttribArray attributes['normal']
+          @state.enable_attribute(attributes['normal'])
 
           glVertexAttribPointer(attributes['normal'], 3, GL_FLOAT, GL_FALSE, 0, 0)
         end
@@ -589,9 +579,7 @@ module Mittsu
         if attributes['tangent'] && attributes['tangent'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_tangent_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['tangent'])
-          glEnableVertexAttribArray attributes['tangent']
+          @state.enable_attribute(attributes['tangent'])
 
           glVertexAttribPointer(attributes['tangent'], 4, GL_FLOAT, GL_FALSE, 0, 0)
         end
@@ -602,9 +590,7 @@ module Mittsu
           if object.geometry.face_vertex_uvs[0]
             glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv_buffer])
 
-            # TODO
-            # state.enable_attribute(attributes['uv'])
-            glEnableVertexAttribArray attributes['uv']
+            @state.enable_attribute(attributes['uv'])
 
             glVertexAttribPointer(attributes['uv'], 2, GL_FLOAT, GL_FALSE, 0, 0)
           elsif !material.default_attribute_values.nil?
@@ -616,9 +602,7 @@ module Mittsu
           if object.geometry.face_vertex_uvs[1]
             glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv2_buffer])
 
-            # TODO
-            # state.enable_attribute(attributes['uv2'])
-            glEnableVertexAttribArray attributes['uv2']
+            @state.enable_attribute(attributes['uv2'])
 
             glVertexAttribPointer(attributes['uv2'], 2, GL_FLOAT, GL_FALSE, 0, 0)
           elsif !material.default_attribute_values.nil?
@@ -629,17 +613,13 @@ module Mittsu
         if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_indices_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['skin_index'])
-          glEnableVertexAttribArray attributes['skin_index']
+          @state.enable_attribute(attributes['skin_index'])
 
           glVertexAttribPointer(attributes['skin_index'], 4, GL_FLOAT, GL_FALSE, 0, 0)
 
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_weight_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['skin_weight'])
-          glEnableVertexAttribArray attributes['skin_weight']
+          @state.enable_attribute(attributes['skin_weight'])
 
           glVertexAttribPointer(attributes['skin_weight'], 4, GL_FLOAT, GL_FALSE, 0, 0)
         end
@@ -649,16 +629,13 @@ module Mittsu
         if attributes['line_distances'] && attributes['line_distances'] >= 0
           glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_line_distance_buffer])
 
-          # TODO
-          # state.enable_attribute(attributes['line_distance'])
-          glEnableVertexAttribArray attributes['line_distance']
+          @state.enable_attribute(attributes['line_distance'])
 
           glVertexAttribPointer(attributes['line_distance'], 1, GL_FLOAT, GL_FALSE, 0, 0)
         end
       end
 
-      # TODO
-      # state.disable_unused_attributes
+      @state.disable_unused_attributes
 
       case object
 
@@ -668,8 +645,7 @@ module Mittsu
 
         # wireframe
         if material.wireframe
-          # TODO
-          # state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
+          @state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
 
           glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_line_buffer]) if update_buffers
           glDrawElements(GL_LINES, geometry_group[:_opengl_line_count], type, 0)
@@ -689,7 +665,7 @@ module Mittsu
         # mode = object.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
         #
         # TODO
-        # state.set_line_width(material.line_width * @pixel_ratio)
+        # @state.set_line_width(material.line_width * @pixel_ratio)
         #
         # glDrawArrays(mode, 0, geometry_group[:_opengl_line_count])
         #
@@ -1143,18 +1119,15 @@ module Mittsu
 
     def set_material(material)
       if material.transparent
-        # TODO
-        # state.set_blending(material.blending, material.blend_equation, material.blend_src, material.blend_dst, material.blend_equation_alpha, material.blend_src_alpha, material.blend_dst_alpha)
+        @state.set_blending(material.blending, material.blend_equation, material.blend_src, material.blend_dst, material.blend_equation_alpha, material.blend_src_alpha, material.blend_dst_alpha)
       else
-        # TODO
-        # state.set_blending(NoBlending)
+        @state.set_blending(NoBlending)
       end
 
-      # TODO
-      # state.set_depth_test(material.depth_test)
-      # state.set_depth_write(material_depth_write)
-      # state.set_color_write(material.color_write)
-      # state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
+      @state.set_depth_test(material.depth_test)
+      @state.set_depth_write(material.depth_write)
+      @state.set_color_write(material.color_write)
+      @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
     def create_mesh_buffers(geometry_group)

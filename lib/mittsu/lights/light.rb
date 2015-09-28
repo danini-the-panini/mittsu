@@ -1,4 +1,4 @@
-require 'mittsu/core/object3_d'
+require 'mittsu/core/object_3d'
 require 'mittsu/math/color'
 
 module Mittsu
