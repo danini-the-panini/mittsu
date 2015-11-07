@@ -40,7 +40,7 @@ module Mittsu
           @vertices << vertex
 
           vertices_row << @vertices.length - 1.0
-          uvs_row << Vector2.new(u, 1.0 - v)
+          uvs_row << Vector2.new(u, v)
         end
 
         _vertices << vertices_row
