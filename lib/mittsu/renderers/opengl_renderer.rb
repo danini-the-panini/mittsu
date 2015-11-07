@@ -184,6 +184,7 @@ module Mittsu
       # TODO: get shader precision format???
       # TODO: load extensions??
 
+      reset_gl_state
       set_default_gl_state
 
       # GPU capabilities

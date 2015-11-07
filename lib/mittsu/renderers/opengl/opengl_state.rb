@@ -31,24 +31,25 @@ module Mittsu
 
     def init_attributes
       @new_attributes.length.times do |i|
-        @new_attributes[i] = 0
+        @new_attributes[i] = false
       end
     end
 
     def enable_attribute(attribute)
-      @new_attributes[attribute] = 1
+      glEnableVertexAttribArray(attribute)
+      @new_attributes[attribute] = true
 
-      if @enabled_attributes[attribute] == 0
-        glEnableVertexAttribArray(attribute)
-        @enabled_attributes[attribute] = 1
+      if !@enabled_attributes[attribute]
+        # glEnableVertexAttribArray(attribute)
+        @enabled_attributes[attribute] = true
       end
     end
 
     def disable_unused_attributes
       @enabled_attributes.length.times do |i|
-        if @enabled_attributes[i] != @new_attributes[i]
+        if @enabled_attributes[i] && !@new_attributes[i]
           glDisableVertexAttribArray(i)
-          @enabled_attributes[i] = 0
+          @enabled_attributes[i] = false
         end
       end
     end
@@ -191,8 +192,8 @@ module Mittsu
     end
 
     def reset
-      @enabled_attributes.length.each do |i|
-        @enabled_attributes[i] = 0
+      @enabled_attributes.length.times do |i|
+        @enabled_attributes[i] = false
       end
 
       @current_blending = nil

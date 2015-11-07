@@ -36,7 +36,7 @@ module Mittsu
   attr_accessor :color, :map, :light_map, :specular_map, :alpha_map, :env_map, :combine, :reflectivity, :refraction_ratio, :shading, :wireframe, :wireframe_linewidth, :wireframe_linecap, :wireframe_linejoin, :vertex_colors, :skinning, :morph_targets, :fog
 
   class MeshBasicMaterial < Material
-    def initialize(parameters)
+    def initialize(parameters = {})
       super()
 
       @type = 'MeshBasicMaterial'
