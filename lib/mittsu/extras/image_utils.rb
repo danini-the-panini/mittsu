@@ -13,12 +13,10 @@ module Mittsu
     end
 
     def self.load_texture_cube(array, mapping = Texture::DEFAULT_MAPPING)
-      images = []
+      images = HashArray.new
 
       loader = ImageLoader.new
       CubeTexture.new(images, mapping).tap do |texture|
-        # no flipping needed for the cube textures
-        texture.flip_y = false
         loaded = 0
 
         array.length.times do |i|

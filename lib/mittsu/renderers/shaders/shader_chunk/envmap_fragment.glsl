@@ -30,7 +30,7 @@
 	#endif
 
 	#ifdef ENVMAP_TYPE_CUBE
-		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+		vec4 envColor = texture( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
 
 	#elif defined( ENVMAP_TYPE_EQUIREC )
 		vec2 sampleUV;
