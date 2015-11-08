@@ -197,9 +197,9 @@ module Mittsu
     end
 
     def look_at(eye, target, up)
-      x = Mittus::Vector3.new
-      y = Mittus::Vector3.new
-      z = Mittus::Vector3.new
+      x = Mittsu::Vector3.new
+      y = Mittsu::Vector3.new
+      z = Mittsu::Vector3.new
       te = self.elements
       z.sub_vectors(eye, target).normalize
       if z.length.zero?

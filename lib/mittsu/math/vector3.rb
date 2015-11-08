@@ -368,8 +368,8 @@ module Mittsu
     end
 
     def cross_vectors(a, b)
-      ax = a.x, ay = a.y, az = a.z
-      bx = b.x, by = b.y, bz = b.z
+      ax, ay, az = a.x, a.y, a.z
+      bx, by, bz = b.x, b.y, b.z
 
       @x = ay * bz - az * by
       @y = az * bx - ax * bz
