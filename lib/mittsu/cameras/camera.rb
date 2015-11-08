@@ -21,7 +21,7 @@ module Mittsu
     def look_at(vector)
       @_m1 ||= Matrix4.new
       @_m1.look_at(@position, vector, @up)
-      @quternion.set_from_rotation_matrix(@_m1)
+      @quaternion.set_from_rotation_matrix(@_m1)
     end
 
     def clone(camera = Camera.new)
