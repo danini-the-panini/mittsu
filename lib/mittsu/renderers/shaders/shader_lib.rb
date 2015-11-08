@@ -192,7 +192,7 @@ module Mittsu
         "  #ifdef DOUBLE_SIDED",
 
             #"float isFront = float( gl_FrontFacing );",
-            #"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
+            #"fragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
 
         "    if ( gl_FrontFacing )",
         "      outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
@@ -221,14 +221,45 @@ module Mittsu
         "}"
 
       ].join("\n")
-    )
+    ),
     # TODO:
     # phong
     # particle_basic
     # dashed
     # depth
     # normal
-    # cube
+    cube: ShaderLib_Instance.new(
+      uniforms: {
+        'tCube' => Uniform.new(:t, nil),
+        'tFlip' => Uniform.new(:f, -1.0)
+      },
+      vertex_shader: [
+  			'out vec3 vWorldPosition;',
+
+  			ShaderChunk[:common],
+  			ShaderChunk[:logdepthbuf_pars_vertex],
+
+  			'void main() {',
+  			'	vWorldPosition = transformDirection( position, modelMatrix );',
+  			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+  				ShaderChunk[:logdepthbuf_vertex],
+  			'}'
+      ].join("\n"),
+      fragment_shader: [
+  			'uniform samplerCube tCube;',
+  			'uniform float tFlip;',
+
+  			'in vec3 vWorldPosition;',
+
+  			ShaderChunk[:common],
+  			ShaderChunk[:logdepthbuf_pars_fragment],
+
+  			'void main() {',
+  			'	fragColor = texture( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );',
+  				ShaderChunk[:logdepthbuf_fragment],
+  			'}'
+      ].join("\n")
+    )
     # equirect
     # depth_rgba
   }
