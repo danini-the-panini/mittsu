@@ -45,9 +45,14 @@ module Mittsu
     },
 
     bump: {
-      'bumpMap' => Uniform.new(:f, nil),
+      'bumpMap' => Uniform.new(:t, nil),
       'bumpScale' => Uniform.new(:f, 1.0)
     },
+
+  	normal_map: {
+  		'normalMap' => Uniform.new(:t, nil),
+  		'normalScale' => Uniform.new(:v2, Vector2.new(1.0, 1.0))
+  	},
 
     fog: {
       'fogDensity' => Uniform.new(:f, 0.00025),

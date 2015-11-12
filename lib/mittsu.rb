@@ -1,3 +1,5 @@
+require "pry"
+
 require "mittsu/version"
 require "mittsu/math"
 require "mittsu/core"

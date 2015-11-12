@@ -154,17 +154,15 @@ module Mittsu
         '}',
       ].join("\n"),
       fragment_shader: [
-        "uniform vec3 diffuse;",
-        "uniform vec3 emissive;",
-        "uniform float opacity;",
+        'uniform vec3 diffuse;',
+        'uniform vec3 emissive;',
+        'uniform float opacity;',
 
-        "in vec3 vLightFront;",
+        'in vec3 vLightFront;',
 
-        "#ifdef DOUBLE_SIDED",
-
-        "  in vec3 vLightBack;",
-
-        "#endif",
+        '#ifdef DOUBLE_SIDED',
+        '  in vec3 vLightBack;',
+        '#endif',
 
         ShaderChunk[:common],
         ShaderChunk[:color_pars_fragment],
@@ -177,10 +175,10 @@ module Mittsu
         ShaderChunk[:specularmap_pars_fragment],
         ShaderChunk[:logdepthbuf_pars_fragment],
 
-        "void main() {",
+        'void main() {',
 
-        "  vec3 outgoingLight = vec3( 0.0 );",  # outgoing light does not have an alpha, the surface does
-        "  vec4 diffuseColor = vec4( diffuse, opacity );",
+        '  vec3 outgoingLight = vec3( 0.0 );',  # outgoing light does not have an alpha, the surface does
+        '  vec4 diffuseColor = vec4( diffuse, opacity );',
 
           ShaderChunk[:logdepthbuf_fragment],
           ShaderChunk[:map_fragment],
@@ -189,21 +187,21 @@ module Mittsu
           ShaderChunk[:alphatest_fragment],
           ShaderChunk[:specularmap_fragment],
 
-        "  #ifdef DOUBLE_SIDED",
+        '  #ifdef DOUBLE_SIDED',
 
-            #"float isFront = float( gl_FrontFacing );",
-            #"fragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
+            #'float isFront = float( gl_FrontFacing );',
+            #'fragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;',
 
-        "    if ( gl_FrontFacing )",
-        "      outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
-        "    else",
-        "      outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
+        '    if ( gl_FrontFacing )',
+        '      outgoingLight += diffuseColor.rgb * vLightFront + emissive;',
+        '    else',
+        '      outgoingLight += diffuseColor.rgb * vLightBack + emissive;',
 
-        "  #else",
+        '  #else',
 
-        "    outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
+        '    outgoingLight += diffuseColor.rgb * vLightFront + emissive;',
 
-        "  #endif",
+        '  #endif',
 
           ShaderChunk[:lightmap_fragment],
           ShaderChunk[:envmap_fragment],
@@ -213,17 +211,124 @@ module Mittsu
 
           ShaderChunk[:fog_fragment],
 
-        # "  fragColor = vec4( outgoingLight, diffuseColor.a );",  # TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+        # '  fragColor = vec4( outgoingLight, diffuseColor.a );',  # TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
+        '  fragColor = vec4(outgoingLight, diffuseColor.a);',
+        '}'
+      ].join("\n")
+    ),
+    phong: ShaderLib_Instance.new(
+      uniforms: UniformsUtils.merge([
+  			UniformsLib[:common],
+  			UniformsLib[:bump],
+  			UniformsLib[:normal_map],
+  			UniformsLib[:fog],
+  			UniformsLib[:lights],
+  			UniformsLib[:shadow_map],
+  			{
+  				'emissive'  => Uniform.new(:c, Color.new(0x000000)),
+  				'specular'  => Uniform.new(:c, Color.new(0x111111)),
+  				'shininess' => Uniform.new(:f, 30.0),
+  				'wrapRGB'   => Uniform.new(:v3, Vector3.new(1.0, 1.0, 1.0))
+  			}
+      ]),
+      vertex_shader: [
+  			'#define PHONG',
+  			'out vec3 vViewPosition;',
+  			'#ifndef FLAT_SHADED',
+  			'	out vec3 vNormal;',
+  			'#endif',
 
-        "  fragColor = vec4(outgoingLight, diffuseColor.a);",
+  			ShaderChunk[:common],
+  			ShaderChunk[:map_pars_vertex],
+  			ShaderChunk[:lightmap_pars_vertex],
+  			ShaderChunk[:envmap_pars_vertex],
+  			ShaderChunk[:lights_phong_pars_vertex],
+  			ShaderChunk[:color_pars_vertex],
+  			ShaderChunk[:morphtarget_pars_vertex],
+  			ShaderChunk[:skinning_pars_vertex],
+  			ShaderChunk[:shadowmap_pars_vertex],
+  			ShaderChunk[:logdepthbuf_pars_vertex],
 
-        "}"
+  			'void main() {',
 
+  				ShaderChunk[:map_vertex],
+  				ShaderChunk[:lightmap_vertex],
+  				ShaderChunk[:color_vertex],
+
+  				ShaderChunk[:morphnormal_vertex],
+  				ShaderChunk[:skinbase_vertex],
+  				ShaderChunk[:skinnormal_vertex],
+  				ShaderChunk[:defaultnormal_vertex],
+
+  			'#ifndef FLAT_SHADED', # Normal computed with derivatives when FLAT_SHADED
+  			'	vNormal = normalize( transformedNormal );',
+  			'#endif',
+
+  				ShaderChunk[:morphtarget_vertex],
+  				ShaderChunk[:skinning_vertex],
+  				ShaderChunk[:default_vertex],
+  				ShaderChunk[:logdepthbuf_vertex],
+
+  			'	vViewPosition = -mvPosition.xyz;',
+
+  				ShaderChunk[:worldpos_vertex],
+  				ShaderChunk[:envmap_vertex],
+  				ShaderChunk[:lights_phong_vertex],
+  				ShaderChunk[:shadowmap_vertex],
+  			'}'
+      ].join("\n"),
+      fragment_shader: [
+  			'#define PHONG',
+
+  			'uniform vec3 diffuse;',
+  			'uniform vec3 emissive;',
+  			'uniform vec3 specular;',
+  			'uniform float shininess;',
+  			'uniform float opacity;',
+
+  			ShaderChunk[:common],
+  			ShaderChunk[:color_pars_fragment],
+  			ShaderChunk[:map_pars_fragment],
+  			ShaderChunk[:alphamap_pars_fragment],
+  			ShaderChunk[:lightmap_pars_fragment],
+  			ShaderChunk[:envmap_pars_fragment],
+  			ShaderChunk[:fog_pars_fragment],
+  			ShaderChunk[:lights_phong_pars_fragment],
+  			ShaderChunk[:shadowmap_pars_fragment],
+  			ShaderChunk[:bumpmap_pars_fragment],
+  			ShaderChunk[:normalmap_pars_fragment],
+  			ShaderChunk[:specularmap_pars_fragment],
+  			ShaderChunk[:logdepthbuf_pars_fragment],
+
+  			'void main() {',
+
+  			'	vec3 outgoingLight = vec3( 0.0 );',	# outgoing light does not have an alpha, the surface does
+  			'	vec4 diffuseColor = vec4( diffuse, opacity );',
+
+  				ShaderChunk[:logdepthbuf_fragment],
+  				ShaderChunk[:map_fragment],
+  				ShaderChunk[:color_fragment],
+  				ShaderChunk[:alphamap_fragment],
+  				ShaderChunk[:alphatest_fragment],
+  				ShaderChunk[:specularmap_fragment],
+
+  				ShaderChunk[:lights_phong_fragment],
+
+  				ShaderChunk[:lightmap_fragment],
+  				ShaderChunk[:envmap_fragment],
+  				ShaderChunk[:shadowmap_fragment],
+
+  				ShaderChunk[:linear_to_gamma_fragment],
+
+  				ShaderChunk[:fog_fragment],
+
+  			'	fragColor = vec4( outgoingLight, diffuseColor.a );',	# TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
+  			'}'
       ].join("\n")
     ),
     # TODO:
-    # phong
     # particle_basic
     # dashed
     # depth

@@ -152,7 +152,7 @@ module Mittsu
         # MeshNormalMaterial => :normal, # TODO...
         MeshBasicMaterial => :basic,
         MeshLambertMaterial => :lambert,
-        # MeshPhongMaterial => :phong, # TODO...
+        MeshPhongMaterial => :phong,
         # LineBasicMaterial => :basic, # TODO...
         # LineDashedMaterial => :dashed, # TODO...
         # PointCloudMaterial => :particle_basic # TODO...
@@ -2025,9 +2025,7 @@ module Mittsu
     end
 
     def material_needs_face_normals(material)
-      # TODO: when MeshPhongMaterial exists
-      # !material.is_a?(MeshPhongMaterial) && material.shading == FlatShading
-      material.shading == FlatShading # for now...
+      !material.is_a?(MeshPhongMaterial) && material.shading == FlatShading
     end
 
     def set_program(camera, lights, fog, material, object)
@@ -2082,18 +2080,14 @@ module Mittsu
         # load material specific uniforms
         # (shader material also gets them for the sake of genericity)
 
-        # TODO: when (Shader|MeshPhong)Material is defined
-        # if material.is_a?(ShaderMaterial) || material.is_a?(MeshPhongMaterial) || material.env_map
-        if material.env_map
+        if material.is_a?(ShaderMaterial) || material.is_a?(MeshPhongMaterial) || material.env_map
           if !p_uniforms['cameraPosition'].nil?
             @_vector3.set_from_matrix_position(camera.matrix_world)
             glUniform3f(p_uniforms['cameraPosition'], @_vector3.x, @_vector3.y, @_vector3.z)
           end
         end
 
-        # TODO: when (MeshPhong|Shader)Material is defined
-        # if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.is_a?(ShaderMaterial) || material.skinning
-        if material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.skinning
+        if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.is_a?(ShaderMaterial) || material.skinning
           if !p_uniforms['viewMatrix'].nil?
             glUniformMatrix4fv(p_uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
           end
@@ -2135,9 +2129,7 @@ module Mittsu
         if fog && material.fog
         end
 
-        # TODO: when MeshPhongMaterial is defined
-        # if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
-        if material.is_a?(MeshLambertMaterial) || material.lights
+        if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
           if @_lights_need_update
             refresh_lights = true
             setup_lights(lights)
@@ -2152,9 +2144,7 @@ module Mittsu
           end
         end
 
-        # TODO: when MeshPhongMaterial is defined
-        # if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshPhongMaterial)
-        if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial)
+        if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshPhongMaterial)
           refresh_uniforms_common(m_uniforms, material)
         end
 
@@ -2169,8 +2159,8 @@ module Mittsu
         #   refresh_uniforms_dash(m_uniforms, material)
         # when PointCloudMaterial
         #   refresh_uniforms_particle(m_uniforms, material)
-        # when MeshPhongMaterial
-        #   refresh_uniforms_phong(m_uniforms, material)
+        when MeshPhongMaterial
+          refresh_uniforms_phong(m_uniforms, material)
         when MeshLambertMaterial
           refresh_uniforms_lambert(m_uniforms, material)
         # when MeshDepthMaterial
@@ -2486,6 +2476,17 @@ module Mittsu
       uniforms['refractionRatio'].value = material.refraction_ratio
     end
 
+    def refresh_uniforms_phong(uniforms, material)
+      uniforms['shininess'].value = material.shininess
+
+      uniforms['emissive'].value = material.emissive
+      uniforms['specular'].value = material.specular
+
+      if material.wrap_around
+        uniforms['wrapRGB'].value.copy(material.wrap_rgb)
+      end
+    end
+
     def load_uniforms_generic(uniforms)
       uniforms.each do |(uniform, location)|
         # needs_update property is not added to all uniforms.
@@ -2643,7 +2644,7 @@ module Mittsu
             uniform[:_array][i] = get_texture_unit
           end
 
-          glUniform1iv(location, array_to_ptr_easy(uniform[:_array]))
+          glUniform1iv(location, uniform[:_array].length, array_to_ptr_easy(uniform[:_array]))
 
           uniform.value.each_with_index do |tex, i|
             tex_unit = uniform[:_array][i]

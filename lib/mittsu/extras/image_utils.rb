@@ -4,7 +4,7 @@ module Mittsu
       loader = ImageLoader.new
 
       Texture.new(nil, mapping).tap do |texture|
-        image = loader.load(url)
+        image = loader.load(url, flip: true)
         texture.image = image
         texture.needs_update = true
 
