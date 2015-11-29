@@ -154,4 +154,7 @@ module Mittsu
   RGB_PVRTC_2BPPV1_Format = 2101
   RGBA_PVRTC_4BPPV1_Format = 2102
   RGBA_PVRTC_2BPPV1_Format = 2103
+
+  LineStrip = 0
+  LinePieces = 1
 end

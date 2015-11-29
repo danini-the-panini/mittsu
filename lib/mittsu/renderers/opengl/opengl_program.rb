@@ -228,7 +228,7 @@ module Mittsu
 
 
           parameters[:shadow_map_enabled] ? '#define USE_SHADOWMAP' : '',
-          parameters[:shadow_map_enabled] ? "#define #{shadow_map_define}" : '',
+          parameters[:shadow_map_enabled] ? "#define #{shadow_map_type_define}" : '',
           parameters[:shadow_map_debug] ? '#define SHADOWMAP_DEBUG' : '',
           parameters[:'shadow_map_cascade'] ? '#define SHADOWMAP_CASCADE' : '',
 
@@ -238,7 +238,7 @@ module Mittsu
           'uniform mat4 viewMatrix;',
           'uniform vec3 cameraPosition;',
 
-          "out vec4 fragColor;"
+          'layout(location = 0) out vec4 fragColor;'
         ].reject(&:empty?).join("\n") + "\n"
       end
 

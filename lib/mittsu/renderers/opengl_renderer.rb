@@ -1,6 +1,7 @@
 require 'mittsu'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
+require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
@@ -17,7 +18,7 @@ include GLFW
 
 module Mittsu
   class OpenGLRenderer
-    attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height
+    attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
 
     attr_reader :prevision
 
@@ -153,7 +154,7 @@ module Mittsu
         MeshBasicMaterial => :basic,
         MeshLambertMaterial => :lambert,
         MeshPhongMaterial => :phong,
-        # LineBasicMaterial => :basic, # TODO...
+        LineBasicMaterial => :basic,
         # LineDashedMaterial => :dashed, # TODO...
         # PointCloudMaterial => :particle_basic # TODO...
       }
@@ -206,7 +207,7 @@ module Mittsu
       # Plugins
 
       # TODO: when plugins are ready
-      # @shadow_map_plugin = ShadowMapPlugin(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
+      @shadow_map_plugin = ShadowMapPlugin.new(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
       #
       # @sprite_plugin = SpritePlugin(self, @sprites)
       # @lens_flare_plugin = LensFlarePlugin(self, @lens_flares)
@@ -349,14 +350,79 @@ module Mittsu
 
     def set_render_target(render_target = nil)
       # TODO: when OpenGLRenderTargetCube exists
-      # is_cube = render_target.is_a? OpenGLRenderTargetCube
+      is_cube = false # render_target.is_a? OpenGLRenderTargetCube
 
-      if render_target && render_target[:_opengl_frame_buffer].nil?
-        puts 'TODO (render_target)'
+      if render_target && render_target[:_opengl_framebuffer].nil?
+        render_target.depth_buffer = true if render_target.depth_buffer.nil?
+        render_target.stencil_buffer = true if render_target.stencil_buffer.nil?
+
+        render_target.add_event_listener(:dispose, @on_render_target_dispose)
+
+        render_target[:_opengl_texture] = glCreateTexture
+
+        @info[:memory][:textures] += 1
+
+        # Setup texture, create render and frame buffers
+
+        is_target_power_of_two = Math.power_of_two?(render_target.width) && Math.power_of_two?(render_target.height)
+        gl_format = param_mittsu_to_gl(render_target.format)
+        gl_type = param_mittsu_to_gl(render_target.type)
+
+        if is_cube
+          # TODO
+        else
+          render_target[:_opengl_framebuffer] = glCreateFramebuffer
+
+          if render_target.share_depth_from
+            render_target[:_opengl_renderbuffer] = render_target.share_depth_from[:_opengl_renderbuffer]
+          else
+            render_target[:_opengl_renderbuffer] = glCreateRenderbuffer
+          end
+
+          glBindTexture(GL_TEXTURE_2D, render_target[:_opengl_texture])
+          set_texture_parameters(GL_TEXTURE_2D, render_target, is_target_power_of_two)
+
+          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, render_target.width, render_target.height, 0, gl_format, gl_type, nil)
+
+          setup_framebuffer(render_target[:_opengl_framebuffer], render_target, GL_TEXTURE_2D)
+
+          if render_target.share_depth_from
+            if render_target.depth_buffer && !render_target.stencil_buffer
+              glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_target[:_opengl_renderbuffer])
+            elsif render_target.depth_buffer && render_target.stencil_buffer
+              glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_target[:_opengl_renderbuffer])
+            end
+          else
+            setup_renderbuffer(render_target[:_opengl_renderbuffer], render_target)
+          end
+
+          glGenerateMipmap(GL_TEXTURE_2D) if is_target_power_of_two
+        end
+
+        # Release everything
+
+        if is_cube
+          # TODO
+        else
+          glBindTexture(GL_TEXTURE_2D, 0)
+        end
+
+        glBindRenderbuffer(GL_RENDERBUFFER, 0)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
       end
 
       if render_target
-        puts 'TODO (render_target again)'
+        if is_cube
+          # TODO
+        else
+          framebuffer = render_target[:_opengl_framebuffer]
+        end
+
+        width = render_target.width
+        height = render_target.height
+
+        vx = 0
+        vy = 0
       else
         framebuffer = nil
 
@@ -368,7 +434,7 @@ module Mittsu
       end
 
       if framebuffer != @_current_framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer || 0)
         glViewport(vx, vy, width, height)
 
         @_current_framebuffer = framebuffer
@@ -428,7 +494,7 @@ module Mittsu
 
       # custom render plugins
       # TODO: when plugins are ready
-      # @shadow_map_plugin.render(scene, camera)
+      @shadow_map_plugin.render(scene, camera)
 
       #
 
@@ -660,17 +726,14 @@ module Mittsu
         @info[:render][:calls] += 1
         @info[:render][:vertices] += geometry_group[:_opengl_face_count]
         @info[:render][:faces] += geometry_group[:_opengl_face_count] / 3
-
-      # TODO: render lines
       when Line
-        # mode = object.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
-        #
-        # TODO
-        # @state.set_line_width(material.line_width * @pixel_ratio)
-        #
-        # glDrawArrays(mode, 0, geometry_group[:_opengl_line_count])
-        #
-        # @info[:render][:calls] += 1
+        mode = object.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
+
+        @state.set_line_width(material.line_width * @pixel_ratio)
+
+        glDrawArrays(mode, 0, geometry_group[:_opengl_line_count])
+
+        @info[:render][:calls] += 1
 
       # TODO: render particles
       when PointCloud
@@ -930,16 +993,16 @@ module Mittsu
           when BufferGeometry
           when Mesh
             init_geometry_groups(object, geometry)
-          # TODO: when Line, PointCloud exist
-          # when Line
-          #   if geometry[:_opengl_vertex_buffer].nil?
-          #     create_line_buffers(geometry)
-          #     init_line_buffers(geometry, object)
-          #
-          #     geometry.vertices_need_update = true
-          #     geometry.colors_need_update = true
-          #     geometry.line_distances_need_update
-          #   end
+          when Line
+            if geometry[:_opengl_vertex_buffer].nil?
+              create_line_buffers(geometry)
+              init_line_buffers(geometry, object)
+
+              geometry.vertices_need_update = true
+              geometry.colors_need_update = true
+              geometry.line_distances_need_update
+            end
+          # TODO: when PointCloud exists
           # when PointCloud
           #   if geometry[:_opengl_vertex_buffer].nil?
           #     create_particle_buffers(geometry)
@@ -963,9 +1026,8 @@ module Mittsu
             geometry_groups_list.each do |group|
               add_buffer(@_opengl_objects, group, object)
             end
-          # TODO: when Line, PointCloud exist
-          # when Line, PointCloud
-          #   add_buffer(@_opengl_objects, geometry, object)
+          when Line #, PointCloud TODO
+            add_buffer(@_opengl_objects, geometry, object)
           else
             # TODO: when ImmediateRenderObject exists
             # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
@@ -1131,6 +1193,14 @@ module Mittsu
       @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
+    def create_line_buffers(geometry)
+      geometry[:_opengl_vertex_buffer] = glCreateBuffer
+      geometry[:_opengl_color_buffer] = glCreateBuffer
+      geometry[:_opengl_line_distance_buffer] = glCreateBuffer
+
+      @info[:memory][:geometries] += 1
+    end
+
     def create_mesh_buffers(geometry_group)
       geometry_group[:_opengl_vertex_array] = glCreateVertexArray
 
@@ -1183,8 +1253,20 @@ module Mittsu
     end
 
     def glCreateVertexArray
-      @_b = ' '*8
+      @_b ||= ' '*8
       glGenVertexArrays(1, @_b)
+      @_b.unpack('L')[0]
+    end
+
+    def glCreateFramebuffer
+      @_b ||= ' '*8
+      glGenFramebuffers(1, @_b)
+      @_b.unpack('L')[0]
+    end
+
+    def glCreateRenderbuffer
+      @_b ||= ' '*8
+      glGenRenderbuffers(1, @_b)
       @_b.unpack('L')[0]
     end
 
@@ -1204,6 +1286,54 @@ module Mittsu
     def glBufferData_easy(target, data, usage)
       ptr = array_to_ptr_easy(data)
       glBufferData(target, ptr.size, ptr, usage)
+    end
+
+    def init_custom_attributes(object)
+      geometry = object.geometry
+      material = object.material
+
+      nvertices = geometry.vertices.length
+
+      if material.attributes
+        geometry[:_opengl_custom_attributes_list] ||= []
+
+        material.attributes.each do |(name, attribute)|
+          if !attribute[:_opengl_initialized] || attribute.create_unique_buffers
+            attribute[:_opengl_initialized] = true
+
+            size = case attribute.type
+            when :v2 then 2
+            when :v3 then 3
+            when :v4 then 4
+            when :c then 3
+            else 1
+            end
+
+            attribute.size = size
+
+            attribute.array = Array.new(nvertices * size) # Float32Array
+
+            attribute.buffer = glCreateBuffer
+            attribute.buffer.belongs_to_attribute = name
+
+            attribute.needs_update = true
+          end
+
+          geometry[:_opengl_custom_attributes_list] << attribute
+        end
+      end
+    end
+
+    def init_line_buffers(geometry, object)
+      nvertices = geometry.vertices.length
+
+      geometry[:_vertex_array] = Array.new(nvertices * 3) # Float32Array
+      geometry[:_color_array] = Array.new(nvertices * 3) # Float32Array
+      geometry[:_line_distance_array] = Array.new(nvertices) # Float32Array
+
+      geometry[:_opengl_line_count] = nvertices
+
+      init_custom_attributes(object)
     end
 
     def init_mesh_buffers(geometry_group, object)
@@ -2152,8 +2282,8 @@ module Mittsu
 
         # TODO: when all of these things exist
         case material
-        # when LineBasicMaterial
-        #   refresh_uniforms_line(m_uniforms, material)
+        when LineBasicMaterial
+          refresh_uniforms_line(m_uniforms, material)
         # when LineDashedMaterial
         #   refresh_uniforms_line(m_uniforms, material)
         #   refresh_uniforms_dash(m_uniforms, material)
@@ -2171,7 +2301,7 @@ module Mittsu
         #   m_uniforms.opactity.value = material.opacity
         end
 
-        if object.receive_shadow && !material._shadow_pass
+        if object.receive_shadow && !material[:_shadow_pass]
           refresh_uniforms_shadow(m_uniforms, lights)
         end
 
@@ -2381,9 +2511,8 @@ module Mittsu
       lights.each do |light|
         next unless light.cast_shadow
 
-        if light.is_a? SpotLight || (light.is_a? DirectionalLight && !light.shadow_cascade)
-          max_shadows += 1
-        end
+        max_shadows += 1 if light.is_a?(SpotLight)
+        max_shadows += 1 if light.is_a?(DirectionalLight) && !light.shadow_cascade
       end
 
       max_shadows
@@ -2485,6 +2614,27 @@ module Mittsu
       if material.wrap_around
         uniforms['wrapRGB'].value.copy(material.wrap_rgb)
       end
+    end
+
+    def refresh_uniforms_shadow(uniforms, lights)
+      if uniforms['shadowMatrix']
+        lights.select(&:cast_shadow).select { |light|
+          light.is_a?(SpotLight) || (light.is_a?(DirectionalLight) && !light.shadow_cascade)
+        }.each_with_index { |light, i|
+          uniforms['shadowMap'].value[i] = light.shadow_map
+          uniforms['shadowMapSize'].value[i] = light.shadow_map_size
+
+          uniforms['shadowMatrix'].value[i] = light.shadow_matrix
+
+          uniforms['shadowDarkness'].value[i] = light.shadow_darkness
+          uniforms['shadowBias'].value[i] = light.shadow_bias
+        }
+      end
+    end
+
+    def refresh_uniforms_line(uniforms, material)
+      uniforms['diffuse'].value = material.color
+      uniforms['opactity'].value = material.opacity
     end
 
     def load_uniforms_generic(uniforms)
@@ -3084,6 +3234,32 @@ module Mittsu
           glActiveTexture(GL_TEXTURE0 + slot)
           glBindTexture(GL_TEXTURE_CUBE_MAP, texture.image[:_opengl_texture_cube])
         end
+      end
+    end
+
+    def setup_framebuffer(framebuffer, render_target, texture_target)
+      glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture_target, render_target[:_opengl_texture], 0)
+    end
+
+    def setup_renderbuffer(renderbuffer, render_target)
+      glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer)
+
+      if render_target.depth_buffer && !render_target.stencil_buffer
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, render_target.width, render_target.height)
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer)
+
+        # TODO: investigate this (?):
+    		# THREE.js - For some reason this is not working. Defaulting to RGBA4.
+    		# } else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+        #
+    		# 	_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
+    		# 	_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+      elsif render_target.depth_buffer && render_target.stencil_buffer
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_STENCIL, render_target.width, render_target.height)
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer)
+      else
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, render_target.width, render_target.height)
       end
     end
   end

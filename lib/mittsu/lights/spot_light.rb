@@ -59,6 +59,14 @@ module Mittsu
       @shadow_matrix = nil
     end
 
+    def virtual?
+      @is_virtual
+    end
+
+    def is_virtual=(value)
+      @is_virtual = value
+    end
+
     def clone
 
       light = SpotLight.new

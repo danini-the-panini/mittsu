@@ -202,7 +202,7 @@ module Mittsu
 
     def unproject(camera)
       matrix = Mittsu::Matrix4.new
-      matrix.multiply_matrices(camera.matrix_world, matrix.get_inverse(camera.projection_matrix))
+      matrix.multiply_matrices(camera.matrix_world, matrix.inverse(camera.projection_matrix))
       self.apply_projection(matrix)
     end
 

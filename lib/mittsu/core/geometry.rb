@@ -4,7 +4,7 @@ require 'mittsu/core/hash_object'
 
 module Mittsu
   class Geometry < HashObject
-    include Mittsu::EventDispatcher
+    include EventDispatcher
 
     MorphNormal = Struct.new(:face_normals, :vertex_normals)
     Normal = Struct.new(:a, :b, :c)

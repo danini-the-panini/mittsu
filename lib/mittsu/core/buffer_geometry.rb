@@ -4,7 +4,7 @@ require 'mittsu/core/event_dispatcher'
 
 module Mittsu
   class BufferGeometry
-    include Mittsu::EventDispatcher
+    include EventDispatcher
 
     DrawCall = Struct.new(:start, :count, :index)
 

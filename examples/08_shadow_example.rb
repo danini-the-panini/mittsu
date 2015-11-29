@@ -8,6 +8,8 @@ scene = Mittsu::Scene.new
 camera = Mittsu::PerspectiveCamera.new(75.0, ASPECT, 0.1, 1000.0)
 
 renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT, title: '08 Shadow Example'
+renderer.shadow_map_enabled = true
+renderer.shadow_map_type = Mittsu::PCFSoftShadowMap
 
 floor = Mittsu::Mesh.new(
   Mittsu::BoxGeometry.new(10.0, 1.0, 10.0),
@@ -24,11 +26,20 @@ ball = Mittsu::Mesh.new(
 ball.cast_shadow = true
 scene.add(ball)
 
-light = Mittsu::DirectionalLight.new(0xffffff, 0.5)
-light.position.y = 5.0
-light.position.x = 5.0
-light.position.z = 2.0
+light = Mittsu::SpotLight.new(0xffffff, 0.5)
+light.position.set(10.0, 20.0, 0.0)
+
 light.cast_shadow = true
+light.shadow_darkness = 0.2
+
+light.shadow_map_width = 1024
+light.shadow_map_height = 1024
+
+light.shadow_camera_near = 1.0
+light.shadow_camera_far = 100.0
+light.shadow_camera_fov = 60.0
+
+light.shadow_camera_visible = true
 scene.add(light)
 
 camera.position.z = 5.0
@@ -37,6 +48,7 @@ camera.look_at(floor.position)
 
 x = 0
 renderer.window.run do
+  # break if x > 0
   x += 1
   ball.position.y = Math::sin(x * 0.1)
 
