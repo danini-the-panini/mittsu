@@ -34,7 +34,7 @@ scene.add(line)
 
 camera.position.z = 5.0
 camera.position.y = 0.0
-camera.look_at(ball.position)
+camera.look_at(line.position)
 
 x = 0
 renderer.window.run do

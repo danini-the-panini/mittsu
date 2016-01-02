@@ -1,5 +1,7 @@
 module Mittsu
   class LineBasicMaterial < Material
+    attr_accessor :line_width, :line_cap, :line_join
+
     def initialize(parameters = {})
       super()
 
@@ -10,7 +12,6 @@ module Mittsu
       @line_width = 1.0
       @line_cap = :round
       @line_join = :round
-
 
       @vertex_colors = NoColors
 

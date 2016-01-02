@@ -570,7 +570,10 @@ module Mittsu
       return unless material.visible
 
       # TODO: place to put this ???
-      glBindVertexArray(geometry_group[:_opengl_vertex_array])
+      vertex_array = geometry_group[:_opengl_vertex_array]
+      if vertex_array
+        glBindVertexArray(vertex_array)
+      end
 
       update_object(object)
 
@@ -736,11 +739,11 @@ module Mittsu
         @info[:render][:calls] += 1
 
       # TODO: render particles
-      when PointCloud
-        glDrawArrays(GL_POINTS, 0, geometry_group[:_opengl_particle_count])
-
-        @info[:render][:calls] += 1
-        @info[:render][:points] += geometry_group[:_opengl_particle_count]
+      # when PointCloud
+      #   glDrawArrays(GL_POINTS, 0, geometry_group[:_opengl_particle_count])
+      #
+      #   @info[:render][:calls] += 1
+      #   @info[:render][:points] += geometry_group[:_opengl_particle_count]
       end
     end
 
@@ -983,41 +986,39 @@ module Mittsu
 
       if geometry.nil?
         # ImmediateRenderObject
-      elsif geometry[:_opengl_geometry_init].nil?
-        geometry[:_opengl_geometry_init] = true
+      elsif geometry[:_opengl_init].nil?
+        geometry[:_opengl_init] = true
         geometry.add_event_listener(:dispose, @on_geometry_dispose)
-        if geometry.is_a? BufferGeometry
+        case object
+        when BufferGeometry
           @info[:memory][:geometries] += 1
-        else
-          case object
-          when BufferGeometry
-          when Mesh
-            init_geometry_groups(object, geometry)
-          when Line
-            if geometry[:_opengl_vertex_buffer].nil?
-              create_line_buffers(geometry)
-              init_line_buffers(geometry, object)
+        when Mesh
+          init_geometry_groups(object, geometry)
+        when Line
+          if geometry[:_opengl_vertex_buffer].nil?
+            create_line_buffers(geometry)
+            init_line_buffers(geometry, object)
 
-              geometry.vertices_need_update = true
-              geometry.colors_need_update = true
-              geometry.line_distances_need_update
-            end
-          # TODO: when PointCloud exists
-          # when PointCloud
-          #   if geometry[:_opengl_vertex_buffer].nil?
-          #     create_particle_buffers(geometry)
-          #     init_particle_buffers(geometry, object)
-          #
-          #     geometry.vertices_need_update = true
-          #     geometry.colors_need_update = true
-          #   end
+            geometry.vertices_need_update = true
+            geometry.colors_need_update = true
+            geometry.line_distances_need_update
           end
+        # TODO: when PointCloud exists
+        # when PointCloud
+        #   if geometry[:_opengl_vertex_buffer].nil?
+        #     create_particle_buffers(geometry)
+        #     init_particle_buffers(geometry, object)
+        #
+        #     geometry.vertices_need_update = true
+        #     geometry.colors_need_update = true
+        #   end
         end
       end
 
       if object[:_opengl_active].nil?
         object[:_opengl_active] = true
-        if object.is_a? Mesh
+        case object
+        when Mesh
           case geometry
           when BufferGeometry
             add_buffer(@_opengl_objects, geometry, object)
@@ -1026,14 +1027,14 @@ module Mittsu
             geometry_groups_list.each do |group|
               add_buffer(@_opengl_objects, group, object)
             end
-          when Line #, PointCloud TODO
-            add_buffer(@_opengl_objects, geometry, object)
-          else
-            # TODO: when ImmediateRenderObject exists
-            # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
-            #   add_buffer_immediate(@_opengl_objects_immediate, object)
-            # end
           end
+        when Line #, PointCloud TODO
+          add_buffer(@_opengl_objects, geometry, object)
+        else
+          # TODO: when ImmediateRenderObject exists
+          # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
+          #   add_buffer_immediate(@_opengl_objects_immediate, object)
+          # end
         end
       end
     end
@@ -1194,6 +1195,8 @@ module Mittsu
     end
 
     def create_line_buffers(geometry)
+      geometry[:_opengl_vertex_array] = glCreateVertexArray
+
       geometry[:_opengl_vertex_buffer] = glCreateBuffer
       geometry[:_opengl_color_buffer] = glCreateBuffer
       geometry[:_opengl_line_distance_buffer] = glCreateBuffer
@@ -1272,7 +1275,15 @@ module Mittsu
 
     def array_to_ptr_easy(data)
       size_of_element = data.first.is_a?(Float) ? Fiddle::SIZEOF_FLOAT : Fiddle::SIZEOF_INT
-      format_of_element = data.first.is_a?(Float) ? 'F' : 'L'
+      if data.first.is_a?(Float)
+        size_of_element = Fiddle::SIZEOF_FLOAT
+        format_of_element = 'F'
+        # data.map!{ |d| d.nil? ? 0.0 : d }
+      else
+        size_of_element = Fiddle::SIZEOF_INT
+        format_of_element = 'L'
+        # data.map!{ |d| d.nil? ? 0 : d }
+      end
       size = data.length * size_of_element
       array_to_ptr(data, size, format_of_element)
     end
@@ -1327,9 +1338,9 @@ module Mittsu
     def init_line_buffers(geometry, object)
       nvertices = geometry.vertices.length
 
-      geometry[:_vertex_array] = Array.new(nvertices * 3) # Float32Array
-      geometry[:_color_array] = Array.new(nvertices * 3) # Float32Array
-      geometry[:_line_distance_array] = Array.new(nvertices) # Float32Array
+      geometry[:_vertex_array] = Array.new(nvertices * 3, 0.0) # Float32Array
+      geometry[:_color_array] = Array.new(nvertices * 3, 0.0) # Float32Array
+      geometry[:_line_distance_array] = Array.new(nvertices, 0.0) # Float32Array
 
       geometry[:_opengl_line_count] = nvertices
 
@@ -1529,6 +1540,107 @@ module Mittsu
       # object.material.is_a?(MeshFaceMaterial) ? object.material.materials[geometry_group[:material_index]] : object.material
 
       object.material # for now...
+    end
+
+    def set_line_buffers(geometry, hint)
+      vertices = geometry.vertices
+      colors = geometry.colors
+      line_distances = geometry.line_distances_need_update
+
+      vertex_array = geometry[:_vertex_array]
+      color_array = geometry[:_color_array]
+      line_distance_array = geometry[:_line_distance_array]
+
+      custom_attributes = geometry[:_opengl_custom_attributes_list]
+
+      if geometry.vertices_need_update
+        vertices.each_with_index do |vertex, v|
+          offset = v * 3
+
+          vertex_array[offset]     = vertex.x
+          vertex_array[offset + 1] = vertex.y
+          vertex_array[offset + 2] = vertex.z
+        end
+
+        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_vertex_buffer])
+        glBufferData_easy(GL_ARRAY_BUFFER, vertex_array, hint)
+      end
+
+      if geometry.colors_need_update
+        colors.each_with_index do |color, c|
+          offset = c * 3
+
+          color_array[offset]     = color.r
+          color_array[offset + 1] = color.g
+          color_array[offset + 2] = color.b
+        end
+
+        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_color_buffer])
+        glBufferData_easy(GL_ARRAY_BUFFER, color_array, hint)
+      end
+
+      if geometry.line_distances_need_update
+        line_distances.each_with_index do |l, d|
+          line_distance_array[d] = l
+        end
+
+        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_line_distance_buffer])
+        glBufferData_easy(GL_ARRAY_BUFFER, line_distance_array, hint)
+      end
+
+      if custom_attributes
+        custom_attribute.each do |custom_attribute|
+          offset = 0
+
+          values = custom_attribute.value
+
+          case custom_attribute.size
+          when 1
+            value.each_with_index do |value, ca|
+              custom_attribute.array[ca] = value
+            end
+          when 2
+            values.each_with_index do |value, ca|
+              custom_attribute[offset    ] = value.x
+              custom_attribute[offset + 1] = value.y
+
+              offset += 2
+            end
+          when 3
+            if custom_attribute.type === :c
+              values.each_with_index do |value, ca|
+                custom_attribute[offset    ] = value.r
+                custom_attribute[offset + 1] = value.g
+                custom_attribute[offset + 2] = value.b
+
+                offset += 3
+              end
+            else
+              values.each_with_index do |value, ca|
+                custom_attribute[offset    ] = value.x
+                custom_attribute[offset + 1] = value.y
+                custom_attribute[offset + 2] = value.z
+
+                offset += 3
+              end
+            end
+          when 4
+            values.each_with_index do |value, ca|
+              custom_attribute[offset    ] = value.x
+              custom_attribute[offset + 1] = value.y
+              custom_attribute[offset + 2] = value.z
+              custom_attribute[offset + 3] = value.w
+
+              offset += 4
+            end
+          end
+
+          glBindBuffer(GL_ARRAY_BUFFER, custom_attribute.buffer)
+          glBufferData_easy(GL_ARRAY_BUFFER, custom_attribute.array, hint)
+
+          custom_attribute.needs_update = false
+        end
+      end
     end
 
     def set_mesh_buffers(geometry_group, object, hint, dispose, material)
@@ -2634,7 +2746,7 @@ module Mittsu
 
     def refresh_uniforms_line(uniforms, material)
       uniforms['diffuse'].value = material.color
-      uniforms['opactity'].value = material.opacity
+      uniforms['opacity'].value = material.opacity
     end
 
     def load_uniforms_generic(uniforms)

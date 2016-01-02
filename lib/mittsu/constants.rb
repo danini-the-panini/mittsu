@@ -29,19 +29,19 @@ module Mittsu
 
   # shading
 
-  NoShading = 0
+  NoShading = false
   FlatShading = 1
   SmoothShading = 2
 
   # colors
 
-  NoColors = 0
+  NoColors = false
   FaceColors = 1
   VertexColors = 2
 
   # blending modes
 
-  NoBlending = 0
+  NoBlending = false
   NormalBlending = 1
   AdditiveBlending = 2
   SubtractiveBlending = 3
