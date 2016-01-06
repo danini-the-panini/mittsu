@@ -7,7 +7,7 @@ Ks 0.050000 0.050000 0.050000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd 01_-_Default1noCulling.dds
+map_Kd 01_-_Default1noCulling.png
 
 
 newmtl FrontColorNoCullingID_male-02-1noCulling.JP
@@ -18,7 +18,7 @@ Ks 0.050000 0.050000 0.050000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd male-02-1noCulling.dds
+map_Kd male-02-1noCulling.png
 
 
 newmtl male-02-1noCullingID_male-02-1noCulling.JP
@@ -29,7 +29,7 @@ Ks 0.050000 0.050000 0.050000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd male-02-1noCulling.dds
+map_Kd male-02-1noCulling.png
 
 
 newmtl orig_02_-_Defaul1noCu_orig_02_-_Defaul1noCu
@@ -40,7 +40,7 @@ Ks 0.050000 0.050000 0.050000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd orig_02_-_Defaul1noCulling.dds
+map_Kd orig_02_-_Defaul1noCulling.png
 
 
 newmtl FrontColorNoCullingID_orig_02_-_Defaul1noCu
@@ -51,6 +51,4 @@ Ks 0.050000 0.050000 0.050000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd orig_02_-_Defaul1noCulling.dds
-
-
+map_Kd orig_02_-_Defaul1noCulling.png

@@ -13,7 +13,7 @@ renderer.shadow_map_type = Mittsu::PCFSoftShadowMap
 
 loader = Mittsu::OBJMTLLoader.new
 
-object = loader.load('male02.obj', 'male02_dds.mtl')
+object = loader.load('male02.obj', 'male02.mtl')
 
 object.receive_shadow = true
 object.cast_shadow = true
@@ -38,7 +38,7 @@ light.shadow_camera_near = 1.0
 light.shadow_camera_far = 500.0
 light.shadow_camera_fov = 60.0
 
-light.shadow_camera_visible = true
+light.shadow_camera_visible = false
 scene.add(light)
 
 camera.position.z = 200.0
