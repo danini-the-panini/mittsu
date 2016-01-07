@@ -91,7 +91,61 @@ module Mittsu
         mpars[:opacity] = m.opacity
       end
 
-      # TODO ...
+      if m.specular_coef
+        mpars[:shininess] = m.specular_coef
+      end
+
+      # textures
+
+      if m.map_diffuse && texture_path
+        create_texture(mpars, 'map', m.map_diffuse, m.map_diffuse_repeat, m.map_diffuse_offset, m.map_diffuse_wrap, m.map_diffuse_anisotropy)
+      end
+
+      if m.map_light && texture_path
+        create_texture(mpars, 'light_map', m.map_light, m.map_light_repeat, m.map_light_offset, m.map_light_wrap, m.map_light_anisotropy)
+      end
+
+      if m.map_bump && texture_path
+        create_texture(mpars, 'bump_map', m.map_bump, m.map_bump_repeat, m.map_bump_offset, m.map_bump_wrap, m.map_bump_anisotropy)
+      end
+
+      if m.map_normal && texture_path
+        create_texture(mpars, 'normal_map', m.map_normal, m.map_normal_repeat, m.map_normal_offset, m.map_normal_wrap, m.map_normal_anisotropy)
+      end
+
+      if m.map_specular && texture_path
+        create_texture(mpars, 'specular_map', m.map_specular, m.map_specular_repeat, m.map_specular_offset, m.map_specular_wrap, m.map_specular_anisotropy)
+      end
+
+      if m.map_alpha && texture_path
+        create_texture(mpars, 'alpha_map', m.map_alpha, m.map_alpha_repeat, m.map_alpha_offset, m.map_alpha_wrap, m.map_alpha_anisotropy)
+      end
+
+      #
+
+      if m.map_bump_scale
+        mpars[:bump_scale] = m.map_bump_scale
+      end
+
+      if m.map_normal_factor
+        mpars[:normal_scale] = Vector2.new(m.map_normal_factor, m.map_normal_factor)
+      end
+
+      Mittsu.const_get(mtype).new(mpars).tap do |material|
+        material.name = m.dbg_name if !m.dbg_name.nil?
+      end
+    end
+
+    module Handlers
+      def self.add(regex, loader)
+        @@handlers ||= {}
+        @@handlers[regex] = loader
+      end
+
+      def self.get(file)
+        @@handlers ||= {}
+        @@handlers.find(-> () { [nil, nil] }) { |regex, loader| regex =~ file }[1]
+      end
     end
 
     private

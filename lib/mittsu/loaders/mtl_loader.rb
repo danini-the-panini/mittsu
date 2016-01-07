@@ -147,7 +147,7 @@ module Mittsu
       end
 
       def load_texture(url, mapping = nil)
-        loader = Loader.Handlers.get(url)
+        loader = Loader::Handlers.get(url)
 
         if !loader.nil?
           texture = loader.load url
@@ -156,9 +156,9 @@ module Mittsu
 
           loader = ImageLoader.new
           # loader.cross_origin = @cross_origin # TODO: ???
-          image = loader.load
+          image = loader.load url
 
-          texture.image = MTLLoader.ensure_power_of_two(image)
+          texture.image = ensure_power_of_two(image)
           texture.needs_update = true
         end
 
