@@ -25,6 +25,16 @@ end
 
 scene.add(object)
 
+floor = Mittsu::Mesh.new(
+  Mittsu::BoxGeometry.new(1000.0, 1.0, 1000.0),
+  Mittsu::MeshPhongMaterial.new(color: 0xffffff)
+)
+floor.position.y = -1.0
+floor.receive_shadow = true
+scene.add(floor)
+
+scene.add Mittsu::AmbientLight.new(0xffffff)
+
 light = Mittsu::SpotLight.new(0xffffff, 1.0)
 light.position.set(300.0, 200.0, 0.0)
 
@@ -35,7 +45,7 @@ light.shadow_map_width = 1024
 light.shadow_map_height = 1024
 
 light.shadow_camera_near = 1.0
-light.shadow_camera_far = 500.0
+light.shadow_camera_far = 2000.0
 light.shadow_camera_fov = 60.0
 
 light.shadow_camera_visible = false
