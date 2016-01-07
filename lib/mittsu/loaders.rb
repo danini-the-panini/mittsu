@@ -1,3 +1,7 @@
 require 'mittsu/loaders/cache'
+require 'mittsu/loaders/loader'
 require 'mittsu/loaders/loading_manager'
 require 'mittsu/loaders/image_loader'
+require 'mittsu/loaders/file_loader'
+require 'mittsu/loaders/mtl_loader'
+require 'mittsu/loaders/obj_mtl_loader'

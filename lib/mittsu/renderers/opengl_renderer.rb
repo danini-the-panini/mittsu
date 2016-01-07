@@ -2752,7 +2752,7 @@ module Mittsu
     def load_uniforms_generic(uniforms)
       uniforms.each do |(uniform, location)|
         # needs_update property is not added to all uniforms.
-        next if uniform.needs_update == false
+        next if uniform.needs_update == false || location == -1
 
         type = uniform.type
         value = uniform.value
