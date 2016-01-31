@@ -67,6 +67,10 @@ module Mittsu
       def on_key_typed &block
         @key_repeat_handler = block
       end
+
+      def key_down?(key)
+        glfwGetKey(@handle, key) == GLFW_PRESS
+      end
     end
   end
 end
