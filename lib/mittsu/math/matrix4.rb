@@ -450,8 +450,8 @@ module Mittsu
       c = Math.cos(angle)
       s = Math.sin(angle)
       t = 1.0 - c
-      x = axis.x, y = axis.y, z = axis.z
-      tx = t * x, ty = t * y
+      x, y, z = axis.x, axis.y, axis.z
+      tx, ty = t * x, t * y
       self.set(
             tx * x + c, tx * y - s * z, tx * z + s * y, 0.0,
         tx * y + s * z,     ty * y + c, ty * z - s * x, 0.0,

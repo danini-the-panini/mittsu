@@ -86,7 +86,7 @@ module Mittsu
       # axis is assumed to be normalized
       @_q1 ||= Quaternion.new
       @_q1.set_from_axis_angle(axis, angle)
-      @quaternion.multiply(q1)
+      @quaternion.multiply(@_q1)
       self
     end
 
