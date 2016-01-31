@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -58,6 +58,11 @@ module Mittsu
           end
         end
         glfwSetMouseButtonCallback(@handle, @mouse_button_callback)
+
+        @scroll_callback = ::GLFW::create_callback(:GLFWscrollfun) do |window_handle, xoffset, yoffset|
+          this.scroll_handler.call(Vector2.new(xoffset, yoffset)) unless this.scroll_handler.nil?
+        end
+        glfwSetScrollCallback(@handle, @scroll_callback)
       end
 
       def run
@@ -113,6 +118,14 @@ module Mittsu
         xpos, ypos = ' '*8, ' '*8
         glfwGetCursorPos(@handle, xpos, ypos);
         Vector2.new(xpos.unpack('D')[0], ypos.unpack('D')[0])
+      end
+
+      def mouse_button_down?(button)
+        glfwGetMouseButton(@handle, button) == GLFW_PRESS
+      end
+
+      def on_scroll &block
+        @scroll_handler = block
       end
     end
   end
