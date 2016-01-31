@@ -9,6 +9,8 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler
+
       def initialize(width, height, title)
         glfwInit
 
@@ -22,6 +24,19 @@ module Mittsu
         @handle = glfwCreateWindow(@width, @height, @title, nil, nil)
         glfwMakeContextCurrent @handle
         glfwSwapInterval 1
+
+        this = self
+        @key_callback = ::GLFW::create_callback(:GLFWkeyfun) do |window_handle, key, scancode, action, mods|
+          if action == GLFW_PRESS
+            this.key_press_handler.call(key) unless this.key_press_handler.nil?
+            this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
+          elsif action == GLFW_RELEASE
+            this.key_release_handler.call(key) unless this.key_release_handler.nil?
+          elsif action == GLFW_REPEAT
+            this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
+          end
+        end
+        glfwSetKeyCallback(@handle, @key_callback)
       end
 
       def run
@@ -35,10 +50,26 @@ module Mittsu
         glfwTerminate
       end
 
-      def get_framebuffer_size
+      def framebuffer_size
         width, height = ' '*8, ' '*8
         glfwGetFramebufferSize(@handle, width, height)
         [width.unpack('L')[0], height.unpack('L')[0]]
+      end
+
+      def on_key_pressed &block
+        @key_press_handler = block
+      end
+
+      def on_key_released &block
+        @key_release_handler = block
+      end
+
+      def on_key_typed &block
+        @key_repeat_handler = block
+      end
+
+      def key_down?(key)
+        glfwGetKey(@handle, key) == GLFW_PRESS
       end
     end
   end
