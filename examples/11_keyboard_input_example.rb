@@ -16,7 +16,7 @@ scene.add(cube)
 
 camera.position.z = 5.0
 
-renderer.window.on_key_press do |key|
+renderer.window.on_key_typed do |key|
   case key
   when GLFW_KEY_UP
     cube.position.y += 0.5

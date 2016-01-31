@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -27,10 +27,13 @@ module Mittsu
 
         this = self
         @key_callback = ::GLFW::create_callback(:GLFWkeyfun) do |window_handle, key, scancode, action, mods|
-          if action == GLFW_PRESS && !this.key_press_handler.nil?
-            this.key_press_handler.call(key)
-          elsif action == GLFW_RELEASE && !this.key_release_handler.nil?
-            this.key_release_handler.call(key)
+          if action == GLFW_PRESS
+            this.key_press_handler.call(key) unless this.key_press_handler.nil?
+            this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
+          elsif action == GLFW_RELEASE
+            this.key_release_handler.call(key) unless this.key_release_handler.nil?
+          elsif action == GLFW_REPEAT
+            this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
           end
         end
         glfwSetKeyCallback(@handle, @key_callback)
@@ -53,12 +56,16 @@ module Mittsu
         [width.unpack('L')[0], height.unpack('L')[0]]
       end
 
-      def on_key_press &block
+      def on_key_pressed &block
         @key_press_handler = block
       end
 
-      def on_key_release &block
+      def on_key_released &block
         @key_release_handler = block
+      end
+
+      def on_key_typed &block
+        @key_repeat_handler = block
       end
     end
   end
