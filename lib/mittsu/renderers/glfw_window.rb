@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -37,6 +37,12 @@ module Mittsu
           end
         end
         glfwSetKeyCallback(@handle, @key_callback)
+
+        @char_callback = ::GLFW::create_callback(:GLFWcharfun) do |window_handle, codepoint|
+          char = [codepoint].pack('U')
+          this.char_input_handler.call(char) unless this.char_input_handler.nil?
+        end
+        glfwSetCharCallback(@handle, @char_callback)
       end
 
       def run
@@ -70,6 +76,10 @@ module Mittsu
 
       def key_down?(key)
         glfwGetKey(@handle, key) == GLFW_PRESS
+      end
+
+      def on_character_input &block
+        @char_input_handler = block
       end
     end
   end
