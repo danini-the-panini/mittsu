@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -43,6 +43,11 @@ module Mittsu
           this.char_input_handler.call(char) unless this.char_input_handler.nil?
         end
         glfwSetCharCallback(@handle, @char_callback)
+
+        @cursor_pos_callback = ::GLFW::create_callback(:GLFWcursorposfun) do |window_handle, xpos, ypos|
+          this.cursor_pos_handler.call(xpos, ypos) unless this.cursor_pos_handler.nil?
+        end
+        glfwSetCursorPosCallback(@handle, @cursor_pos_callback)
       end
 
       def run
@@ -80,6 +85,10 @@ module Mittsu
 
       def on_character_input &block
         @char_input_handler = block
+      end
+
+      def on_mouse_move &block
+        @cursor_pos_handler = block
       end
     end
   end
