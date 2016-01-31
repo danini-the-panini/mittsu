@@ -73,11 +73,11 @@ module Mittsu
     end
 
     def update_projection_matrix
-      fov = Math.rad_to_deg(2.0 * Math.atan(Math.tan(Math.deg_to_rad(@fov) * 0.5) / zoom))
+      new_fov = Math.rad_to_deg(2.0 * Math.atan(Math.tan(Math.deg_to_rad(@fov) * 0.5) / @zoom))
 
       if @full_width
         aspect = @full_width / @full_height
-        top = Math.tan(Math.deg_to_rad(fov * 0.5)) * near
+        top = Math.tan(Math.deg_to_rad(new_fov * 0.5)) * @near
         bottom = -top
         left = aspect * bottom
         right = aspect * top
@@ -89,11 +89,11 @@ module Mittsu
           left + (@x + @width) * width / @full_width,
           top - (@y + @height) * height / @full_height,
           top - @y * height / @full_height,
-          near,
-          far
+          @near,
+          @far
         )
       else
-        projection_matrix.make_perspective(@fov, @aspect, @near, @far)
+        projection_matrix.make_perspective(new_fov, @aspect, @near, @far)
       end
     end
 
