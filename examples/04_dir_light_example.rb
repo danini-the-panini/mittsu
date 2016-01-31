@@ -22,6 +22,12 @@ scene.add(light_object)
 
 camera.position.z = 5.0
 
+renderer.window.on_resize do |width, height|
+  renderer.set_viewport(0, 0, width, height)
+  camera.aspect = width.to_f / height.to_f
+  camera.update_projection_matrix
+end
+
 renderer.window.run do
   light_object.rotation.x += 0.1
   light_object.rotation.y += 0.1

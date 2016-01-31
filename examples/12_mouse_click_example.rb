@@ -22,6 +22,12 @@ renderer.window.on_mouse_button_pressed do |button, position|
   cubes << cube
 end
 
+renderer.window.on_resize do |width, height|
+  renderer.set_viewport(0, 0, width, height)
+  camera.aspect = width.to_f / height.to_f
+  camera.update_projection_matrix
+end
+
 renderer.window.run do
   cubes.each do |cube|
     cube.rotation.x += 0.1

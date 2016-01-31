@@ -16,6 +16,12 @@ scene.add(cube)
 
 camera.position.z = 5.0
 
+renderer.window.on_resize do |width, height|
+  renderer.set_viewport(0, 0, width, height)
+  camera.aspect = width.to_f / height.to_f
+  camera.update_projection_matrix
+end
+
 renderer.window.on_key_typed do |key|
   case key
   when GLFW_KEY_UP

@@ -57,6 +57,12 @@ renderer.window.on_mouse_move do |position|
   end
 end
 
+renderer.window.on_resize do |width, height|
+  renderer.set_viewport(0, 0, width, height)
+  camera.aspect = width.to_f / height.to_f
+  camera.update_projection_matrix
+end
+
 renderer.window.run do
   renderer.render(scene, camera)
 end

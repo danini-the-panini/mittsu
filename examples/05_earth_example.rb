@@ -27,6 +27,12 @@ scene.add(earth)
 
 camera.position.z = 5.0
 
+renderer.window.on_resize do |width, height|
+  renderer.set_viewport(0, 0, width, height)
+  camera.aspect = width.to_f / height.to_f
+  camera.update_projection_matrix
+end
+
 renderer.window.run do
   light_object.rotation.z += 0.05
   earth.rotation.x += 0.05
