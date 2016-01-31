@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler, :frabuffer_size_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -63,6 +63,11 @@ module Mittsu
           this.scroll_handler.call(Vector2.new(xoffset, yoffset)) unless this.scroll_handler.nil?
         end
         glfwSetScrollCallback(@handle, @scroll_callback)
+
+        @frabuffer_size_callback = ::GLFW::create_callback(:GLFWframebuffersizefun) do |window_handle, new_width, new_height|
+          this.frabuffer_size_handler.call(new_width, new_height) unless this.frabuffer_size_handler.nil?
+        end
+        glfwSetFramebufferSizeCallback(@handle, @frabuffer_size_callback)
       end
 
       def run
@@ -126,6 +131,10 @@ module Mittsu
 
       def on_scroll &block
         @scroll_handler = block
+      end
+
+      def on_resize &block
+        @frabuffer_size_handler = block
       end
     end
   end
