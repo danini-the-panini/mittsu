@@ -173,7 +173,7 @@ module Mittsu
 
         @window = GLFW::Window.new(@width, @height, @title)
 
-        @_viewport_width, @_viewport_height = *(@window.get_framebuffer_size)
+        @_viewport_width, @_viewport_height = *(@window.framebuffer_size)
 
         # TODO: handle losing opengl context??
       rescue => error
