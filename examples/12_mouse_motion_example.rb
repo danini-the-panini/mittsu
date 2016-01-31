@@ -16,9 +16,9 @@ scene.add(cube)
 
 camera.position.z = 5.0
 
-renderer.window.on_mouse_move do |x, y|
-  cube.position.x = ((x/SCREEN_WIDTH)*2.0-1.0) * 5.0
-  cube.position.y = ((y/SCREEN_HEIGHT)*-2.0+1.0) * 5.0
+renderer.window.on_mouse_move do |position|
+  cube.position.x = ((position.x/SCREEN_WIDTH)*2.0-1.0) * 5.0
+  cube.position.y = ((position.y/SCREEN_HEIGHT)*-2.0+1.0) * 5.0
 end
 
 renderer.window.run do

@@ -9,7 +9,7 @@ include GLFW
 module Mittsu
   module GLFW
     class Window
-      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler
+      attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler
 
       def initialize(width, height, title)
         glfwInit
@@ -45,9 +45,19 @@ module Mittsu
         glfwSetCharCallback(@handle, @char_callback)
 
         @cursor_pos_callback = ::GLFW::create_callback(:GLFWcursorposfun) do |window_handle, xpos, ypos|
-          this.cursor_pos_handler.call(xpos, ypos) unless this.cursor_pos_handler.nil?
+          this.cursor_pos_handler.call(Vector2.new(xpos, ypos)) unless this.cursor_pos_handler.nil?
         end
         glfwSetCursorPosCallback(@handle, @cursor_pos_callback)
+
+        @mouse_button_callback = ::GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
+          mpos = this.mouse_position
+          if action == GLFW_PRESS
+            this.mouse_button_press_handler.call(button, mpos) unless this.mouse_button_press_handler.nil?
+          elsif action == GLFW_RELEASE
+            this.mouse_button_release_handler.call(button, mpos) unless this.mouse_button_release_handler.nil?
+          end
+        end
+        glfwSetMouseButtonCallback(@handle, @mouse_button_callback)
       end
 
       def run
@@ -89,6 +99,20 @@ module Mittsu
 
       def on_mouse_move &block
         @cursor_pos_handler = block
+      end
+
+      def on_mouse_button_pressed &block
+        @mouse_button_press_handler = block
+      end
+
+      def on_mouse_button_released &block
+        @mouse_button_release_handler = block
+      end
+
+      def mouse_position
+        xpos, ypos = ' '*8, ' '*8
+        glfwGetCursorPos(@handle, xpos, ypos);
+        Vector2.new(xpos.unpack('D')[0], ypos.unpack('D')[0])
       end
     end
   end
