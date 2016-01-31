@@ -11,8 +11,6 @@ module Mittsu
     class Window
       attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler, :framebuffer_size_handler
 
-      attr_reader :joystick_buttons
-
       def initialize(width, height, title)
         glfwInit
 
@@ -71,7 +69,7 @@ module Mittsu
         end
         glfwSetFramebufferSizeCallback(@handle, @frabuffer_size_callback)
 
-        @joystick_buttons = poll_joystick_buttons
+        @joystick_buttons = poll_all_joysticks_buttons
       end
 
       def run
@@ -142,10 +140,15 @@ module Mittsu
         @framebuffer_size_handler = block
       end
 
-      def joystick_axes
-        return [] unless joystick_present?
+      def joystick_buttons(joystick = GLFW_JOYSTICK_1)
+        @joystick_buttons = poll_all_joysticks_buttons
+        @joystick_buttons[joystick]
+      end
+
+      def joystick_axes(joystick = GLFW_JOYSTICK_1)
+        return [] unless joystick_present?(joystick)
         count = ' ' * 4
-        array = glfwGetJoystickAxes(GLFW_JOYSTICK_1, count)
+        array = glfwGetJoystickAxes(joystick, count)
         count = count.unpack('l')[0]
         array[0, count * 4].unpack('f' * count)
       end
@@ -162,31 +165,51 @@ module Mittsu
         glfwJoystickPresent(joystick).nonzero?
       end
 
-      def joystick_button_down?(button)
-        @joystick_buttons[button]
+      def joystick_button_down?(button, joystick = GLFW_JOYSTICK_1)
+        @joystick_buttons[joystick][button]
+      end
+
+      def joystick_name(joystick = GLFW_JOYSTICK_1)
+        glfwGetJoystickName(joystick)
       end
 
       private
 
-      def poll_joystick_buttons
-        return [] unless joystick_present?
+      def poll_all_joysticks_buttons
+        (GLFW_JOYSTICK_1..GLFW_JOYSTICK_LAST).map do |joystick|
+          poll_joystick_buttons(joystick)
+        end
+      end
+
+      def poll_joystick_buttons(joystick)
+        return nil unless joystick_present?(joystick)
         count = ' ' * 4
-        array = glfwGetJoystickButtons(GLFW_JOYSTICK_1, count)
+        array = glfwGetJoystickButtons(joystick, count)
         count = count.unpack('l')[0]
         array[0, count].unpack('c' * count).map(&:nonzero?)
       end
 
       def poll_joystick_events
-        return unless joystick_present?
-        new_joystick_buttons = poll_joystick_buttons
-        new_joystick_buttons.each_with_index do |pressed, button|
-          if !@joystick_buttons[button] && pressed
-            @joystick_button_press_handler.call(button) unless @joystick_button_press_handler.nil?
-          elsif @joystick_buttons[button] && !pressed
-            @joystick_button_release_handler.call(button) unless @joystick_button_release_handler.nil?
-          end
+        new_joystick_buttons = poll_all_joysticks_buttons
+        new_joystick_buttons.each_with_index do |buttons, joystick|
+          poll_single_joystick_events(joystick, buttons)
         end
         @joystick_buttons = new_joystick_buttons
+      end
+
+      def poll_single_joystick_events(joystick, buttons)
+        return if buttons.nil?
+        buttons.each_with_index do |pressed, button|
+          fire_joystick_button_event(joystick, button, pressed)
+        end
+      end
+
+      def fire_joystick_button_event(joystick, button, pressed)
+        if !@joystick_buttons[joystick][button] && pressed
+          @joystick_button_press_handler.call(joystick, button) unless @joystick_button_press_handler.nil?
+        elsif @joystick_buttons[joystick][button] && !pressed
+          @joystick_button_release_handler.call(joystick, button) unless @joystick_button_release_handler.nil?
+        end
       end
     end
   end

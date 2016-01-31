@@ -50,15 +50,15 @@ right_stick = Mittsu::Vector2.new
 JOYSTICK_DEADZONE = 0.15
 JOYSTICK_SENSITIVITY = 0.1
 
-puts "Joystick Connected: #{glfwGetJoystickName(GLFW_JOYSTICK_1)}"
+puts "Joystick Connected: #{renderer.window.joystick_name}"
 puts "Number of Axes: #{renderer.window.joystick_axes.count}"
 puts "Number of Buttons: #{renderer.window.joystick_buttons.count}"
 
-renderer.window.on_joystick_button_pressed do |button|
+renderer.window.on_joystick_button_pressed do |joystick, button|
   center_cube.material.color = Mittsu::Color.new(1.0, 0.0, 1.0) if button == 0
 end
 
-renderer.window.on_joystick_button_released do |button|
+renderer.window.on_joystick_button_released do |joystick, button|
   center_cube.material.color = Mittsu::Color.new(1.0, 1.0, 1.0) if button == 0
 end
 
