@@ -1,26 +1,24 @@
+
+require 'opengl'
+require 'glfw'
+require 'fiddle'
+
+OpenGL.load_lib
+
 require 'mittsu'
+require 'mittsu/renderers/glfw_window'
+require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
-require 'opengl'
-require 'mittsu/renderers/opengl/opengl_debug'
-require 'glfw'
-require 'mittsu/renderers/glfw_window'
-require 'fiddle'
-
-OpenGL.load_lib
-
 include OpenGL
-include GLFW
 
 module Mittsu
   class OpenGLRenderer
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
-
-    attr_reader :prevision
 
     def initialize(parameters = {})
       puts "OpenGLRenderer #{REVISION}"
