@@ -243,6 +243,23 @@ module Mittsu
       end
     end
 
+    def print_tree(lines=[])
+      if lines.empty?
+        puts self
+      else
+        last = !lines.last
+        indent = lines[0..-2].map{|l| l ? '┃ ' : '  '}.join
+        puts "#{indent}#{last ? '┗' : '┣'}╸#{self}"
+      end
+      @children.each do |child|
+        child.print_tree(lines + [child != @children.last])
+      end
+    end
+
+    def to_s
+      "#{type} (#{name}) #{position}"
+    end
+
     def traverse_visible(&callback)
       return unless @visible
       callback.yield self

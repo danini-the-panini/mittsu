@@ -230,5 +230,9 @@ module Mittsu
     def clone
       Vector2.new(@x, @y)
     end
+
+    def to_s
+      "[#{x}, #{y}]"
+    end
   end
 end

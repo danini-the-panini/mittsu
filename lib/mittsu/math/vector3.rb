@@ -483,5 +483,9 @@ module Mittsu
     def clone
       Mittsu::Vector3.new(@x, @y, @z)
     end
+
+    def to_s
+      "[#{x}, #{y}, #{z}]"
+    end
   end
 end
