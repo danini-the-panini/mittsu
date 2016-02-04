@@ -407,5 +407,8 @@ module Mittsu
       Mittsu::Vector4.new @x, @y, @z, @w
     end
 
+    def to_s
+      "[#{x}, #{y}, #{z}, #{w}]"
+    end
   end
 end
