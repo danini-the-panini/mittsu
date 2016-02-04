@@ -25,6 +25,8 @@ end
 
 scene.add(object)
 
+scene.print_tree
+
 floor = Mittsu::Mesh.new(
   Mittsu::BoxGeometry.new(1000.0, 1.0, 1000.0),
   Mittsu::MeshPhongMaterial.new(color: 0xffffff)
