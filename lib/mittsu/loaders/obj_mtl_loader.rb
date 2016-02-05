@@ -146,7 +146,7 @@ module Mittsu
       Vector2.new(u, v)
     end
 
-    def face3(a, b, c, normals)
+    def face3(a, b, c, normals = nil)
       Face3.new(a, b, c, normals)
     end
 
@@ -199,7 +199,7 @@ module Mittsu
       ]
     end
 
-    def handle_face_line(faces, uvs, normal_inds)
+    def handle_face_line(faces, uvs = nil, normal_inds = nil)
       if faces[3].nil?
         add_face(faces[0], faces[1], faces[2], normal_inds)
 
