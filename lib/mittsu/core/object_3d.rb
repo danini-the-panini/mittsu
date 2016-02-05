@@ -6,7 +6,7 @@ module Mittsu
   class Object3D < HashObject
     include EventDispatcher
 
-    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_updaste, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry
+    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_update, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry
 
     attr_reader :id, :uuid, :type
 
@@ -38,7 +38,7 @@ module Mittsu
         @rotation.set_from_quaternion(quaternion, false)
       end
 
-      @rotation_auto_updaste = true
+      @rotation_auto_update = true
 
       @matrix = Matrix4.new
       @matrix_world = Matrix4.new
@@ -115,18 +115,18 @@ module Mittsu
     end
 
     def translate_x(distance)
-      @_v1 ||= Vector3.new(1, 0, 0)
-      self.translate_on_axis(@_v1, distance)
+      @_x_axis ||= Vector3.new(1, 0, 0)
+      self.translate_on_axis(@_x_axis, distance)
     end
 
     def translate_y(distance)
-      @_v1 ||= Vector3.new(0, 1, 0)
-      self.translate_on_axis(@_v1, distance)
+      @_y_axis ||= Vector3.new(0, 1, 0)
+      self.translate_on_axis(@_y_axis, distance)
     end
 
     def translate_z(distance)
-      @_v1 ||= Vector3.new(0, 0, 1)
-      self.translate_on_axis(@_v1, distance)
+      @_z_axis ||= Vector3.new(0, 0, 1)
+      self.translate_on_axis(@_z_axis, distance)
     end
 
     def local_to_world(vector)
@@ -168,13 +168,14 @@ module Mittsu
       self
     end
 
-    def remove(arguments)
+    def remove(*arguments)
       if arguments.length > 1
         arguments.each do |arg|
           self.remove(arg)
         end
         return
       end
+      object = arguments.first
       index = @children.index(object)
       if index
         object.parent = nil
