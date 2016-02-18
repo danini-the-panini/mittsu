@@ -1,0 +1,12 @@
+## Customize the test machine
+machine:
+
+  # Version of ruby to use
+  ruby:
+    version:
+      2.0.0
+
+## Customize dependencies
+dependencies:
+  pre:
+    - apt-get install libmagickwand-dev libglfw3-dev
