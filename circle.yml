@@ -9,4 +9,4 @@ machine:
 ## Customize dependencies
 dependencies:
   pre:
-    - apt-get install libmagickwand-dev libglfw3-dev
+    - sudo apt-get update; sudo apt-get install libmagickwand-dev libglfw3-dev
