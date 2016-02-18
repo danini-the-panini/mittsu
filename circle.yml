@@ -11,5 +11,5 @@ dependencies:
   cache_directories:
     - glfw-3.1.2
   pre:
-    - sudo apt-get update; sudo apt-get install libmagickwand-dev xorg-dev libgl1-mesa-dev
+    - sudo apt-get update; sudo apt-get install libmagickwand5 libmagickcore5-extra libmagickcore-dev libmagickwand-dev xorg-dev libgl1-mesa-dev
     - bash ./install-glfw-3.1.2.sh
