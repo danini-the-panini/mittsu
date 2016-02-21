@@ -10,7 +10,7 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 
 Install the prerequisites:
 
-Mittsu depends on OpenGL, GLFW3 and ImageMagick
+Mittsu depends on Ruby 2.x, OpenGL 3.3+, GLFW 3.1.x and ImageMagick 6.4.9+
 
 ```bash
 # OSX
