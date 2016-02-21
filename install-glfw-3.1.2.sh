@@ -11,5 +11,6 @@ if [ ! -e src/libglfw3.a ]; then
   make;
 fi
 if [ ! -e /usr/local/lib/libglfw.so ]; then
+  sudo apt-get update; sudo apt-get install cmake
   sudo make install;
 fi
