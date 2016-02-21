@@ -5,10 +5,10 @@ require 'mittsu/renderers/shaders/shader_chunk'
 module Mittsu
   class ShaderLib_Instance
     attr_accessor :uniforms, :vertex_shader, :fragment_shader
-    def initialize(uniforms:, vertex_shader:, fragment_shader:)
-      @uniforms = uniforms
-      @vertex_shader = vertex_shader
-      @fragment_shader = fragment_shader
+    def initialize(options = {})
+      @uniforms = options.fetch(:uniforms)
+      @vertex_shader = options.fetch(:vertex_shader)
+      @fragment_shader = options.fetch(:fragment_shader)
     end
   end
 
