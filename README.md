@@ -8,13 +8,17 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 
 Install the prerequisites:
 
+Mittsu depends on OpenGL, GLFW3 and ImageMagick
+
 ```bash
 # OSX
-$ brew intall glfw3
+$ brew intall glfw3 imagemagick
 
 # Ubuntu
-$ sudo apt-get install glfw3
+$ sudo apt-get install libglfw3-dev libmagickwand-dev
 ```
+
+**NOTE**: On Ubuntu, you may need to install `libgl1-mesa-dev` for the OpenGL dependency.
 
 Add this line to your application's Gemfile:
 
