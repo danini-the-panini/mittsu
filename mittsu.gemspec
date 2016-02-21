@@ -9,15 +9,20 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Daniel Smith"]
   spec.email         = ["jellymann@gmail.com"]
 
-  spec.summary       = %q{THREE.js for Ruby}
-  spec.description   = %q{A direct port of THREE.js from JavaScript/WebGL to Ruby/OpenGL}
+  spec.summary       = %q{3D Graphics Library for Ruby}
+  spec.description   = %q{Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of THREE.js. No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!}
   spec.homepage      = "https://github.com/jellymann/mittsu"
   spec.license       = "MIT"
+  spec.metadata = {
+    "bug_tracker" => "https://github.com/jellymann/mittsu/issues"
+  }
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|examples)/}) }
   spec.require_paths = ["lib"]
+
+  spec.required_ruby_version = '>= 2.0.0'
+  spec.requirements << 'ImageMagick 6.4.9 or later'
+  spec.requirements << 'OpenGL 4+ capable hardware'
 
   spec.add_runtime_dependency 'opengl-bindings', "~> 1.5"
   spec.add_runtime_dependency 'ffi', "~> 1.9"
