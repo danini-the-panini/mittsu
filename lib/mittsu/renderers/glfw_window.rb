@@ -8,7 +8,8 @@ rescue
   "libglfw.#{GLFW_LIB_EXT}"
 end
 GLFW_LIB_PATH = begin
-  `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
+  s = `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
+  s.empty? ? nil : s
 rescue
   nil
 end
@@ -33,6 +34,9 @@ module Mittsu
 
         @width, @height, @title = width, height, title
         @handle = glfwCreateWindow(@width, @height, @title, nil, nil)
+        if @handle.null?
+          raise "Unable to create window."
+        end
         glfwMakeContextCurrent @handle
         glfwSwapInterval 1
 
