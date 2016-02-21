@@ -1,5 +1,7 @@
 # Mittsu
 
+[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+
 3D Graphics Library for Ruby
 
 Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of [THREE.js](http://threejs.org). No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!
