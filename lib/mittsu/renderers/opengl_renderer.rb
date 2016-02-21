@@ -21,7 +21,7 @@ module Mittsu
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
 
     def initialize(parameters = {})
-      puts "OpenGLRenderer #{REVISION}"
+      puts "OpenGLRenderer (Revision #{REVISION})"
 
       @pixel_ratio = 1.0
 
