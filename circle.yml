@@ -13,3 +13,8 @@ dependencies:
   pre:
     - sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
     - bash ./install-glfw-3.1.2.sh
+
+test:
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/minitest/
+    - cp -r test/reports/*.xml $CIRCLE_TEST_REPORTS/minitest/
