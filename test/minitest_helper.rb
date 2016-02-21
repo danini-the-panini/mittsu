@@ -1,3 +1,6 @@
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 require "minitest/reporters"
 REPORTER = "#{ENV['MINITEST_REPORTER'] || 'Progress'}Reporter"
 if !Minitest::Reporters.const_defined?(REPORTER)
