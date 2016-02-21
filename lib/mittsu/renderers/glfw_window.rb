@@ -3,12 +3,12 @@ require 'glfw'
 
 GLFW_LIB_EXT = OpenGL.get_platform == :OPENGL_PLATFORM_MACOSX ? 'dylib' : 'so'
 GLFW_LIB = begin
-  "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp}.#{GLFW_LIB_EXT}"
+  "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp.strip}.#{GLFW_LIB_EXT}"
 rescue
   "libglfw.#{GLFW_LIB_EXT}"
 end
 GLFW_LIB_PATH = begin
-  `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp
+  `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
 rescue
   nil
 end
