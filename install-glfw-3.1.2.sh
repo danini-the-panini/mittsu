@@ -10,6 +10,6 @@ if [ ! -e src/libglfw3.a ]; then
   cmake -D BUILD_SHARED_LIBS=ON .
   make;
 fi
-if [ ! -e /usr/local/lib/libglfw3.so ]; then
+if [ ! -e /usr/local/lib/libglfw.so ]; then
   sudo make install;
 fi
