@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
   spec.requirements << 'ImageMagick 6.4.9 or later'
-  spec.requirements << 'OpenGL 4+ capable hardware'
+  spec.requirements << 'OpenGL 3.3+ capable hardware + drivers'
 
   spec.add_runtime_dependency 'opengl-bindings', "~> 1.5"
   spec.add_runtime_dependency 'ffi', "~> 1.9"
