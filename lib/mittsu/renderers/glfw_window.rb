@@ -1,8 +1,11 @@
 require 'opengl'
 require 'glfw'
 
-path = `pkg-config glfw3 --libs-only-L`.chomp.strip[2..-1]
-GLFW.load_lib('libglfw3.dylib', path)
+if OpenGL.get_platform == :OPENGL_PLATFORM_MACOSX
+  GLFW.load_lib = 'libglfw.dylib', `pkg-config glfw3 --libs-only-L`.chomp.strip[2..-1]
+else
+  GLFW.load_lib
+end
 
 include GLFW
 
