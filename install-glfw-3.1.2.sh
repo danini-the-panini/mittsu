@@ -5,7 +5,7 @@ if [ ! -e glfw-3.1.2/include/GLFW/glfw3.h ]; then
   unzip glfw-3.1.2.zip;
 fi
 cd glfw-3.1.2
-if [ ! -e src/libglfw3.a ]; then
+if [ ! -e src/libglfw3.so ]; then
   cmake -D BUILD_SHARED_LIBS=ON .
   make;
 fi
