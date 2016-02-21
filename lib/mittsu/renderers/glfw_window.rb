@@ -34,6 +34,9 @@ module Mittsu
 
         @width, @height, @title = width, height, title
         @handle = glfwCreateWindow(@width, @height, @title, nil, nil)
+        if @handle.null?
+          raise "Unable to create window."
+        end
         glfwMakeContextCurrent @handle
         glfwSwapInterval 1
 
