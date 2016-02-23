@@ -7,7 +7,9 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
   CodeClimate::TestReporter::Formatter
 ]
-SimpleCov.start
+SimpleCov.start do
+  add_filter "/test/"
+end
 
 require "minitest/reporters"
 REPORTER = "#{ENV['MINITEST_REPORTER'] || 'Progress'}Reporter"
