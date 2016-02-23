@@ -1,5 +1,26 @@
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+require 'codeclimate-test-reporter'
+require 'simplecov'
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  Coveralls::SimpleCov::Formatter,
+  SimpleCov::Formatter::HTMLFormatter,
+  CodeClimate::TestReporter::Formatter
+]
+SimpleCov.start do
+  add_filter "/test/"
+  add_group 'Cameras', 'lib/mittsu/cameras'
+  add_group 'Core', 'lib/mittsu/core'
+  add_group 'Extras', 'lib/mittsu/extras'
+  add_group 'Lights', 'lib/mittsu/lights'
+  add_group 'Loaders', 'lib/mittsu/loaders'
+  add_group 'Materials', 'lib/mittsu/materials'
+  add_group 'Math', 'lib/mittsu/math'
+  add_group 'Objects', 'lib/mittsu/objects'
+  add_group 'Renderers', 'lib/mittsu/renderers'
+  add_group 'Scenes', 'lib/mittsu/scenes'
+  add_group 'Textures', 'lib/mittsu/textures'
+end
 
 require "minitest/reporters"
 REPORTER = "#{ENV['MINITEST_REPORTER'] || 'Progress'}Reporter"
