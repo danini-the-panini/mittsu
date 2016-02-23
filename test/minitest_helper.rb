@@ -1,8 +1,13 @@
+require 'codeclimate-test-reporter'
+require 'simplecov'
 require 'coveralls'
-Coveralls.wear!
 
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  Coveralls::SimpleCov::Formatter,
+  SimpleCov::Formatter::HTMLFormatter,
+  CodeClimate::TestReporter::Formatter
+]
+SimpleCov.start
 
 require "minitest/reporters"
 REPORTER = "#{ENV['MINITEST_REPORTER'] || 'Progress'}Reporter"
