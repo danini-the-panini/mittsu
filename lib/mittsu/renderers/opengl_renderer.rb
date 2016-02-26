@@ -1103,8 +1103,7 @@ module Mittsu
 
     def add_buffer(objlist, buffer, object)
       id = object.id
-      objlist[id] ||= []
-      objlist[id] << {
+      (objlist[id] ||= []) << {
         id: id,
         buffer: buffer,
         object: object,
@@ -1204,7 +1203,6 @@ module Mittsu
     end
 
     def array_to_ptr_easy(data)
-      size_of_element = data.first.is_a?(Float) ? Fiddle::SIZEOF_FLOAT : Fiddle::SIZEOF_INT
       if data.first.is_a?(Float)
         size_of_element = Fiddle::SIZEOF_FLOAT
         format_of_element = 'F'
@@ -1231,12 +1229,13 @@ module Mittsu
 
     def init_custom_attributes(object)
       geometry = object.geometry
+      geometry_group = geometry.implementation(self)
       material = object.material
 
       nvertices = geometry.vertices.length
 
       if material.attributes
-        geometry[:_opengl_custom_attributes_list] ||= []
+        geometry_group.custom_attributes_list ||= []
 
         material.attributes.each do |(name, attribute)|
           if !attribute[:_opengl_initialized] || attribute.create_unique_buffers
@@ -1260,7 +1259,7 @@ module Mittsu
             attribute.needs_update = true
           end
 
-          geometry[:_opengl_custom_attributes_list] << attribute
+          geometry_group.custom_attributes_list << attribute
         end
       end
     end
@@ -1284,27 +1283,30 @@ module Mittsu
       faces3 = geometry_group.faces3
 
       nvertices = faces3.length * 3
+      nvertices2 = nvertices * 2
+      nvertices3 = nvertices * 3
+      nvertices4 = nvertices * 4
       ntris = faces3.length * 1
       nlines = faces3.length * 3
 
       material = get_buffer_material(object, geometry_group)
 
-      geometry_group.vertex_array = Array.new(nvertices * 3) # Float32Array
-      geometry_group.normal_array = Array.new(nvertices * 3) # Float32Array
-      geometry_group.color_array = Array.new(nvertices * 3) # Float32Array
-      geometry_group.uv_array = Array.new(nvertices * 2) # Float32Array
+      geometry_group.vertex_array = Array.new(nvertices3) # Float32Array
+      geometry_group.normal_array = Array.new(nvertices3) # Float32Array
+      geometry_group.color_array = Array.new(nvertices3) # Float32Array
+      geometry_group.uv_array = Array.new(nvertices2) # Float32Array
 
       if geometry.face_vertex_uvs.length > 1
-        geometry_group.uv2_array = Array.new(nvertices * 2) # Float32Array
+        geometry_group.uv2_array = Array.new(nvertices2) # Float32Array
       end
 
       if geometry.has_tangents
-        geometry_group.tangent_array = Array.new(nvertices * 4) # Float32Array
+        geometry_group.tangent_array = Array.new(nvertices4) # Float32Array
       end
 
       if !object.geometry.skin_weights.empty? && !object.geometry.skin_indices.empty?
-        geometry_group.skin_indices_array = Array.new(nvertices * 4) # Float32Array
-        geometry_group.skin_weight_array = Array.new(nvertices * 4)
+        geometry_group.skin_indices_array = Array.new(nvertices4) # Float32Array
+        geometry_group.skin_weight_array = Array.new(nvertices4)
       end
 
       # UintArray from OES_element_index_uint ???
@@ -1319,7 +1321,7 @@ module Mittsu
         geometry_group.morph_targets_arrays = []
 
         num_morph_targets.times do |m|
-          geometry_group.morph_targets_arrays << Array.new(nvertices * 3) # Float32Array ???
+          geometry_group.morph_targets_arrays << Array.new(nvertices3) # Float32Array ???
         end
       end
 
@@ -1329,7 +1331,7 @@ module Mittsu
         geometry_group.morph_normals_arrays = []
 
         num_morph_normals.times do |m|
-          geometry_group.morph_normals_arrays << Array.new(nvertices * 3) # Float32Array ???
+          geometry_group.morph_normals_arrays << Array.new(nvertices3) # Float32Array ???
         end
       end
 
@@ -3113,10 +3115,11 @@ module Mittsu
     end
 
     def clamp_to_max_size(image, max_size)
-      if image.width > max_size || image.height > max_size
+      width, height = image.width, image.height
+      if width > max_size || height > max_size
         # TODO: scale the image ...
 
-        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{image.width} x #{image.height}). Resized to ??? x ???"
+        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to ??? x ???"
       end
       image
     end
