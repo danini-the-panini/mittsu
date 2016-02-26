@@ -17,6 +17,10 @@ module Mittsu
       @_sphere = Sphere.new
     end
 
+    def renderer(impl_renderer)
+      @_renderer ||= impl_renderer.create_line_renderer(self)
+    end
+
     def raycast(raycaster, intersects)
       precision = raycaster.line_precision
       precision_sq = precision * precision

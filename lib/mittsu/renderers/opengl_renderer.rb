@@ -11,6 +11,7 @@ require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/opengl/object_renderers/mesh_opengl_renderer'
+require 'mittsu/renderers/opengl/object_renderers/line_opengl_renderer'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
@@ -698,19 +699,8 @@ module Mittsu
 
       @state.disable_unused_attributes
 
-      case object
-
       # render mesh
-      when Mesh
-        object.renderer(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      when Line
-        mode = object.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
-
-        @state.set_line_width(material.line_width * @pixel_ratio)
-
-        glDrawArrays(mode, 0, geometry_group[:_opengl_line_count])
-
-        @info[:render][:calls] += 1
+      object.renderer(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
 
       # TODO: render particles
       # when PointCloud
@@ -718,7 +708,6 @@ module Mittsu
       #
       #   @info[:render][:calls] += 1
       #   @info[:render][:points] += geometry_group[:_opengl_particle_count]
-      end
     end
 
     def set_texture(texture, slot)
@@ -809,6 +798,10 @@ module Mittsu
 
     def create_mesh_renderer(mesh)
       MeshOpenGLRenderer.new(mesh, self)
+    end
+
+    def create_line_renderer(line)
+      LineOpenGLRenderer.new(line, self)
     end
 
     private
