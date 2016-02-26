@@ -563,6 +563,11 @@ module Mittsu
       self.dispatch_event type: :dispose
     end
 
+    # TODO: FIXME: HACK: make this implementation independent!!!
+    def to_group
+      @group ||= OpenGLGeometryGroup.new(0, 0, 0)
+    end
+
     private
 
     def set_bit(value, position, enabled)

@@ -920,9 +920,10 @@ module Mittsu
 
         set_material_faces(material)
         if buffer.is_a? BufferGeometry
-          render_buffer_direct(camera, lights, fog, material, buffer, object)
+          # TODO
+          # render_buffer_direct(camera, lights, fog, material, buffer, object)
         else
-          render_buffer(camera, lights, fog, material, buffer, object)
+          render_buffer(camera, lights, fog, material, buffer.to_group, object)
         end
       end
     end
@@ -966,8 +967,10 @@ module Mittsu
         when Mesh
           init_geometry_groups(object, geometry)
         when Line
-          if geometry[:_opengl_vertex_buffer].nil?
-            create_line_buffers(geometry)
+          # TODO: find better way to handle lines as geometry groups
+          geometry_group = geometry.to_group
+          if geometry_group.vertex_buffer.nil?
+            create_line_buffers(geometry_group)
             init_line_buffers(geometry, object)
 
             geometry.vertices_need_update = true
@@ -1151,12 +1154,12 @@ module Mittsu
       @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
-    def create_line_buffers(geometry)
-      geometry[:_opengl_vertex_array] = glCreateVertexArray
+    def create_line_buffers(geometry_group)
+      geometry_group.vertex_array_object = glCreateVertexArray
 
-      geometry[:_opengl_vertex_buffer] = glCreateBuffer
-      geometry[:_opengl_color_buffer] = glCreateBuffer
-      geometry[:_opengl_line_distance_buffer] = glCreateBuffer
+      geometry_group.vertex_buffer = glCreateBuffer
+      geometry_group.color_buffer = glCreateBuffer
+      geometry_group.line_distance_buffer = glCreateBuffer
 
       @info[:memory][:geometries] += 1
     end
@@ -1262,11 +1265,14 @@ module Mittsu
     def init_line_buffers(geometry, object)
       nvertices = geometry.vertices.length
 
-      geometry[:_vertex_array] = Array.new(nvertices * 3, 0.0) # Float32Array
-      geometry[:_color_array] = Array.new(nvertices * 3, 0.0) # Float32Array
-      geometry[:_line_distance_array] = Array.new(nvertices, 0.0) # Float32Array
+      # TODO: line as geometry_group !!
+      geometry_group = geometry.to_group
 
-      geometry[:_opengl_line_count] = nvertices
+      geometry_group.vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      geometry_group.color_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      geometry_group.line_distance_array = Array.new(nvertices, 0.0) # Float32Array
+
+      geometry_group.line_count = nvertices
 
       init_custom_attributes(object)
     end
@@ -1372,7 +1378,7 @@ module Mittsu
       geometry = object.geometry
 
       if geometry.is_a? BufferGeometry
-        # TODO: geomertry vertex array ?????
+        # TODO: geometry vertex array ?????
         # glBindVertexArray geometry.vertex_array
 
         geometry.attributes.each do |(key, attribute)|
@@ -1471,11 +1477,13 @@ module Mittsu
       colors = geometry.colors
       line_distances = geometry.line_distances_need_update
 
-      vertex_array = geometry[:_vertex_array]
-      color_array = geometry[:_color_array]
-      line_distance_array = geometry[:_line_distance_array]
+      geometry_group = geometry.to_group
 
-      custom_attributes = geometry[:_opengl_custom_attributes_list]
+      vertex_array = geometry_group.vertex_array
+      color_array = geometry_group.color_array
+      line_distance_array = geometry_group.line_distance_array
+
+      custom_attributes = geometry_group.custom_attributes_list
 
       if geometry.vertices_need_update
         vertices.each_with_index do |vertex, v|
@@ -1486,7 +1494,7 @@ module Mittsu
           vertex_array[offset + 2] = vertex.z
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_vertex_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.vertex_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, vertex_array, hint)
       end
 
@@ -1499,7 +1507,7 @@ module Mittsu
           color_array[offset + 2] = color.b
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_color_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.color_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, color_array, hint)
       end
 
@@ -1508,7 +1516,7 @@ module Mittsu
           line_distance_array[d] = l
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry[:_opengl_line_distance_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.line_distance_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, line_distance_array, hint)
       end
 

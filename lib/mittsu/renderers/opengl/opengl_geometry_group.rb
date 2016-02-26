@@ -92,6 +92,10 @@ module Mittsu
       @skin_weight_array = nil
     end
 
+    def to_group
+      self
+    end
+
     private
 
     def glCreateBuffer
