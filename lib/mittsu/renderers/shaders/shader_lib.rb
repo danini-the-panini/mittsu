@@ -11,6 +11,7 @@ module Mittsu
       @fragment_shader = options.fetch(:fragment_shader)
     end
   end
+  private_constant :ShaderLib_Instance
 
   ShaderLib = {
     basic: ShaderLib_Instance.new(
