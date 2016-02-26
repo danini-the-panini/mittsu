@@ -563,9 +563,8 @@ module Mittsu
       self.dispatch_event type: :dispose
     end
 
-    # TODO: FIXME: HACK: make this implementation independent!!!
-    def to_group
-      @group ||= OpenGLGeometryGroup.new(0, 0, 0)
+    def implementation(impl_renderer)
+      @_implementation ||= impl_renderer.create_geometry_implementation(self)
     end
 
     private

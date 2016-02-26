@@ -804,6 +804,10 @@ module Mittsu
       LineOpenGLRenderer.new(line, self)
     end
 
+    def create_geometry_implementation(_)
+      OpenGLGeometryGroup.new(0, 0, 0);
+    end
+
     private
 
     def clear_color(r, g, b, a)
@@ -923,7 +927,7 @@ module Mittsu
           # TODO
           # render_buffer_direct(camera, lights, fog, material, buffer, object)
         else
-          render_buffer(camera, lights, fog, material, buffer.to_group, object)
+          render_buffer(camera, lights, fog, material, buffer.implementation(self), object)
         end
       end
     end
@@ -967,8 +971,7 @@ module Mittsu
         when Mesh
           init_geometry_groups(object, geometry)
         when Line
-          # TODO: find better way to handle lines as geometry groups
-          geometry_group = geometry.to_group
+          geometry_group = geometry.implementation(self)
           if geometry_group.vertex_buffer.nil?
             create_line_buffers(geometry_group)
             init_line_buffers(geometry, object)
@@ -1265,8 +1268,7 @@ module Mittsu
     def init_line_buffers(geometry, object)
       nvertices = geometry.vertices.length
 
-      # TODO: line as geometry_group !!
-      geometry_group = geometry.to_group
+      geometry_group = geometry.implementation(self)
 
       geometry_group.vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
       geometry_group.color_array = Array.new(nvertices * 3, 0.0) # Float32Array
@@ -1477,7 +1479,7 @@ module Mittsu
       colors = geometry.colors
       line_distances = geometry.line_distances_need_update
 
-      geometry_group = geometry.to_group
+      geometry_group = geometry.implementation(self)
 
       vertex_array = geometry_group.vertex_array
       color_array = geometry_group.color_array
