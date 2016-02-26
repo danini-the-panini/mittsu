@@ -9,6 +9,7 @@ require 'mittsu/renderers/glfw_window'
 require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
+require 'mittsu/renderers/opengl/opengl_geometry_group'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/opengl/object_renderers/mesh_opengl_renderer'
 require 'mittsu/renderers/opengl/object_renderers/line_opengl_renderer'
@@ -144,7 +145,6 @@ module Mittsu
       }
 
       @geometry_groups = {}
-      @geometry_group_counter = 0
 
       @shader_ids = {
         # MeshDepthMaterial => :depth, # TODO...
@@ -562,7 +562,7 @@ module Mittsu
       return unless material.visible
 
       # TODO: place to put this ???
-      vertex_array = geometry_group[:_opengl_vertex_array]
+      vertex_array = geometry_group.vertex_array_object
       if vertex_array
         glBindVertexArray(vertex_array)
       end
@@ -575,7 +575,7 @@ module Mittsu
 
       update_buffers = false
       wireframe_bit = material.wireframe ? 1 : 0
-      geometry_program = "#{geometry_group[:id]}_#{program.id}_#{wireframe_bit}"
+      geometry_program = "#{geometry_group.id}_#{program.id}_#{wireframe_bit}"
 
       if geometry_program != @_current_geometry_program
         @_current_geometry_program = geometry_program
@@ -587,7 +587,7 @@ module Mittsu
       # vertices
       if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
         if update_buffers
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_vertex_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.vertex_buffer)
 
           @state.enable_attribute(attributes['position'])
 
@@ -602,8 +602,8 @@ module Mittsu
 
         # use the per-geometry_group custom attribute arrays which are setup in init_mesh_buffers
 
-        if geometry_group[:_opengl_custom_attributes_list]
-          geometry_group[:_opengl_custom_attributes_list].each do |attribute|
+        if geometry_group.custom_attributes_list
+          geometry_group.custom_attributes_list.each do |attribute|
             if attributes[attribute.buffer.belongs_to_attribute] >= 0
               glBindBuffer(GL_ARRAY_BUFFER, attribute.buffer)
 
@@ -617,7 +617,7 @@ module Mittsu
         # colors
 
         if attributes['color'] && attributes['color'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_color_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.color_buffer)
 
           @state.enable_attribute(attributes['color'])
 
@@ -629,7 +629,7 @@ module Mittsu
         # normals
 
         if attributes['normal'] && attributes['normal'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_normal_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.normal_buffer)
 
           @state.enable_attribute(attributes['normal'])
 
@@ -639,7 +639,7 @@ module Mittsu
         # tangents
 
         if attributes['tangent'] && attributes['tangent'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_tangent_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.tangent_buffer)
 
           @state.enable_attribute(attributes['tangent'])
 
@@ -650,7 +650,7 @@ module Mittsu
 
         if attributes['uv'] && attributes['uv'] >= 0
           if object.geometry.face_vertex_uvs[0]
-            glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv_buffer])
+            glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv_buffer)
 
             @state.enable_attribute(attributes['uv'])
 
@@ -662,7 +662,7 @@ module Mittsu
 
         if attributes['uv2'] && attributes['uv2'] >= 0
           if object.geometry.face_vertex_uvs[1]
-            glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv2_buffer])
+            glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv2_buffer)
 
             @state.enable_attribute(attributes['uv2'])
 
@@ -673,13 +673,13 @@ module Mittsu
         end
 
         if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_indices_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_indices_buffer)
 
           @state.enable_attribute(attributes['skin_index'])
 
           glVertexAttribPointer(attributes['skin_index'], 4, GL_FLOAT, GL_FALSE, 0, 0)
 
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_weight_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_weight_buffer)
 
           @state.enable_attribute(attributes['skin_weight'])
 
@@ -689,7 +689,7 @@ module Mittsu
         # line distances
 
         if attributes['line_distances'] && attributes['line_distances'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_line_distance_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.line_distance_buffer)
 
           @state.enable_attribute(attributes['line_distance'])
 
@@ -704,10 +704,10 @@ module Mittsu
 
       # TODO: render particles
       # when PointCloud
-      #   glDrawArrays(GL_POINTS, 0, geometry_group[:_opengl_particle_count])
+      #   glDrawArrays(GL_POINTS, 0, geometry_group.particle_count)
       #
       #   @info[:render][:calls] += 1
-      #   @info[:render][:points] += geometry_group[:_opengl_particle_count]
+      #   @info[:render][:points] += geometry_group.particle_count
     end
 
     def set_texture(texture, slot)
@@ -1031,39 +1031,25 @@ module Mittsu
         group_hash = "#{hash_map[material_index][:hash]}_#{hash_map[material_index][:counter]}"
 
         if !groups.include? group_hash
-          group = {
-            id: @geometry_group_counter += 1,
-            faces3: [],
-            material_index: material_index,
-            vertices: 0,
-            num_morph_targets: num_morph_targets,
-            num_morph_normals: num_morph_normals
-          }
+          group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals)
 
           groups[group_hash] = group
           groups_list << group
         end
 
-        if groups[group_hash][:vertices] + 3 > max_vertices_in_group
+        if groups[group_hash].num_vertices + 3 > max_vertices_in_group
           hash_map[material_index][:counter] += 1
           group_hash = "#{hash_map[material_index][:hash]}_#{hash_map[material_index][:counter]}"
 
           if !groups.include? group_hash
-            group = {
-              id: @geometry_group_counter += 1,
-              faces3: [],
-              material_index: material_index,
-              vertices: 0,
-              num_morph_targets: num_morph_targets,
-              num_morph_normals: num_morph_normals
-            }
+            group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals)
 
             groups[group_hash] = group
             groups_list << group
           end
         end
-        groups[group_hash][:faces3] << f
-        groups[group_hash][:vertices] += 3
+        groups[group_hash].faces3 << f
+        groups[group_hash].num_vertices += 3
       end
       groups_list
     end
@@ -1086,7 +1072,7 @@ module Mittsu
 
       geometry_groups_list.each do |geometry_group|
         # initialize VBO on the first access
-        if geometry_group[:_opengl_vertex_buffer].nil?
+        if geometry_group.vertex_buffer.nil?
           create_mesh_buffers(geometry_group)
           init_mesh_buffers(geometry_group, object)
 
@@ -1176,40 +1162,7 @@ module Mittsu
     end
 
     def create_mesh_buffers(geometry_group)
-      geometry_group[:_opengl_vertex_array] = glCreateVertexArray
-
-      geometry_group[:_opengl_vertex_buffer] = glCreateBuffer
-      geometry_group[:_opengl_normal_buffer] = glCreateBuffer
-      geometry_group[:_opengl_tangent_buffer] = glCreateBuffer
-      geometry_group[:_opengl_color_buffer] = glCreateBuffer
-      geometry_group[:_opengl_uv_buffer] = glCreateBuffer
-      geometry_group[:_opengl_uv2_buffer] = glCreateBuffer
-
-      geometry_group[:_opengl_skin_indices_buffer] = glCreateBuffer
-      geometry_group[:_opengl_skin_weights_buffer] = glCreateBuffer
-
-      geometry_group[:_opengl_face_buffer] = glCreateBuffer
-      geometry_group[:_opengl_line_buffer] = glCreateBuffer
-
-      num_morph_targets = geometry_group[:num_morph_targets]
-
-      if num_morph_targets
-        geometry_group[:_opengl_morph_targets_buffers] = []
-
-        num_morph_targets.times do |m|
-          geometry_group[:_opengl_morph_targets_buffers] << glCreateBuffer
-        end
-      end
-
-      num_morph_normals = geometry_group[:num_morph_normals]
-
-      if num_morph_normals
-        geometry_group[:_opengl_morph_normals_buffers] = []
-
-        num_morph_normals.times do |m|
-          geometry_group[:_opengl_morph_normals_buffers] << glCreateBuffer
-        end
-      end
+      geometry_group.create_mesh_buffers
 
       @info[:memory][:geometries] += 1
     end
@@ -1320,7 +1273,7 @@ module Mittsu
 
     def init_mesh_buffers(geometry_group, object)
       geometry = object.geometry
-      faces3 = geometry_group[:faces3]
+      faces3 = geometry_group.faces3
 
       nvertices = faces3.length * 3
       ntris = faces3.length * 1
@@ -1328,58 +1281,58 @@ module Mittsu
 
       material = get_buffer_material(object, geometry_group)
 
-      geometry_group[:_vertex_array] = Array.new(nvertices * 3) # Float32Array
-      geometry_group[:_normal_array] = Array.new(nvertices * 3) # Float32Array
-      geometry_group[:_color_array] = Array.new(nvertices * 3) # Float32Array
-      geometry_group[:_uv_array] = Array.new(nvertices * 2) # Float32Array
+      geometry_group.vertex_array = Array.new(nvertices * 3) # Float32Array
+      geometry_group.normal_array = Array.new(nvertices * 3) # Float32Array
+      geometry_group.color_array = Array.new(nvertices * 3) # Float32Array
+      geometry_group.uv_array = Array.new(nvertices * 2) # Float32Array
 
       if geometry.face_vertex_uvs.length > 1
-        geometry_group[:_uv2_array] = Array.new(nvertices * 2) # Float32Array
+        geometry_group.uv2_array = Array.new(nvertices * 2) # Float32Array
       end
 
       if geometry.has_tangents
-        geometry_group[:_tangent_array] = Array.new(nvertices * 4) # Float32Array
+        geometry_group.tangent_array = Array.new(nvertices * 4) # Float32Array
       end
 
       if !object.geometry.skin_weights.empty? && !object.geometry.skin_indices.empty?
-        geometry_group[:_skin_index_array] = Array.new(nvertices * 4) # Float32Array
-        geometry_group[:_skin_weight_array] = Array.new(nvertices * 4)
+        geometry_group.skin_indices_array = Array.new(nvertices * 4) # Float32Array
+        geometry_group.skin_weight_array = Array.new(nvertices * 4)
       end
 
       # UintArray from OES_element_index_uint ???
 
-      geometry_group[:_type_array] = Array # UintArray ???
-      geometry_group[:_face_array] = Array.new(ntris * 3)
-      geometry_group[:_line_array] = Array.new(nlines * 2)
+      geometry_group.type_array = Array # UintArray ???
+      geometry_group.face_array = Array.new(ntris * 3)
+      geometry_group.line_array = Array.new(nlines * 2)
 
-      num_morph_targets = geometry_group[:num_morph_targets]
+      num_morph_targets = geometry_group.num_morph_targets
 
       if !num_morph_targets.zero?
-        geometry_group[:_morph_targets_arrays] = []
+        geometry_group.morph_targets_arrays = []
 
         num_morph_targets.times do |m|
-          geometry_group[:_morph_targets_arrays] << Array.new(nvertices * 3) # Float32Array ???
+          geometry_group.morph_targets_arrays << Array.new(nvertices * 3) # Float32Array ???
         end
       end
 
-      num_morph_normals = geometry_group[:num_morph_normals]
+      num_morph_normals = geometry_group.num_morph_normals
 
       if !num_morph_targets.zero?
-        geometry_group[:_morph_normals_arrays] = []
+        geometry_group.morph_normals_arrays = []
 
         num_morph_normals.times do |m|
-          geometry_group[:_morph_normals_arrays] << Array.new(nvertices * 3) # Float32Array ???
+          geometry_group.morph_normals_arrays << Array.new(nvertices * 3) # Float32Array ???
         end
       end
 
-      geometry_group[:_opengl_face_count] = ntris * 3
-      geometry_group[:_opengl_line_count] = nlines * 2
+      geometry_group.face_count = ntris * 3
+      geometry_group.line_count = nlines * 2
 
       # custom attributes
 
       if material.attributes
-        if geometry_group[:_opengl_custom_attributes_list].nil?
-          geometry_group[:_opengl_custom_attributes_list] = []
+        if geometry_group.custom_attributes_list.nil?
+          geometry_group.custom_attributes_list = []
         end
 
         material.attributes.each do |(name, original_attribute)|
@@ -1408,11 +1361,11 @@ module Mittsu
             attribute[:_original] = original_attribute
           end
 
-          geometry_group[:_opengl_custom_attributes_list] << attribute
+          geometry_group.custom_attributes_list << attribute
         end
       end
 
-      geometry_group[:_initted_arrays] = true
+      geometry_group.initted_arrays = true
     end
 
     def update_object(object)
@@ -1457,7 +1410,7 @@ module Mittsu
         material = nil
         geometry_groups_list.each do |geometry_group|
           # TODO: place to put this???
-          # glBindVertexArray(geometry_group[:_opengl_vertex_array])
+          # glBindVertexArray(geometry_group.vertex_array_object)
           material = get_buffer_material(object, geometry_group)
 
           custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
@@ -1508,7 +1461,7 @@ module Mittsu
 
     def get_buffer_material(object, geometry_group)
       # TODO: when MeshFaceMaterial exists
-      # object.material.is_a?(MeshFaceMaterial) ? object.material.materials[geometry_group[:material_index]] : object.material
+      # object.material.is_a?(MeshFaceMaterial) ? object.material.materials[geometry_group.material_index] : object.material
 
       object.material # for now...
     end
@@ -1615,7 +1568,7 @@ module Mittsu
     end
 
     def set_mesh_buffers(geometry_group, object, hint, dispose, material)
-      return unless geometry_group[:_initted_arrays]
+      return unless geometry_group.initted_arrays?
 
       needs_face_normals = material_needs_face_normals(material)
 
@@ -1633,23 +1586,23 @@ module Mittsu
       offset_morph_target = 0
       offset_custom = 0
 
-      vertex_array = geometry_group[:_vertex_array]
-      uv_array = geometry_group[:_uv_array]
-      uv2_array = geometry_group[:_uv2_array]
-      normal_array = geometry_group[:_normal_array]
-      tangent_array = geometry_group[:_tangent_array]
-      color_array = geometry_group[:_color_array]
+      vertex_array = geometry_group.vertex_array
+      uv_array = geometry_group.uv_array
+      uv2_array = geometry_group.uv2_array
+      normal_array = geometry_group.normal_array
+      tangent_array = geometry_group.tangent_array
+      color_array = geometry_group.color_array
 
-      skin_index_array = geometry_group[:_skin_index_array]
-      skin_weight_array = geometry_group[:_skin_weight_array]
+      skin_indices_array = geometry_group.skin_indices_array
+      skin_weight_array = geometry_group.skin_weight_array
 
-      morph_targets_arrays = geometry_group[:_morph_targets_arrays]
-      morph_normals_arrays = geometry_group[:_morph_normals_arrays]
+      morph_targets_arrays = geometry_group.morph_targets_arrays
+      morph_normals_arrays = geometry_group.morph_normals_arrays
 
-      custom_attributes = geometry_group[:_opengl_custom_attributes_list]
+      custom_attributes = geometry_group.custom_attributes_list
 
-      face_array = geometry_group[:_face_array]
-      line_array = geometry_group[:_line_array]
+      face_array = geometry_group.face_array
+      line_array = geometry_group.line_array
 
       geometry = object.geometry # this is shared for all chunks
 
@@ -1662,7 +1615,7 @@ module Mittsu
       dirty_morph_targets = geometry.morph_targets_need_update
 
       vertices = geometry.vertices
-      chunk_faces3 = geometry_group[:faces3]
+      chunk_faces3 = geometry_group.faces3
       obj_faces = geometry.faces
 
       obj_uvs = geometry.face_vertex_uvs[0]
@@ -1697,7 +1650,7 @@ module Mittsu
           offset += 9
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_vertex_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.vertex_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, vertex_array, hint)
       end
 
@@ -1761,11 +1714,11 @@ module Mittsu
             offset_morph_target += 9
           end
 
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_morph_targets_buffers][vk])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.morph_targets_buffers[vk])
           glBufferData_easy(GL_ARRAY_BUFFER, morph_targets_arrays[vk], hint)
 
           if material.morph_normals
-            glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_morph_normals_buffers][vk])
+            glBindBuffer(GL_ARRAY_BUFFER, geometry_group.morph_normals_buffers[vk])
             glBufferData_easy(GL_ARRAY_BUFFER, morph_normals_arrays[vk], hint)
           end
         end
@@ -1821,10 +1774,10 @@ module Mittsu
         end
 
         if offset_skin > 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_indices_buffer])
-          glBufferData_easy(GL_ARRAY_BUFFER, skin_index_array, hint)
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_indices_buffer)
+          glBufferData_easy(GL_ARRAY_BUFFER, skin_indices_array, hint)
 
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_skin_weights_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_weights_buffer)
           glBufferData_easy(GL_ARRAY_BUFFER, skin_weight_array, hint)
         end
       end
@@ -1862,7 +1815,7 @@ module Mittsu
         end
 
         if offset_color > 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_color_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.color_buffer)
           glBufferData_easy(GL_ARRAY_BUFFER, color_array, hint)
         end
       end
@@ -1895,7 +1848,7 @@ module Mittsu
           offset_tangent += 12
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_tangent_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.angent_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, tangent_array, hint)
       end
 
@@ -1927,7 +1880,7 @@ module Mittsu
           end
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_normal_buffer])
+        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.normal_buffer)
         glBufferData_easy(GL_ARRAY_BUFFER, normal_array, hint)
       end
 
@@ -1948,7 +1901,7 @@ module Mittsu
         end
 
         if offset_uv > 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv_buffer)
           glBufferData_easy(GL_ARRAY_BUFFER, uv_array, hint)
         end
       end
@@ -1970,7 +1923,7 @@ module Mittsu
         end
 
         if offset_uv2 > 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group[:_opengl_uv2_buffer])
+          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv2_buffer)
           glBufferData_easy(GL_ARRAY_BUFFER, uv2_array, hint)
         end
       end
@@ -1997,10 +1950,10 @@ module Mittsu
           vertex_index += 3
         end
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_face_buffer])
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.face_buffer)
         glBufferData_easy(GL_ELEMENT_ARRAY_BUFFER, face_array, hint)
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_line_buffer])
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.line_buffer)
         glBufferData_easy(GL_ELEMENT_ARRAY_BUFFER, line_array, hint)
       end
 
@@ -2223,17 +2176,7 @@ module Mittsu
       end
 
       if dispose
-        geometry_group.delete(:_initted_arrays)
-        geometry_group.delete(:_color_array)
-        geometry_group.delete(:_normal_array)
-        geometry_group.delete(:_tangent_array)
-        geometry_group.delete(:_uv_array)
-        geometry_group.delete(:_uv2_array)
-        geometry_group.delete(:_face_array)
-        geometry_group.delete(:_vertex_array)
-        geometry_group.delete(:_line_array)
-        geometry_group.delete(:_skin_index_array)
-        geometry_group.delete(:_skin_weight_array)
+        geometry_group.dispose
       end
     end
 

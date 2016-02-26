@@ -17,7 +17,7 @@ module Mittsu
 
     def initialize
       super
-      
+
       @id = (@@id ||= 1).tap { @@id += 1 }
 
       @name = ''
