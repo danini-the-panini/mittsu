@@ -77,9 +77,6 @@ module Mittsu
       else
         prefix_vertex = [
           '#version 330',
-          # TODO: do we need precision for an OpenGL program?
-          # "precision #{parameters[:precision]} float;",
-          # "precision #{parameters[:precision]} int;",
 
           custom_defines,
 
@@ -183,11 +180,7 @@ module Mittsu
 
         prefix_fragment = [
           '#version 330',
-          # TODO: do we need precision for an OpenGL program?
-          # "precison #{parameters[:precision]} float;",
-          # "precison #{parameters[:precision]} int;",
-
-          # (parameters[:bump_map] || parameters[:normal_map] || parameters[:flat_shading]) ? '#extension GL_OES_standard_derivatives : enable' : '', # TODO: oes extension in OpenGL?
+          # (parameters[:bump_map] || parameters[:normal_map] || parameters[:flat_shading]) ? '#extension GL_OES_standard_derivatives : enable' : '', # TODO: does extension exist in OpenGL?
 
           custom_defines,
 

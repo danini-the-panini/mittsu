@@ -1,4 +1,3 @@
-
 require 'opengl'
 require 'glfw'
 require 'fiddle'
@@ -25,7 +24,6 @@ module Mittsu
 
       @pixel_ratio = 1.0
 
-      @precision = parameters.fetch(:precision, 'highp') # not sure if OpenGL works with the whole 'highp' thing...
       @_alpha = parameters.fetch(:alpha, false)
       @_depth = parameters.fetch(:depth, true)
       @_stencil = parameters.fetch(:stencil, true)
@@ -180,7 +178,6 @@ module Mittsu
 
       @state = OpenGLState.new(self.method(:param_mittsu_to_gl))
 
-      # TODO: get shader precision format???
       # TODO: load extensions??
 
       reset_gl_state
@@ -197,10 +194,6 @@ module Mittsu
       @_supports_bone_textures = @_supports_vertex_textures && false # TODO: extensions.get('OES_texture_float') ????
 
       #
-
-      # TODO: get more shader precision formats ???
-
-      # TODO: clear precision to maximum available ???
 
       # Plugins
 
@@ -2457,7 +2450,6 @@ module Mittsu
       max_bones = allocate_bones(object)
 
       parameters = {
-        precision: @_precision,
         supports_vertex_textures: @_supports_vertex_textures,
 
         map: !!material.map,
