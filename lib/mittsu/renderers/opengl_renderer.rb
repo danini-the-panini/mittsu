@@ -10,10 +10,11 @@ require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
+require 'mittsu/renderers/opengl/object_renderers/mesh_opengl_renderer'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
-include OpenGL
+include ENV['DEBUG'] ? OpenGLDebug : OpenGL
 
 module Mittsu
   class OpenGLRenderer
@@ -484,7 +485,6 @@ module Mittsu
       end
 
       # custom render plugins
-      # TODO: when plugins are ready
       @shadow_map_plugin.render(scene, camera)
 
       #
@@ -702,24 +702,7 @@ module Mittsu
 
       # render mesh
       when Mesh
-        type = GL_UNSIGNED_INT # geometry_group[:_type_array] == Uint32Array ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT
-
-        # wireframe
-        if material.wireframe
-          @state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
-
-          glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_line_buffer]) if update_buffers
-          glDrawElements(GL_LINES, geometry_group[:_opengl_line_count], type, 0)
-
-        # triangles
-        else
-          glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group[:_opengl_face_buffer]) if update_buffers
-          glDrawElements(GL_TRIANGLES, geometry_group[:_opengl_face_count], type, 0)
-        end
-
-        @info[:render][:calls] += 1
-        @info[:render][:vertices] += geometry_group[:_opengl_face_count]
-        @info[:render][:faces] += geometry_group[:_opengl_face_count] / 3
+        object.renderer(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
       when Line
         mode = object.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
 
@@ -822,6 +805,10 @@ module Mittsu
       if texture.on_update
         texture.on_update.()
       end
+    end
+
+    def create_mesh_renderer(mesh)
+      MeshOpenGLRenderer.new(mesh, self)
     end
 
     private

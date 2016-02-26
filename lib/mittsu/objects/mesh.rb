@@ -15,6 +15,10 @@ module Mittsu
       update_morph_targets
     end
 
+    def renderer(impl_renderer)
+      @_renderer ||= impl_renderer.create_mesh_renderer(self)
+    end
+
     def update_morph_targets
       if !@morph_targets.nil? && !@morph_targets.empty?
         @morph_targets_base = -1
