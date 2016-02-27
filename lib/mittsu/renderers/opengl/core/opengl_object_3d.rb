@@ -1,10 +1,15 @@
 module Mittsu
   class OpenGLObject3D
     attr_reader :model_view_matrix
+    attr_writer :active
 
     def initialize(object, renderer)
       @object = object
       @renderer = renderer
+    end
+
+    def active?
+      @active
     end
 
     def init
@@ -28,8 +33,7 @@ module Mittsu
         when BufferGeometry
           @info[:memory][:geometries] += 1
         when Mesh
-          # TODO!!!
-          @renderer.send(:init_geometry_groups, @object, geometry)
+          geometry_impl.init_geometry_groups(@object)
         when Line
           if geometry_impl.vertex_buffer.nil?
             # TODO!!!
