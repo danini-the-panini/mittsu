@@ -184,6 +184,10 @@ module Mittsu
       @renderer.state.set_polygon_offset(@material.polygon_offset, @material.polygon_offset_factor, @material.polygon_offset_units)
     end
 
+    def needs_face_normals?
+      !@material.is_a?(MeshPhongMaterial) && @material.shading == FlatShading
+    end
+
     private
 
     def allocate_lights(lights)
