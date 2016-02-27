@@ -171,6 +171,19 @@ module Mittsu
       end
     end
 
+    def set
+      if @material.transparent
+        @renderer.state.set_blending(@material.blending, @material.blend_equation, @material.blend_src, @material.blend_dst, @material.blend_equation_alpha, @material.blend_src_alpha, @material.blend_dst_alpha)
+      else
+        @renderer.state.set_blending(NoBlending)
+      end
+
+      @renderer.state.set_depth_test(@material.depth_test)
+      @renderer.state.set_depth_write(@material.depth_write)
+      @renderer.state.set_color_write(@material.color_write)
+      @renderer.state.set_polygon_offset(@material.polygon_offset, @material.polygon_offset_factor, @material.polygon_offset_units)
+    end
+
     private
 
     def allocate_lights(lights)

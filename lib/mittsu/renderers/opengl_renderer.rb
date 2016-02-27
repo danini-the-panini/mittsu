@@ -531,8 +531,9 @@ module Mittsu
 
       if scene.override_material
         override_material = scene.override_material
+        material_impl = override_material.implementation(self)
 
-        set_material(override_material)
+        material_impl.set
 
         render_objects(opaque_object, camera, @lights, fog, override_material)
         render_objects(transparent_objects, camera, @lights, fog, override_material)
@@ -935,10 +936,12 @@ module Mittsu
 
         if override_material
           material = override_material
+          material_impl = material.implementation(self)
         else
           material = opengl_object[:material]
           next unless material
-          set_material(material)
+          material_impl = material.implementation(self)
+          material_impl.set
         end
 
         set_material_faces(material)
@@ -961,7 +964,8 @@ module Mittsu
           else
             material = opengl_object[material_type]
             next unless material
-            set_material(material)
+            material_impl = material.implementation(self)
+            material_impl.set
           end
           render_immediate_object(camera, lights, fog, material, object)
         end
@@ -1010,19 +1014,6 @@ module Mittsu
 
     def setup_matrices(object, camera)
       object.implementation(self).setup_matrices(camera)
-    end
-
-    def set_material(material)
-      if material.transparent
-        @state.set_blending(material.blending, material.blend_equation, material.blend_src, material.blend_dst, material.blend_equation_alpha, material.blend_src_alpha, material.blend_dst_alpha)
-      else
-        @state.set_blending(NoBlending)
-      end
-
-      @state.set_depth_test(material.depth_test)
-      @state.set_depth_write(material.depth_write)
-      @state.set_color_write(material.color_write)
-      @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
     def update_object(object)
