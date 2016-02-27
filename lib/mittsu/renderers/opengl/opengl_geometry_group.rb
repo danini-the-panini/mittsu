@@ -172,19 +172,5 @@ module Mittsu
     def implementation(_)
       self
     end
-
-    private
-
-    def glCreateBuffer
-      @_b ||= ' '*8
-      glGenBuffers(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def glCreateVertexArray
-      @_b ||= ' '*8
-      glGenVertexArrays(1, @_b)
-      @_b.unpack('L')[0]
-    end
   end
 end
