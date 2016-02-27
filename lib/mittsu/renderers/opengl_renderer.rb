@@ -10,9 +10,11 @@ require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/opengl_geometry_group'
+require 'mittsu/renderers/opengl/core/opengl_geometry'
+require 'mittsu/renderers/opengl/core/opengl_object_3d'
+require 'mittsu/renderers/opengl/objects/opengl_mesh'
+require 'mittsu/renderers/opengl/objects/opengl_line'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
-require 'mittsu/renderers/opengl/object_renderers/mesh_opengl_renderer'
-require 'mittsu/renderers/opengl/object_renderers/line_opengl_renderer'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
@@ -699,8 +701,7 @@ module Mittsu
 
       @state.disable_unused_attributes
 
-      # render mesh
-      object.renderer(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
+      object.implementation(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
 
       # TODO: render particles
       # when PointCloud
@@ -796,16 +797,20 @@ module Mittsu
       end
     end
 
-    def create_mesh_renderer(mesh)
-      MeshOpenGLRenderer.new(mesh, self)
+    def create_mesh_implementation(mesh)
+      OpenGLMesh.new(mesh, self)
     end
 
-    def create_line_renderer(line)
-      LineOpenGLRenderer.new(line, self)
+    def create_line_implementation(line)
+      OpenGLLine.new(line, self)
     end
 
-    def create_geometry_implementation(_)
-      OpenGLGeometryGroup.new(0, 0, 0);
+    def create_geometry_implementation(geometry)
+      OpenGLGeometry.new(geometry, self)
+    end
+
+    def create_object3d_implementation(geometry)
+      OpenGLObject3D.new(geometry, self)
     end
 
     private

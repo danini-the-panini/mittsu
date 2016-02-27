@@ -1,5 +1,5 @@
 module Mittsu
-  class MeshOpenGLRenderer
+  class OpenGLMesh
     def initialize(mesh, renderer)
       @mesh = mesh
       @renderer = renderer

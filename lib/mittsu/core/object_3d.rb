@@ -336,6 +336,10 @@ module Mittsu
       object
     end
 
+    def implementation(impl_renderer)
+      @_implementation ||= impl_renderer.create_object3d_implementation(self)
+    end
+
     private
 
     def parse_geometry(geometry)

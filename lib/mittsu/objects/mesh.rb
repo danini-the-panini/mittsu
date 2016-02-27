@@ -15,8 +15,8 @@ module Mittsu
       update_morph_targets
     end
 
-    def renderer(impl_renderer)
-      @_renderer ||= impl_renderer.create_mesh_renderer(self)
+    def implementation(impl_renderer)
+      @_implementation ||= impl_renderer.create_mesh_implementation(self)
     end
 
     def update_morph_targets

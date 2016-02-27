@@ -1,5 +1,5 @@
 module Mittsu
-  class LineOpenGLRenderer
+  class OpenGLLine
     def initialize(line, renderer)
       @line = line
       @renderer = renderer
