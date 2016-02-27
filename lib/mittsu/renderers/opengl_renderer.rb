@@ -1058,7 +1058,7 @@ module Mittsu
           end
         end
       elsif object.is_a? Mesh
-        # check all geometry g
+        # check all geometry groubs
         geometry_impl = geometry.implementation(self)
 
         material = nil
@@ -1089,7 +1089,8 @@ module Mittsu
         custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
         if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
-          set_line_buffers(geometry, GL_DYNAMIC_DRAW)
+          geometry_impl = geometry.implementation(self)
+          geometry_impl.set_line_buffers(GL_DYNAMIC_DRAW)
         end
 
         geometry.vertices_need_update = false
@@ -1110,109 +1111,6 @@ module Mittsu
         geometry.colors_need_update = false
 
         material.attributes && clear_custom_attributes(material)
-      end
-    end
-
-    def set_line_buffers(geometry, hint)
-      vertices = geometry.vertices
-      colors = geometry.colors
-      line_distances = geometry.line_distances_need_update
-
-      geometry_group = geometry.implementation(self)
-
-      vertex_array = geometry_group.vertex_array
-      color_array = geometry_group.color_array
-      line_distance_array = geometry_group.line_distance_array
-
-      custom_attributes = geometry_group.custom_attributes_list
-
-      if geometry.vertices_need_update
-        vertices.each_with_index do |vertex, v|
-          offset = v * 3
-
-          vertex_array[offset]     = vertex.x
-          vertex_array[offset + 1] = vertex.y
-          vertex_array[offset + 2] = vertex.z
-        end
-
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.vertex_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, vertex_array, hint)
-      end
-
-      if geometry.colors_need_update
-        colors.each_with_index do |color, c|
-          offset = c * 3
-
-          color_array[offset]     = color.r
-          color_array[offset + 1] = color.g
-          color_array[offset + 2] = color.b
-        end
-
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.color_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, color_array, hint)
-      end
-
-      if geometry.line_distances_need_update
-        line_distances.each_with_index do |l, d|
-          line_distance_array[d] = l
-        end
-
-        glBindBuffer(GL_ARRAY_BUFFER, geometry_group.line_distance_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, line_distance_array, hint)
-      end
-
-      if custom_attributes
-        custom_attribute.each do |custom_attribute|
-          offset = 0
-
-          values = custom_attribute.value
-
-          case custom_attribute.size
-          when 1
-            value.each_with_index do |value, ca|
-              custom_attribute.array[ca] = value
-            end
-          when 2
-            values.each_with_index do |value, ca|
-              custom_attribute[offset    ] = value.x
-              custom_attribute[offset + 1] = value.y
-
-              offset += 2
-            end
-          when 3
-            if custom_attribute.type === :c
-              values.each_with_index do |value, ca|
-                custom_attribute[offset    ] = value.r
-                custom_attribute[offset + 1] = value.g
-                custom_attribute[offset + 2] = value.b
-
-                offset += 3
-              end
-            else
-              values.each_with_index do |value, ca|
-                custom_attribute[offset    ] = value.x
-                custom_attribute[offset + 1] = value.y
-                custom_attribute[offset + 2] = value.z
-
-                offset += 3
-              end
-            end
-          when 4
-            values.each_with_index do |value, ca|
-              custom_attribute[offset    ] = value.x
-              custom_attribute[offset + 1] = value.y
-              custom_attribute[offset + 2] = value.z
-              custom_attribute[offset + 3] = value.w
-
-              offset += 4
-            end
-          end
-
-          glBindBuffer(GL_ARRAY_BUFFER, custom_attribute.buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, custom_attribute.array, hint)
-
-          custom_attribute.needs_update = false
-        end
       end
     end
 
