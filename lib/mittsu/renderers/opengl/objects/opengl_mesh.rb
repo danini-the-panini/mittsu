@@ -1,6 +1,7 @@
 module Mittsu
-  class OpenGLMesh
+  class OpenGLMesh < OpenGLObject3D
     def initialize(mesh, renderer)
+      super
       @mesh = mesh
       @renderer = renderer
     end

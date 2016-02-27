@@ -7,6 +7,7 @@ OpenGL.load_lib
 require 'mittsu'
 require 'mittsu/renderers/glfw_window'
 require 'mittsu/renderers/opengl/opengl_debug'
+require 'mittsu/renderers/opengl/opengl_helper'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/opengl_geometry_group'
@@ -19,6 +20,7 @@ require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
 include ENV['DEBUG'] ? OpenGLDebug : OpenGL
+include Mittsu::OpenGLHelper
 
 module Mittsu
   class OpenGLRenderer
@@ -807,8 +809,8 @@ module Mittsu
       OpenGLGeometry.new(geometry, self)
     end
 
-    def create_object3d_implementation(geometry)
-      OpenGLObject3D.new(geometry, self)
+    def create_object3d_implementation(object)
+      OpenGLObject3D.new(object, self)
     end
 
     private
@@ -953,70 +955,8 @@ module Mittsu
     end
 
     def init_object(object)
-      if object[:_opengl_init].nil?
-        object[:_opengl_init] = true
-        object[:_model_view_matrix] = Matrix4.new
-        object[:_normal_matrix] = Matrix3.new
-
-        object.add_event_listener(:removed, @on_object_removed)
-      end
-
-      geometry = object.geometry
-
-      if geometry.nil?
-        # ImmediateRenderObject
-      elsif geometry[:_opengl_init].nil?
-        geometry[:_opengl_init] = true
-        geometry.add_event_listener(:dispose, @on_geometry_dispose)
-        case object
-        when BufferGeometry
-          @info[:memory][:geometries] += 1
-        when Mesh
-          init_geometry_groups(object, geometry)
-        when Line
-          geometry_group = geometry.implementation(self)
-          if geometry_group.vertex_buffer.nil?
-            create_line_buffers(geometry_group)
-            init_line_buffers(geometry, object)
-
-            geometry.vertices_need_update = true
-            geometry.colors_need_update = true
-            geometry.line_distances_need_update
-          end
-        # TODO: when PointCloud exists
-        # when PointCloud
-        #   if geometry[:_opengl_vertex_buffer].nil?
-        #     create_particle_buffers(geometry)
-        #     init_particle_buffers(geometry, object)
-        #
-        #     geometry.vertices_need_update = true
-        #     geometry.colors_need_update = true
-        #   end
-        end
-      end
-
-      if object[:_opengl_active].nil?
-        object[:_opengl_active] = true
-        case object
-        when Mesh
-          case geometry
-          when BufferGeometry
-            add_buffer(@_opengl_objects, geometry, object)
-          when Geometry
-            geometry_impl = geometry.implementation(self)
-            geometry_impl.groups.each do |group|
-              add_buffer(@_opengl_objects, group, object)
-            end
-          end
-        when Line #, PointCloud TODO
-          add_buffer(@_opengl_objects, geometry, object)
-        else
-          # TODO: when ImmediateRenderObject exists
-          # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
-          #   add_buffer_immediate(@_opengl_objects_immediate, object)
-          # end
-        end
-      end
+      object_impl = object.implementation(self)
+      object_impl.init
     end
 
     def make_groups(geometry, uses_face_material = false)
@@ -1139,10 +1079,7 @@ module Mittsu
     end
 
     def setup_matrices(object, camera)
-      object[:_model_view_matrix].tap do |model_view_matrix|
-        model_view_matrix.multiply_matrices(camera.matrix_world_inverse, object.matrix_world)
-        object[:_normal_matrix].normal_matrix(model_view_matrix)
-      end
+      object.implementation(self).setup_matrices(camera)
     end
 
     def set_material(material)
@@ -1172,61 +1109,6 @@ module Mittsu
       geometry_group.create_mesh_buffers
 
       @info[:memory][:geometries] += 1
-    end
-
-    def glCreateBuffer
-      @_b ||= ' '*8
-      glGenBuffers(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def glCreateTexture
-      @_b ||= ' '*8
-      glGenTextures(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def glCreateVertexArray
-      @_b ||= ' '*8
-      glGenVertexArrays(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def glCreateFramebuffer
-      @_b ||= ' '*8
-      glGenFramebuffers(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def glCreateRenderbuffer
-      @_b ||= ' '*8
-      glGenRenderbuffers(1, @_b)
-      @_b.unpack('L')[0]
-    end
-
-    def array_to_ptr_easy(data)
-      if data.first.is_a?(Float)
-        size_of_element = Fiddle::SIZEOF_FLOAT
-        format_of_element = 'F'
-        # data.map!{ |d| d.nil? ? 0.0 : d }
-      else
-        size_of_element = Fiddle::SIZEOF_INT
-        format_of_element = 'L'
-        # data.map!{ |d| d.nil? ? 0 : d }
-      end
-      size = data.length * size_of_element
-      array_to_ptr(data, size, format_of_element)
-    end
-
-    def array_to_ptr(data, size, format)
-      ptr = Fiddle::Pointer.malloc(size)
-      ptr[0,size] = data.pack(format * data.length)
-      ptr
-    end
-
-    def glBufferData_easy(target, data, usage)
-      ptr = array_to_ptr_easy(data)
-      glBufferData(target, ptr.size, ptr, usage)
     end
 
     def init_custom_attributes(object)
@@ -2849,11 +2731,7 @@ module Mittsu
     end
 
     def load_uniforms_matrices(uniforms, object)
-      glUniformMatrix4fv(uniforms['modelViewMatrix'], 1, GL_FALSE, array_to_ptr_easy(object[:_model_view_matrix].elements))
-
-      if uniforms['normalMatrix']
-        glUniformMatrix3fv(uniforms['normalMatrix'], 1, GL_FALSE, array_to_ptr_easy(object[:_normal_matrix].elements))
-      end
+      object.implementation(self).load_uniforms_matrices(uniforms)
     end
 
     def setup_lights(lights)

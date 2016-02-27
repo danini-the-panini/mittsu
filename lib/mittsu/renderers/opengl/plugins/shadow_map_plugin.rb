@@ -273,7 +273,8 @@ module Mittsu
 
         if opengl_objects && object.cast_shadow && (object.frustum_culled == false || @frustum.intersects_object?(object) == true)
           opengl_objects.each do |opengl_object|
-            object[:_model_view_matrix].multiply_matrices(shadow_camera.matrix_world_inverse, object.matrix_world)
+            object_impl = object.implementation(@renderer)
+            object_impl.model_view_matrix.multiply_matrices(shadow_camera.matrix_world_inverse, object.matrix_world)
             @render_list << opengl_object
           end
         end

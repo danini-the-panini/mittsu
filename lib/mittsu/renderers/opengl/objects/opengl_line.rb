@@ -1,6 +1,7 @@
 module Mittsu
-  class OpenGLLine
+  class OpenGLLine < OpenGLObject3D
     def initialize(line, renderer)
+      super
       @line = line
       @renderer = renderer
     end
