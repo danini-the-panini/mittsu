@@ -33,8 +33,8 @@ module Mittsu
       @groups.each do |geometry_group|
         # initialize VBO on the first access
         if geometry_group.vertex_buffer.nil?
+          geometry_group.create_mesh_buffers
           # TODO!!!
-          @renderer.send(:create_mesh_buffers, geometry_group)
           @renderer.send(:init_mesh_buffers, geometry_group, object)
 
           @geometry.vertices_need_update = true
@@ -44,6 +44,8 @@ module Mittsu
           @geometry.normals_need_update = true
           @geometry.tangents_need_update = true
           @geometry.colors_need_update = true
+
+          @renderer.info[:memory][:geometries] += 1
         else
           add_buffers = false
         end

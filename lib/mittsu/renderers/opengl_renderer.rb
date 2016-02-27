@@ -1011,12 +1011,6 @@ module Mittsu
       @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
-    def create_mesh_buffers(geometry_group)
-      geometry_group.create_mesh_buffers
-
-      @info[:memory][:geometries] += 1
-    end
-
     def init_mesh_buffers(geometry_group, object)
       geometry = object.geometry
       faces3 = geometry_group.faces3
