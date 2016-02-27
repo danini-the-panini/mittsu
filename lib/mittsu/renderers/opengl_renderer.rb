@@ -15,6 +15,7 @@ require 'mittsu/renderers/opengl/core/opengl_geometry'
 require 'mittsu/renderers/opengl/core/opengl_object_3d'
 require 'mittsu/renderers/opengl/objects/opengl_mesh'
 require 'mittsu/renderers/opengl/objects/opengl_line'
+require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
@@ -25,6 +26,8 @@ include Mittsu::OpenGLHelper
 module Mittsu
   class OpenGLRenderer
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
+
+    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs
 
     def initialize(parameters = {})
       puts "OpenGLRenderer (Revision #{REVISION})"
@@ -37,7 +40,7 @@ module Mittsu
       @_antialias = parameters.fetch(:antialias, false)
       @_premultiplied_alpha = parameters.fetch(:premultiplied_alpha, true)
       @_preserve_drawing_buffer = parameters.fetch(:preserve_drawing_buffer, false)
-      @_logarithmic_depth_buffer = parameters.fetch(:logarithmic_depth_buffer, false)
+      @logarithmic_depth_buffer = parameters.fetch(:logarithmic_depth_buffer, false)
 
       @_clear_color = Color.new(0x000000)
       @_clear_alpha = 0.0
@@ -110,7 +113,7 @@ module Mittsu
 
       # internal properties
 
-      @_programs = []
+      @programs = []
 
       # internal state cache
 
@@ -189,10 +192,10 @@ module Mittsu
 
       # GPU capabilities
 
-      @_max_textures = get_gl_parameter(GL_MAX_TEXTURE_IMAGE_UNITS)
-      @_max_vertex_textures = get_gl_parameter(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-      @_max_texture_size = get_gl_parameter(GL_MAX_TEXTURE_SIZE)
-      @_max_cubemap_size = get_gl_parameter(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
+      @_max_textures = glGetParameter(GL_MAX_TEXTURE_IMAGE_UNITS)
+      @_max_vertex_textures = glGetParameter(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+      @_max_texture_size = glGetParameter(GL_MAX_TEXTURE_SIZE)
+      @_max_cubemap_size = glGetParameter(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
 
       @_supports_vertex_textures = @_max_vertex_textures > 0
       @_supports_bone_textures = @_supports_vertex_textures && false # TODO: extensions.get('OES_texture_float') ????
@@ -242,6 +245,18 @@ module Mittsu
         material.remove_event_listener(:dispose, @on_material_dispose)
         deallocate_material(material)
       }
+    end
+
+    def supports_bone_textures?
+      @_supports_bone_textures
+    end
+
+    def supports_vertex_textures?
+      @_supports_vertex_textures
+    end
+
+    def shadow_map_enabled?
+      @shadow_map_enabled
     end
 
     # TODO: get_context ???
@@ -797,6 +812,7 @@ module Mittsu
       end
     end
 
+    # TODO: find a better way to do this
     def create_mesh_implementation(mesh)
       OpenGLMesh.new(mesh, self)
     end
@@ -811,6 +827,10 @@ module Mittsu
 
     def create_object3d_implementation(object)
       OpenGLObject3D.new(object, self)
+    end
+
+    def create_material_implementation(material)
+      OpenGLMaterial.new(material, self)
     end
 
     private
@@ -869,12 +889,6 @@ module Mittsu
       else
         a.id - b.id
       end
-    end
-
-    def get_gl_parameter(pname)
-      data = '        '
-      glGetIntegerv(pname, data)
-      data.unpack('L')[0]
     end
 
     def project_object(object)
@@ -1821,11 +1835,12 @@ module Mittsu
 
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
+      material_impl = material.implementation(self)
 
       if material.needs_update?
         deallocate_material(material) if material.program
 
-        init_material(material, lights, fog, object)
+        material_impl.init(lights, fog, object)
         material.needs_update = false
       end
 
@@ -1841,7 +1856,7 @@ module Mittsu
 
       program = material.program
       p_uniforms = program.uniforms
-      m_uniforms = material[:_opengl_shader][:uniforms]
+      m_uniforms = material_impl.shader[:uniforms]
 
       if program.id != @_current_program
         glUseProgram(program.program)
@@ -1862,7 +1877,7 @@ module Mittsu
       if refresh_program || camera != @_current_camera
         glUniformMatrix4fv(p_uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
 
-        if @_logarithmic_depth_buffer
+        if @logarithmic_depth_buffer
           glUniform1f(p_uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
         end
 
@@ -1968,7 +1983,7 @@ module Mittsu
 
         # load common uniforms
 
-        load_uniforms_generic(material[:uniforms_list])
+        load_uniforms_generic(material_impl.uniforms_list)
       end
 
       load_uniforms_matrices(p_uniforms, object)
@@ -1978,234 +1993,6 @@ module Mittsu
       end
 
       program
-    end
-
-    def init_material(material, lights, fog, object)
-      material.add_event_listener(:dispose, @on_material_dispose)
-
-      shader_id = @shader_ids[material.class]
-
-      if shader_id
-        shader = ShaderLib[shader_id]
-        material[:_opengl_shader] = {
-          uniforms: UniformsUtils.clone(shader.uniforms),
-          vertex_shader: shader.vertex_shader,
-          fragment_shader: shader.fragment_shader
-        }
-      else
-        material[:_opengl_shader] = {
-          uniforms: material.uniforms,
-          vertex_shader: material.vertex_shader,
-          fragment_shader: material.fragment_shader
-        }
-      end
-
-      # heuristics to create shader paramaters ccording to lights in the scene
-      # (not to blow over max_lights budget)
-
-      max_light_count = allocate_lights(lights)
-      max_shadows = allocate_shadows(lights)
-      max_bones = allocate_bones(object)
-
-      parameters = {
-        supports_vertex_textures: @_supports_vertex_textures,
-
-        map: !!material.map,
-        env_map: !!material.env_map,
-        env_map_mode: material.env_map && material.env_map.mapping,
-        light_map: !!material.light_map,
-        bump_map: !!material.light_map,
-        normal_map: !!material.normal_map,
-        specular_map: !!material.specular_map,
-        alpha_map: !!material.alpha_map,
-
-        combine: material.combine,
-
-        vertex_colors: material.vertex_colors,
-
-        fog: fog,
-        use_fog: material.fog,
-        # fog_exp: fog.is_a?(FogExp2), # TODO: when FogExp2 exists
-
-        flat_shading: material.shading == FlatShading,
-
-        size_attenuation: material.size_attenuation,
-        logarithmic_depth_buffer: @_logarithmic_depth_buffer,
-
-        skinning: material.skinning,
-        max_bones: max_bones,
-        use_vertex_texture: @_supports_bone_textures,
-
-        morph_targets: material.morph_targets,
-        morph_normals: material.morph_normals,
-        max_morph_targets: @max_morph_targets,
-        max_morph_normals: @max_morph_normals,
-
-        max_dir_lights: max_light_count[:directional],
-        max_point_lights: max_light_count[:point],
-        max_spot_lights: max_light_count[:spot],
-        max_hemi_lights: max_light_count[:hemi],
-
-        max_shadows: max_shadows,
-        shadow_map_enabled: @shadow_map_enabled && object.receive_shadow && max_shadows > 0,
-        shadow_map_type: @shadow_map_type,
-        shadow_map_debug: @shadow_map_debug,
-        shadow_map_cascade: @shadow_map_cascade,
-
-        alpha_test: material.alpha_test,
-        metal: material.metal,
-        wrap_around: material.wrap_around,
-        double_sided: material.side == DoubleSide,
-        flip_sided: material.side == BackSide
-      }
-
-      # generate code
-
-      chunks = []
-
-      if shader_id
-        chunks << shader_id
-      else
-        chunks << material.fragment_shader
-        chunks << material.vertex_shader
-      end
-
-      if !material.defines.nil?
-        material.defines.each do |(name, define)|
-          chunks << name
-          chunks << define
-        end
-      end
-
-      parameters.each do |(name, parameter)|
-        chunks << name
-        chunks << parameter
-      end
-
-      code = chunks.join
-
-      program = nil
-
-      # check if code has been already compiled
-
-      @_programs.each do |program_info|
-        if program_info.code == code
-          program = program_info
-          program.used_times += 1
-          break
-        end
-      end
-
-      if program.nil?
-        program = OpenGLProgram.new(self, code, material, parameters)
-        @_programs.push(program)
-
-        @info[:memory][:programs] = @_programs.length
-      end
-
-      material.program = program
-
-      attributes = program.attributes
-
-      if material.morph_targets
-        material.num_supported_morph_targets = 0
-        base = 'morphTarget'
-
-        @max_morph_targets.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            material.num_supported_morph_targets += 1
-          end
-        end
-      end
-
-      if material.morph_normals
-        material.num_supported_morph_normals = 0
-        base = 'morphNormal'
-
-        @max_morph_normals.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            material.num_supported_morph_normals += 1
-          end
-        end
-      end
-
-      material[:uniforms_list] = []
-
-      material[:_opengl_shader][:uniforms].each_key do |u|
-        location = material.program.uniforms[u]
-
-        if location
-          material[:uniforms_list] << [material[:_opengl_shader][:uniforms][u], location]
-        end
-      end
-    end
-
-    def allocate_lights(lights)
-      dir_lights = 0
-      point_lights = 0
-      spot_lights = 0
-      hemi_lights = 0
-
-      lights.each do |light|
-        next if light.only_shadow || !light.visible
-
-        dir_lights   += 1 if light.is_a? DirectionalLight
-        point_lights += 1 if light.is_a? PointLight
-        spot_lights  += 1 if light.is_a? SpotLight
-        hemi_lights  += 1 if light.is_a? HemisphereLight
-      end
-
-      {
-        directional: dir_lights,
-        point: point_lights,
-        spot: spot_lights,
-        hemi: hemi_lights
-      }
-    end
-
-    def allocate_shadows(lights)
-      max_shadows = 0
-
-      lights.each do |light|
-        next unless light.cast_shadow
-
-        max_shadows += 1 if light.is_a?(SpotLight)
-        max_shadows += 1 if light.is_a?(DirectionalLight) && !light.shadow_cascade
-      end
-
-      max_shadows
-    end
-
-    def allocate_bones(object = nil)
-      if @_supports_bone_textures && object && object.skeleton && object.skeleton.use_vertex_texture
-        return 1024
-      end
-
-      # default for when object is not specified
-      # ( for example when prebuilding shader
-      #   to be used with multiple objects )
-      #
-      #  - leave some extra space for other uniforms
-      #  - limit here is ANGLE's 254 max uniform vectors
-      #    (up to 54 should be safe)
-
-      n_vertex_uniforms = (get_gl_parameter(GL_MAX_VERTEX_UNIFORM_COMPONENTS) / 4.0).floor
-      n_vertex_matrices = ((n_vertex_uniforms - 20) / 4.0).floor
-
-      max_bones = n_vertex_matrices
-
-      # TODO: when SkinnedMesh exists
-      # if !object.nil? && object.is_a?(SkinnedMesh)
-      #   max_bones = [object.skeleton.bones.length, max_bones].min
-      #
-      #   if max_bones < object.skeleton.bones.length
-      #     puts "WARNING: OpenGLRenderer: too many bones - #{object.skeleton.bones.length}, this GPU supports just #{max_bones}"
-      #   end
-      # end
-
-      max_bones
     end
 
     def refresh_uniforms_common(uniforms, material)

@@ -7,11 +7,12 @@ module Mittsu
 
     def initialize(renderer, code, material, parameters)
       defines = material.defines || {} # TODO: setting to default object... ?
-      uniforms = material[:_opengl_shader][:uniforms]
+      material_impl = material.implementation(renderer)
+      uniforms = material_impl.shader[:uniforms]
       attributes = material.attributes || [] # TODO: setting to default array... ?
 
-      vertex_shader = material[:_opengl_shader][:vertex_shader]
-      fragment_shader = material[:_opengl_shader][:fragment_shader]
+      vertex_shader = material_impl.shader[:vertex_shader]
+      fragment_shader = material_impl.shader[:fragment_shader]
 
       # TODO: necessary for OpenGL?
       # index0_attribute_name = material.index0_attribute_name

@@ -136,6 +136,10 @@ module Mittsu
       dispatch_event type: :dispose
     end
 
+    def implementation(renderer)
+      @_implementation ||= renderer.create_material_implementation(self)
+    end
+
     private
 
     def has_property?(key)

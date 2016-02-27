@@ -563,8 +563,8 @@ module Mittsu
       self.dispatch_event type: :dispose
     end
 
-    def implementation(impl_renderer)
-      @_implementation ||= impl_renderer.create_geometry_implementation(self)
+    def implementation(renderer)
+      @_implementation ||= renderer.create_geometry_implementation(self)
     end
 
     private

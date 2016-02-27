@@ -54,5 +54,11 @@ module Mittsu
       ptr = array_to_ptr_easy(data)
       glBufferData(target, ptr.size, ptr, usage)
     end
+
+    def glGetParameter(pname)
+      @_b ||= ' '*8
+      glGetIntegerv(pname, @_b)
+      @_b.unpack('L')[0]
+    end
   end
 end

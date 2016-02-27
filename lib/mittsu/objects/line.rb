@@ -17,8 +17,8 @@ module Mittsu
       @_sphere = Sphere.new
     end
 
-    def implementation(impl_renderer)
-      @_implementation ||= impl_renderer.create_line_implementation(self)
+    def implementation(renderer)
+      @_implementation ||= renderer.create_line_implementation(self)
     end
 
     def raycast(raycaster, intersects)
