@@ -26,5 +26,36 @@ module Mittsu
       @renderer.info[:render][:vertices] += geometry_group.face_count
       @renderer.info[:render][:faces] += geometry_group.face_count / 3
     end
+
+    def update
+      # check all geometry groubs
+      geometry = @mesh.geometry
+      geometry_impl = geometry.implementation(self)
+
+      material = nil
+      material_impl = nil
+      geometry_impl.groups.each do |geometry_group|
+        # TODO: place to put this???
+        # glBindVertexArray(geometry_group.vertex_array_object)
+        material = buffer_material(geometry_group)
+        material_impl = material.implementation(@renderer)
+
+        custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
+
+        if geometry.vertices_need_update || geometry.morph_targets_need_update || geometry.elements_need_update || geometry.uvs_need_update || geometry.normals_need_update || geometry.colors_need_update || geometry.tangents_need_update || custom_attributes_dirty
+          geometry_group.set_mesh_buffers(@mesh, GL_DYNAMIC_DRAW, !geometry.dynamic, material)
+        end
+      end
+
+      geometry.vertices_need_update = false
+      geometry.morph_targets_need_update = false
+      geometry.elements_need_update = false
+      geometry.uvs_need_update = false
+      geometry.normals_need_update = false
+      geometry.colors_need_update = false
+      geometry.tangents_need_update = false
+
+      material.attributes && material_impl.clear_custom_attributes(material)
+    end
   end
 end

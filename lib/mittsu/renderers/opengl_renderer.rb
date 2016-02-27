@@ -1048,61 +1048,24 @@ module Mittsu
             attribute.needs_update = false
           end
         end
-      elsif object.is_a? Mesh
-        # check all geometry groubs
-        geometry_impl = geometry.implementation(self)
-
-        material = nil
-        geometry_impl.groups.each do |geometry_group|
-          # TODO: place to put this???
-          # glBindVertexArray(geometry_group.vertex_array_object)
-          material = object_impl.buffer_material(geometry_group)
-
-          custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
-
-          if geometry.vertices_need_update || geometry.morph_targets_need_update || geometry.elements_need_update || geometry.uvs_need_update || geometry.normals_need_update || geometry.colors_need_update || geometry.tangents_need_update || custom_attributes_dirty
-            geometry_group.set_mesh_buffers(object, GL_DYNAMIC_DRAW, !geometry.dynamic, material)
-          end
-        end
-
-        geometry.vertices_need_update = false
-        geometry.morph_targets_need_update = false
-        geometry.elements_need_update = false
-        geometry.uvs_need_update = false
-        geometry.normals_need_update = false
-        geometry.colors_need_update = false
-        geometry.tangents_need_update = false
-
-        material.attributes && clear_custom_attributes(material)
-      elsif (object.is_a? Line)
-        # TODO: glBindVertexArray ???
-        material = object_impl.buffer_material(geometry)
-        custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
-
-        if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
-          geometry_impl = geometry.implementation(self)
-          geometry_impl.set_line_buffers(GL_DYNAMIC_DRAW)
-        end
-
-        geometry.vertices_need_update = false
-        geometry.colors_need_update = false
-        geometry.line_distances_need_update = false
-
-        material.attributes && clear_custom_attributes(material)
-      elsif object.is_A? PointCloud
-        # TODO: glBindVertexArray ???
-        material = object_impl.buffer_material(geometry)
-        custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
-
-        if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
-          set_particle_buffers(geometry, GL_DYNAMIC_DRAW, object)
-        end
-
-        geometry.vertices_need_update = false
-        geometry.colors_need_update = false
-
-        material.attributes && clear_custom_attributes(material)
+      else
+        object_impl.update
       end
+      # TODO: when PointCloud exists
+      # elsif object.is_A? PointCloud
+      #   # TODO: glBindVertexArray ???
+      #   material = object_impl.buffer_material(geometry)
+      #   custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
+      #
+      #   if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
+      #     set_particle_buffers(geometry, GL_DYNAMIC_DRAW, object)
+      #   end
+      #
+      #   geometry.vertices_need_update = false
+      #   geometry.colors_need_update = false
+      #
+      #   material.attributes && clear_custom_attributes(material)
+      # end
     end
 
     def set_program(camera, lights, fog, material, object)

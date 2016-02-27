@@ -188,6 +188,19 @@ module Mittsu
       !@material.is_a?(MeshPhongMaterial) && @material.shading == FlatShading
     end
 
+    def clear_custom_attributes
+      @material.attributes.each do |attribute|
+        attribute.needs_update = false
+      end
+    end
+
+    def custom_attributes_dirty?
+      @material.attributes.each do |attribute|
+        return true if attribute.needs_update
+      end
+      false
+    end
+
     private
 
     def allocate_lights(lights)
