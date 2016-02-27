@@ -146,8 +146,6 @@ module Mittsu
         hemi: { length: 0, sky_colors: [], ground_colors: [], positions: []}
       }
 
-      @geometry_groups = {}
-
       @shader_ids = {
         # MeshDepthMaterial => :depth, # TODO...
         # MeshNormalMaterial => :normal, # TODO...
@@ -1005,8 +1003,8 @@ module Mittsu
           when BufferGeometry
             add_buffer(@_opengl_objects, geometry, object)
           when Geometry
-            geometry_groups_list = @geometry_groups[geometry.id]
-            geometry_groups_list.each do |group|
+            geometry_impl = geometry.implementation(self)
+            geometry_impl.groups.each do |group|
               add_buffer(@_opengl_objects, group, object)
             end
           end
@@ -1066,22 +1064,21 @@ module Mittsu
     end
 
     def init_geometry_groups(object, geometry)
-      # material = object.material
+      material = object.material
+      geometry_impl = geometry.implementation(self)
       add_buffers = false
 
-      if @geometry_groups[geometry.id].nil? || geometry.groups_need_update
+      if geometry_impl.groups.nil? || geometry.groups_need_update
         @_opengl_objects.delete object.id
 
-        @geometry_groups[geometry.id] = make_groups(geometry, false) # TODO: material.is_a?(MeshFaceMaterial))
+        geometry_impl.groups = make_groups(geometry, material.is_a?(MeshFaceMaterial))
 
         geometry.groups_need_update = false
       end
 
-      geometry_groups_list = @geometry_groups[geometry.id]
-
       # create separate VBOs per geometry chunk
 
-      geometry_groups_list.each do |geometry_group|
+      geometry_impl.groups.each do |geometry_group|
         # initialize VBO on the first access
         if geometry_group.vertex_buffer.nil?
           create_mesh_buffers(geometry_group)
@@ -1420,10 +1417,10 @@ module Mittsu
           init_geometry_groups(object, geometry)
         end
 
-        geometry_groups_list = @geometry_groups[geometry.id]
+        geometry_impl = geometry.implementation(self)
 
         material = nil
-        geometry_groups_list.each do |geometry_group|
+        geometry_impl.groups.each do |geometry_group|
           # TODO: place to put this???
           # glBindVertexArray(geometry_group.vertex_array_object)
           material = get_buffer_material(object, geometry_group)

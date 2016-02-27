@@ -4,6 +4,7 @@ module Mittsu
   class OpenGLGeometry
     include OpenGLGeometryLike
 
+    attr_accessor :groups
     attr_reader :id
 
     def initialize(geometry, renderer)
