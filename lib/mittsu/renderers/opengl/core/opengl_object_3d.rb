@@ -99,5 +99,13 @@ module Mittsu
                            array_to_ptr_easy(@normal_matrix.elements))
       end
     end
+
+    def buffer_material(geometry_group)
+      if @object.material.is_a?(MeshFaceMaterial)
+        @object.material.materials[geometry_group.material_index]
+      else
+        @object.material
+      end
+    end
   end
 end

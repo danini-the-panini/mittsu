@@ -35,7 +35,7 @@ module Mittsu
         if geometry_group.vertex_buffer.nil?
           geometry_group.create_mesh_buffers
           # TODO!!!
-          @renderer.send(:init_mesh_buffers, geometry_group, object)
+          geometry_group.init_mesh_buffers(object)
 
           @geometry.vertices_need_update = true
           @geometry.morph_targets_need_update = true
@@ -104,7 +104,7 @@ module Mittsu
         group_hash = "#{hash_map[material_index][:hash]}_#{hash_map[material_index][:counter]}"
 
         if !groups.include? group_hash
-          group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals)
+          group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals, @renderer)
 
           groups[group_hash] = group
           groups_list << group
@@ -115,7 +115,7 @@ module Mittsu
           group_hash = "#{hash_map[material_index][:hash]}_#{hash_map[material_index][:counter]}"
 
           if !groups.include? group_hash
-            group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals)
+            group = OpenGLGeometryGroup.new(material_index, num_morph_targets, num_morph_normals, @renderer)
 
             groups[group_hash] = group
             groups_list << group

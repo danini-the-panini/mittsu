@@ -1011,108 +1011,9 @@ module Mittsu
       @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
-    def init_mesh_buffers(geometry_group, object)
-      geometry = object.geometry
-      faces3 = geometry_group.faces3
-
-      nvertices = faces3.length * 3
-      nvertices2 = nvertices * 2
-      nvertices3 = nvertices * 3
-      nvertices4 = nvertices * 4
-      ntris = faces3.length * 1
-      nlines = faces3.length * 3
-
-      material = get_buffer_material(object, geometry_group)
-
-      geometry_group.vertex_array = Array.new(nvertices3) # Float32Array
-      geometry_group.normal_array = Array.new(nvertices3) # Float32Array
-      geometry_group.color_array = Array.new(nvertices3) # Float32Array
-      geometry_group.uv_array = Array.new(nvertices2) # Float32Array
-
-      if geometry.face_vertex_uvs.length > 1
-        geometry_group.uv2_array = Array.new(nvertices2) # Float32Array
-      end
-
-      if geometry.has_tangents
-        geometry_group.tangent_array = Array.new(nvertices4) # Float32Array
-      end
-
-      if !object.geometry.skin_weights.empty? && !object.geometry.skin_indices.empty?
-        geometry_group.skin_indices_array = Array.new(nvertices4) # Float32Array
-        geometry_group.skin_weight_array = Array.new(nvertices4)
-      end
-
-      # UintArray from OES_element_index_uint ???
-
-      geometry_group.type_array = Array # UintArray ???
-      geometry_group.face_array = Array.new(ntris * 3)
-      geometry_group.line_array = Array.new(nlines * 2)
-
-      num_morph_targets = geometry_group.num_morph_targets
-
-      if !num_morph_targets.zero?
-        geometry_group.morph_targets_arrays = []
-
-        num_morph_targets.times do |m|
-          geometry_group.morph_targets_arrays << Array.new(nvertices3) # Float32Array ???
-        end
-      end
-
-      num_morph_normals = geometry_group.num_morph_normals
-
-      if !num_morph_targets.zero?
-        geometry_group.morph_normals_arrays = []
-
-        num_morph_normals.times do |m|
-          geometry_group.morph_normals_arrays << Array.new(nvertices3) # Float32Array ???
-        end
-      end
-
-      geometry_group.face_count = ntris * 3
-      geometry_group.line_count = nlines * 2
-
-      # custom attributes
-
-      if material.attributes
-        if geometry_group.custom_attributes_list.nil?
-          geometry_group.custom_attributes_list = []
-        end
-
-        material.attributes.each do |(name, original_attribute)|
-          attribute = {}
-          original_attribute.each do |(key, value)|
-            attribute[key] = value
-          end
-
-          if !attribute[:_opengl_initialized] || attribute[:create_unique_buffers]
-            attribute[:_opengl_initialized] = true
-
-            size = case attribute[:type]
-            when :v2 then 2
-            when :v3, :c then 3
-            when :v4 then 4
-            else 1 # :f and :i
-            end
-
-            attribute[:size] = size
-            attribute[:array] = Array.new(nvertices * size) # Float32Array
-
-            attribute[:buffer] = glCreateBuffer
-            attribute[:buffer_belongs_to_attribute] = name
-
-            original_attribute[:needs_update] = true
-            attribute[:_original] = original_attribute
-          end
-
-          geometry_group.custom_attributes_list << attribute
-        end
-      end
-
-      geometry_group.initted_arrays = true
-    end
-
     def update_object(object)
       geometry = object.geometry
+      object_impl = object.implementation(self)
 
       if geometry.is_a? BufferGeometry
         # TODO: geometry vertex array ?????
@@ -1150,7 +1051,7 @@ module Mittsu
         geometry_impl.groups.each do |geometry_group|
           # TODO: place to put this???
           # glBindVertexArray(geometry_group.vertex_array_object)
-          material = get_buffer_material(object, geometry_group)
+          material = object_impl.buffer_material(geometry_group)
 
           custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
@@ -1170,7 +1071,7 @@ module Mittsu
         material.attributes && clear_custom_attributes(material)
       elsif (object.is_a? Line)
         # TODO: glBindVertexArray ???
-        material = get_buffer_material(object, geometry)
+        material = object_impl.buffer_material(geometry)
         custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
         if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
@@ -1184,7 +1085,7 @@ module Mittsu
         material.attributes && clear_custom_attributes(material)
       elsif object.is_A? PointCloud
         # TODO: glBindVertexArray ???
-        material = get_buffer_material(object, geometry)
+        material = object_impl.buffer_material(geometry)
         custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
 
         if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
@@ -1196,13 +1097,6 @@ module Mittsu
 
         material.attributes && clear_custom_attributes(material)
       end
-    end
-
-    def get_buffer_material(object, geometry_group)
-      # TODO: when MeshFaceMaterial exists
-      # object.material.is_a?(MeshFaceMaterial) ? object.material.materials[geometry_group.material_index] : object.material
-
-      object.material # for now...
     end
 
     def set_line_buffers(geometry, hint)
