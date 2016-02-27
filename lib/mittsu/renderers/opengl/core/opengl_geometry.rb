@@ -57,6 +57,18 @@ module Mittsu
       object_impl.active = true
     end
 
+    def init_line_buffers(object)
+      nvertices = @geometry.vertices.length
+
+      @vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      @color_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      @line_distance_array = Array.new(nvertices, 0.0) # Float32Array
+
+      @line_count = nvertices
+
+      init_custom_attributes(object)
+    end
+
     private
 
     def make_groups(uses_face_material = false)
@@ -101,6 +113,41 @@ module Mittsu
         groups[group_hash].num_vertices += 3
       end
       groups_list
+    end
+
+    def init_custom_attributes(object)
+      material = object.material
+
+      nvertices = @geometry.vertices.length
+
+      if material.attributes
+        @custom_attributes_list ||= []
+
+        material.attributes.each do |(name, attribute)|
+          if !attribute[:_opengl_initialized] || attribute.create_unique_buffers
+            attribute[:_opengl_initialized] = true
+
+            size = case attribute.type
+            when :v2 then 2
+            when :v3 then 3
+            when :v4 then 4
+            when :c then 3
+            else 1
+            end
+
+            attribute.size = size
+
+            attribute.array = Array.new(nvertices * size) # Float32Array
+
+            attribute.buffer = glCreateBuffer
+            attribute.buffer.belongs_to_attribute = name
+
+            attribute.needs_update = true
+          end
+
+          @custom_attributes_list << attribute
+        end
+      end
     end
   end
 end

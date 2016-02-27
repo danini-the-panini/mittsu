@@ -38,7 +38,7 @@ module Mittsu
           if geometry_impl.vertex_buffer.nil?
             # TODO!!!
             @renderer.send(:create_line_buffers, geometry_impl)
-            @renderer.send(:init_line_buffers, geometry, @object)
+            geometry_impl.init_line_buffers(@object)
 
             geometry.vertices_need_update = true
             geometry.colors_need_update = true

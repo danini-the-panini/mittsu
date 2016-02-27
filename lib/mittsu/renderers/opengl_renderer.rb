@@ -1027,57 +1027,6 @@ module Mittsu
       @info[:memory][:geometries] += 1
     end
 
-    def init_custom_attributes(object)
-      geometry = object.geometry
-      geometry_group = geometry.implementation(self)
-      material = object.material
-
-      nvertices = geometry.vertices.length
-
-      if material.attributes
-        geometry_group.custom_attributes_list ||= []
-
-        material.attributes.each do |(name, attribute)|
-          if !attribute[:_opengl_initialized] || attribute.create_unique_buffers
-            attribute[:_opengl_initialized] = true
-
-            size = case attribute.type
-            when :v2 then 2
-            when :v3 then 3
-            when :v4 then 4
-            when :c then 3
-            else 1
-            end
-
-            attribute.size = size
-
-            attribute.array = Array.new(nvertices * size) # Float32Array
-
-            attribute.buffer = glCreateBuffer
-            attribute.buffer.belongs_to_attribute = name
-
-            attribute.needs_update = true
-          end
-
-          geometry_group.custom_attributes_list << attribute
-        end
-      end
-    end
-
-    def init_line_buffers(geometry, object)
-      nvertices = geometry.vertices.length
-
-      geometry_group = geometry.implementation(self)
-
-      geometry_group.vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
-      geometry_group.color_array = Array.new(nvertices * 3, 0.0) # Float32Array
-      geometry_group.line_distance_array = Array.new(nvertices, 0.0) # Float32Array
-
-      geometry_group.line_count = nvertices
-
-      init_custom_attributes(object)
-    end
-
     def init_mesh_buffers(geometry_group, object)
       geometry = object.geometry
       faces3 = geometry_group.faces3
