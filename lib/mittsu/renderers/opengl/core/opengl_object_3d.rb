@@ -31,13 +31,12 @@ module Mittsu
         # geometry.add_event_listener(:dispose, @on_geometry_dispose)
         case @object
         when BufferGeometry
-          @info[:memory][:geometries] += 1
+          @renderer.info[:memory][:geometries] += 1
         when Mesh
           geometry_impl.init_geometry_groups(@object)
         when Line
           if geometry_impl.vertex_buffer.nil?
-            # TODO!!!
-            @renderer.send(:create_line_buffers, geometry_impl)
+            geometry_impl.create_line_buffers
             geometry_impl.init_line_buffers(@object)
 
             geometry.vertices_need_update = true

@@ -69,6 +69,16 @@ module Mittsu
       init_custom_attributes(object)
     end
 
+    def create_line_buffers
+      @vertex_array_object = glCreateVertexArray
+
+      @vertex_buffer = glCreateBuffer
+      @color_buffer = glCreateBuffer
+      @line_distance_buffer = glCreateBuffer
+
+      @renderer.info[:memory][:geometries] += 1
+    end
+
     private
 
     def make_groups(uses_face_material = false)

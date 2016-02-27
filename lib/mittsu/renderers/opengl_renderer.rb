@@ -1011,16 +1011,6 @@ module Mittsu
       @state.set_polygon_offset(material.polygon_offset, material.polygon_offset_factor, material.polygon_offset_units)
     end
 
-    def create_line_buffers(geometry_group)
-      geometry_group.vertex_array_object = glCreateVertexArray
-
-      geometry_group.vertex_buffer = glCreateBuffer
-      geometry_group.color_buffer = glCreateBuffer
-      geometry_group.line_distance_buffer = glCreateBuffer
-
-      @info[:memory][:geometries] += 1
-    end
-
     def create_mesh_buffers(geometry_group)
       geometry_group.create_mesh_buffers
 
