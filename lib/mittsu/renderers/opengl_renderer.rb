@@ -905,14 +905,14 @@ module Mittsu
 
           if refresh_lights
             refresh_uniforms_lights(m_uniforms, @_lights)
-            mark_uniforms_lights_needs_update(m_uniforms, true)
+            OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, true)
           else
-            mark_uniforms_lights_needs_update(m_uniforms, false)
+            OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, false)
           end
         end
 
         if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshPhongMaterial)
-          refresh_uniforms_common(m_uniforms, material)
+          OpenGLHelper.refresh_uniforms_common(m_uniforms, material)
         end
 
         # refresh single material specific uniforms
@@ -920,14 +920,14 @@ module Mittsu
         # TODO: when all of these things exist
         case material
         when LineBasicMaterial
-          refresh_uniforms_line(m_uniforms, material)
+          OpenGLHelper.refresh_uniforms_line(m_uniforms, material)
         # when LineDashedMaterial
         #   refresh_uniforms_line(m_uniforms, material)
         #   refresh_uniforms_dash(m_uniforms, material)
         # when PointCloudMaterial
         #   refresh_uniforms_particle(m_uniforms, material)
         when MeshPhongMaterial
-          refresh_uniforms_phong(m_uniforms, material)
+          OpenGLHelper.refresh_uniforms_phong(m_uniforms, material)
         when MeshLambertMaterial
           refresh_uniforms_lambert(m_uniforms, material)
         # when MeshDepthMaterial
@@ -939,7 +939,7 @@ module Mittsu
         end
 
         if object.receive_shadow && !material[:_shadow_pass]
-          refresh_uniforms_shadow(m_uniforms, lights)
+          OpenGLHelper.refresh_uniforms_shadow(m_uniforms, lights)
         end
 
         # load common uniforms
@@ -956,94 +956,8 @@ module Mittsu
       program
     end
 
-    def refresh_uniforms_common(uniforms, material)
-      uniforms['opacity'].value = material.opacity
-
-      uniforms['diffuse'].value = material.color
-
-      uniforms['map'].value = material.map
-      uniforms['lightMap'].value = material.light_map
-      uniforms['specularMap'].value = material.specular_map
-      uniforms['alphaMap'].value = material.alpha_map
-
-      if material.bump_map
-        uniforms['bumpMap'].value = material.bump_map
-        uniforms['bumpScale'].value = material.bump_scale
-      end
-
-      if material.normal_map
-        uniforms['normalMap'].value = material.normal_map
-        uniforms['normalScale'].value.copy( material.normal_scale )
-      end
-
-      # uv repeat and offset setting priorities
-      #  1. color map
-      #  2. specular map
-      #  3. normal map
-      #  4. bump map
-      #  5. alpha map
-
-      uv_scale_map = nil
-
-      if material.map
-        uv_scale_map = material.map
-      elsif material.specular_map
-        uv_scale_map = material.specular_map
-      elsif material.normal_map
-        uv_scale_map = material.normal_map
-      elsif material.bump_map
-        uv_scale_map = material.bump_map
-      elsif material.alpha_map
-        uv_scale_map = material.alpha_map
-      end
-
-      if !uv_scale_map.nil?
-        offset = uv_scale_map.offset
-        repeat = uv_scale_map.repeat
-
-        uniforms['offsetRepeat'].value.set(offset.x, offset.y, repeat.x, repeat.y)
-      end
-
-      uniforms['envMap'].value = material.env_map
-      # TODO: when OpenGLRenderTargetCube exists
-      # uniforms['flipEnvMap'].value = material.envMap.is_a?(OpenGLRenderTargetCube) ? 1 : - 1
-
-      uniforms['reflectivity'].value = material.reflectivity
-      uniforms['refractionRatio'].value = material.refraction_ratio
-    end
-
-    def refresh_uniforms_phong(uniforms, material)
-      uniforms['shininess'].value = material.shininess
-
-      uniforms['emissive'].value = material.emissive
-      uniforms['specular'].value = material.specular
-
-      if material.wrap_around
-        uniforms['wrapRGB'].value.copy(material.wrap_rgb)
-      end
-    end
-
-    def refresh_uniforms_shadow(uniforms, lights)
-      if uniforms['shadowMatrix']
-        lights.select(&:cast_shadow).select { |light|
-          light.is_a?(SpotLight) || (light.is_a?(DirectionalLight) && !light.shadow_cascade)
-        }.each_with_index { |light, i|
-          uniforms['shadowMap'].value[i] = light.shadow_map
-          uniforms['shadowMapSize'].value[i] = light.shadow_map_size
-
-          uniforms['shadowMatrix'].value[i] = light.shadow_matrix
-
-          uniforms['shadowDarkness'].value[i] = light.shadow_darkness
-          uniforms['shadowBias'].value[i] = light.shadow_bias
-        }
-      end
-    end
-
-    def refresh_uniforms_line(uniforms, material)
-      uniforms['diffuse'].value = material.color
-      uniforms['opacity'].value = material.opacity
-    end
-
+    # FIXME: REFACTOR!?!?!?!?!???
+    # MASSIVE CASE STATEMENT OMG!!!
     def load_uniforms_generic(uniforms)
       uniforms.each do |(uniform, location)|
         # needs_update property is not added to all uniforms.
@@ -1052,6 +966,7 @@ module Mittsu
         type = uniform.type
         value = uniform.value
 
+        # AAAAAHHHHH!!!!! \o/ *flips table*
         case type
         when :'1i'
           glUniform1i(location, value)
@@ -1428,30 +1343,6 @@ module Mittsu
       uniforms['hemisphereLightSkyColor'].value = lights[:hemi][:sky_colors]
       uniforms['hemisphereLightGroundColor'].value = lights[:hemi][:ground_colors]
       uniforms['hemisphereLightDirection'].value = lights[:hemi][:positions]
-    end
-
-    def mark_uniforms_lights_needs_update(uniforms, value)
-      uniforms['ambientLightColor'].needs_update = value
-
-      uniforms['directionalLightColor'].needs_update = value
-      uniforms['directionalLightDirection'].needs_update = value
-
-      uniforms['pointLightColor'].needs_update = value
-      uniforms['pointLightPosition'].needs_update = value
-      uniforms['pointLightDistance'].needs_update = value
-      uniforms['pointLightDecay'].needs_update = value
-
-      uniforms['spotLightColor'].needs_update = value
-      uniforms['spotLightPosition'].needs_update = value
-      uniforms['spotLightDistance'].needs_update = value
-      uniforms['spotLightDirection'].needs_update = value
-      uniforms['spotLightAngleCos'].needs_update = value
-      uniforms['spotLightExponent'].needs_update = value
-      uniforms['spotLightDecay'].needs_update = value
-
-      uniforms['hemisphereLightSkyColor'].needs_update = value
-      uniforms['hemisphereLightGroundColor'].needs_update = value
-      uniforms['hemisphereLightDirection'].needs_update = value
     end
 
     def refresh_uniforms_lambert(uniforms, material)
