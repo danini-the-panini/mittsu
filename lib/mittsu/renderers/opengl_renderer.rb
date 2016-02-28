@@ -17,6 +17,7 @@ require 'mittsu/renderers/opengl/objects/opengl_mesh'
 require 'mittsu/renderers/opengl/objects/opengl_line'
 require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/textures/opengl_texture'
+require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
@@ -766,6 +767,10 @@ module Mittsu
       OpenGLTexture.new(texture, self)
     end
 
+    def create_cube_texture_implementation(cube_texture)
+      OpenGLCubeTexture.new(cube_texture, self)
+    end
+
     def clamp_to_max_size(image, max_size = @_max_texture_size)
       width, height = image.width, image.height
       if width > max_size || height > max_size
@@ -1397,8 +1402,10 @@ module Mittsu
 
           next unless texture
 
-          if texture.is_a?(CubeTexture) || (texture.is_a?(Array) && texture.image.length == 6)
-            set_cube_texture(texture, texture_unit)
+          if texture.is_a?(CubeTexture) || (texture.image.is_a?(Array) && texture.image.length == 6)
+            texture_impl = texture.implementation(self)
+            texture_impl.set(texture_unit)
+
           # TODO: when OpenGLRenderTargetCube is defined
           # elsif texture.is_a?(OpenGLRenderTargetCube)
             # set_cube_texture_dynamic(texture, texture_unit)
@@ -1690,80 +1697,6 @@ module Mittsu
 
       @_used_texture_units += 1
       texture_unit
-    end
-
-    def set_cube_texture(texture, slot)
-      texture_impl = texture.implementation(self)
-      if texture.image.length == 6
-        if texture.needs_update?
-          if !texture.image[:_opengl_texture_cube]
-            texture.add_event_listener(:dispose, @on_texture_dispose)
-            texture.image[:_opengl_texture_cube] = glCreateTexture
-            @info[:memory][:textures] += 1
-          end
-
-          glActiveTexture(GL_TEXTURE0 + slot)
-          glBindTexture(GL_TEXTURE_CUBE_MAP, texture.image[:_opengl_texture_cube])
-
-          # glPixelStorei(GL_UNPACK_FLIP_Y_WEBGL, texture.flip_y)
-
-          is_compressed = texture.is_a?(CompressedTexture)
-          is_data_texture = texture.image[0].is_a?(DataTexture)
-
-          cube_image = [];
-
-          6.times do |i|
-            if @auto_scale_cubemaps && !is_compressed && !is_data_texture
-              cube_image[i] = clamp_to_max_size(texture.image[i], @_max_cubemap_size)
-            else
-              cube_image[i] = is_data_texture ? texture.image[i].image : texture.image[i];
-            end
-          end
-
-          image = cube_image[0]
-          is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-          gl_format = param_mittsu_to_gl(texture.format)
-          gl_type = param_mittsu_to_gl(texture.type)
-
-          # TODO!!! FIXME!!!
-          texture_impl.send(:set_parameters, GL_TEXTURE_CUBE_MAP, is_image_power_of_two)
-
-          6.times do |i|
-            if !is_compressed
-              if is_data_texture
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, gl_format, cube_image[i].width, cube_image[i].height, 0, gl_format, gl_type, cube_image[i].data)
-              else
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, gl_format, cube_image[i].width, cube_image[i].height, 0, gl_format, gl_type, cube_image[i].data)
-              end
-            else
-              mipmaps = cube_image[i].mipmaps
-
-              mipmaps.each_with_index do |mipmap, j|
-                if texture.format != RGBAFormat && texture.format != RGBFormat
-                  if get_compressed_texture_formats.include?(gl_format)
-                    glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, gl_format, mipmap.width, mipmap.height, 0, mipmap.data)
-                  else
-                    puts "WARNING: Mittsu::OpenGLRenderer: Attempt to load unsupported compressed texture format in #set_cube_texture"
-                  end
-                else
-                  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-                end
-              end
-            end
-          end
-
-          if texture.generate_mipmaps && is_image_power_of_two
-            glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
-          end
-
-          texture.needs_update = false
-
-          texture.on_update.call if texture.on_update
-        else
-          glActiveTexture(GL_TEXTURE0 + slot)
-          glBindTexture(GL_TEXTURE_CUBE_MAP, texture.image[:_opengl_texture_cube])
-        end
-      end
     end
   end
 end
