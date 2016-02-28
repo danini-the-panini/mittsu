@@ -153,6 +153,16 @@ module Mittsu
       self
     end
 
+    def update_mipmap
+      # TODO: when OpenGLRenderTargetCube exists
+  		# 	glBindTexture(GL_TEXTURE_CUBE_MAP, @opengl_texture)
+  		# 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
+  		# 	glBindTexture(GL_TEXTURE_CUBE_MAP, nil)
+			glBindTexture(GL_TEXTURE_2D, @opengl_texture)
+			glGenerateMipmap(GL_TEXTURE_2D)
+			glBindTexture(GL_TEXTURE_2D, nil)
+    end
+
     private
 
     def setup_framebuffer(texture_target)

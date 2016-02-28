@@ -77,10 +77,11 @@ module Mittsu
     end
 
     def buffer_material(geometry_group)
-      if @object.material.is_a?(MeshFaceMaterial)
-        @object.material.materials[geometry_group.material_index]
+      material = @object.material
+      if material.is_a?(MeshFaceMaterial)
+        material.materials[geometry_group.material_index]
       else
-        @object.material
+        material
       end
     end
 

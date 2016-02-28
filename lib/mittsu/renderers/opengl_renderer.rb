@@ -364,120 +364,37 @@ module Mittsu
     end
 
     def render(scene, camera, render_target = nil, force_clear = false)
-      if !camera.is_a?(Camera)
-        puts "ERROR: Mittsu::OpenGLRenderer#render: camera is not an instance of Mittsu::Camera"
-        return
-      end
+      raise "ERROR: Mittsu::OpenGLRenderer#render: camera is not an instance of Mittsu::Camera" unless camera.is_a?(Camera)
 
-      fog = scene.fog
+      reset_cache_for_this_frame
 
-      # reset caching for this frame
-
-      @_current_geometry_program = ''
-      @_current_material_id = -1
-      @_current_camera = nil
-      @_lights_need_update = true
-
-      # update scene graph
       scene.update_matrix_world if scene.auto_update
-
-      # update camera matrices and frustum
       camera.update_matrix_world if camera.parent.nil?
 
-      # update skeleton objects
-      # TODO: when SkinnedMesh is defined
-      # scene.traverse do |object|
-      #   if object.is_a? SkinnedMesh
-      #     object.skeleton.update
-      #   end
-      # end
+      update_skeleton_objects(scene)
 
-      camera.matrix_world_inverse.inverse(camera.matrix_world)
-
-      @_proj_screen_matrix.multiply_matrices(camera.projection_matrix, camera.matrix_world_inverse)
-      @_frustum.set_from_matrix(@_proj_screen_matrix)
-
-      @lights.clear
-      @opaque_objects.clear
-      @transparent_objects.clear
-
-      @sprites.clear
-      @lens_flares.clear
-
+      update_screen_projection(camera)
       project_object(scene)
+      sort_objects_for_render if @sort_objects
 
-      if @sort_objects
-        @opaque_objects.sort { |a,b| painter_sort_stable(a,b) }
-        @transparent_objects.sort { |a,b| reverse_painter_sort_stable(a,b) }
-      end
+      render_custom_plugins_pre_pass(scene, camera)
 
-      # custom render plugins
-      @shadow_map_plugin.render(scene, camera)
-
-      #
-
-      @info[:render][:calls] = 0
-      @info[:render][:vertices] = 0
-      @info[:render][:faces] = 0
-      @info[:render][:points] = 0
+      set_matrices_for_immediate_objects(camera)
 
       set_render_target(render_target)
-
       if @auto_clear || force_clear
         clear(@auto_clear_color, @auto_clear_depth, @auto_clear_stencil)
       end
+      render_main_pass(scene, camera)
 
-      # set matrices for immediate objects
-
-      @_opengl_objects_immediate.each do |opengl_object|
-        object = opengl_object[:object]
-
-        if object.visible
-          setup_matrices(object, camera)
-          unroll_immediate_buffer_material(opengl_object)
-        end
-      end
-
-      if scene.override_material
-        override_material = scene.override_material
-        material_impl = override_material.implementation(self)
-
-        material_impl.set
-
-        render_objects(opaque_object, camera, @lights, fog, override_material)
-        render_objects(transparent_objects, camera, @lights, fog, override_material)
-        render_objects_immediate(@_opengl_objects_immediate, nil, camera, @lights, fog, override_material)
-      else
-        # opaque pass (front-to-back order)
-
-        @state.set_blending(NoBlending)
-
-        render_objects(@opaque_objects, camera, @lights, fog, nil)
-        render_objects_immediate(@_opengl_objects_immediate, :opaque, camera, @lights, fog, nil)
-
-        # transparent pass (back-to-front-order)
-
-        render_objects(@transparent_objects, camera, @lights, fog, nil)
-        render_objects_immediate(@_opengl_objects_immediate, :transparent, camera, @lights, fog, nil)
-      end
-
-      # custom render plugins (post pass)
-
-      # TODO: when plugins are ready
-      # @sprite_plugin.render(scene, camera)
-      # lens_flare_plugin.render(scene, camera, @_current_width, @_current_height)
+      render_custom_plugins_post_pass(scene, camera)
 
       # generate mipmap if we're using any kind of mipmap filtering
       if render_target && render_target.generate_mipmaps && render_target.min_filter != NearestFilter && render_target.min_filter != LinearFilter
-        update_render_target_mipmap(render_target)
+        render_target.implementation(self).update_mipmap
       end
 
-      # endure depth buffer writing is enabled so it can be cleared on next render
-      @state.set_depth_test(true)
-      @state.set_depth_write(true)
-      @state.set_color_write(true)
-
-      #glFinish ??????
+      ensure_depth_buffer_writing
     end
 
     def set_material_faces(material)
@@ -881,7 +798,7 @@ module Mittsu
         object = opengl_object[:object]
         buffer = opengl_object[:buffer]
 
-        setup_matrices(object, camera)
+        object.implementation(self).setup_matrices(camera)
 
         if override_material
           material = override_material
@@ -937,6 +854,19 @@ module Mittsu
       }
     end
 
+    def unroll_immediate_buffer_material(globject)
+  		object = globject[:object]
+  		material = object.material
+
+  		if material.transparent
+  			globject[:transparent]
+  			globject[:opaque] = nil
+  		else
+  			globject[:opaque] = material
+  			globject[:transparent] = nil
+  		end
+    end
+
     def unroll_buffer_material(globject)
       object = globject[:object]
       # buffer = globject[:buffer]
@@ -959,10 +889,6 @@ module Mittsu
           @opaque_objects << globject
         end
       end
-    end
-
-    def setup_matrices(object, camera)
-      object.implementation(self).setup_matrices(camera)
     end
 
     def update_object(object)
@@ -1704,6 +1630,120 @@ module Mittsu
 
       @_used_texture_units += 1
       texture_unit
+    end
+
+    def ensure_depth_buffer_writing
+      @state.set_depth_test(true)
+      @state.set_depth_write(true)
+      @state.set_color_write(true)
+    end
+
+    def reset_cache
+      @_current_geometry_program = ''
+      @_current_material_id = -1
+      @_current_camera = nil
+      @_lights_need_update = true
+    end
+
+    def reset_objects_cache
+      @lights.clear
+      @opaque_objects.clear
+      @transparent_objects.clear
+      @sprites.clear
+      @lens_flares.clear
+    end
+
+    def reset_info
+      @info[:render][:calls] = 0
+      @info[:render][:vertices] = 0
+      @info[:render][:faces] = 0
+      @info[:render][:points] = 0
+    end
+
+    def reset_cache_for_this_frame
+      reset_cache
+      reset_objects_cache
+      reset_info
+    end
+
+    def update_screen_projection(camera)
+      camera.matrix_world_inverse.inverse(camera.matrix_world)
+
+      @_proj_screen_matrix.multiply_matrices(camera.projection_matrix, camera.matrix_world_inverse)
+      @_frustum.set_from_matrix(@_proj_screen_matrix)
+    end
+
+    def sort_objects_for_render
+      @opaque_objects.sort { |a,b| painter_sort_stable(a,b) }
+      @transparent_objects.sort { |a,b| reverse_painter_sort_stable(a,b) }
+    end
+
+    def set_matrices_for_immediate_objects(camera)
+      @_opengl_objects_immediate.each do |opengl_object|
+        object = opengl_object[:object]
+
+        if object.visible
+          object.implementation(self).setup_matrices(camera)
+          unroll_immediate_buffer_material(opengl_object)
+        end
+      end
+    end
+
+    def render_main_pass(scene, camera)
+      if scene.override_material
+        render_with_override_material(scene, camera)
+      else
+        render_with_default_materials(scene, camera)
+      end
+    end
+
+    def render_with_override_material(scene, camera)
+      override_material = scene.override_material
+      material_impl = override_material.implementation(self)
+
+      material_impl.set
+
+      render_objects(@opaque_objects, camera, @lights, scene.fog, override_material)
+      render_objects(@transparent_objects, camera, @lights, scene.fog, override_material)
+      render_objects_immediate(@_opengl_objects_immediate, nil, camera, @lights, scene.fog, override_material)
+    end
+
+    def render_with_default_materials(scene, camera)
+      render_opaque_pass(scene, camera)
+      render_transparent_pass(scene, camera)
+    end
+
+    def render_opaque_pass(scene, camera)
+      # front-to-back order
+      @state.set_blending(NoBlending)
+
+      render_objects(@opaque_objects, camera, @lights, scene.fog, nil)
+      render_objects_immediate(@_opengl_objects_immediate, :opaque, camera, @lights, scene.fog, nil)
+    end
+
+    def render_transparent_pass(scene, camera)
+      # back-to-front-order
+      render_objects(@transparent_objects, camera, @lights, scene.fog, nil)
+      render_objects_immediate(@_opengl_objects_immediate, :transparent, camera, @lights, scene.fog, nil)
+    end
+
+    def render_custom_plugins_pre_pass(scene, camera)
+      @shadow_map_plugin.render(scene, camera)
+    end
+
+    def render_custom_plugins_post_pass(scene, camera)
+      # TODO: when these custom plugins are implemented
+      # @sprite_plugin.render(scene, camera)
+      # lens_flare_plugin.render(scene, camera, @_current_width, @_current_height)
+    end
+
+    def update_skeleton_objects(scene)
+      # TODO: when SkinnedMesh is defined
+      # scene.traverse do |object|
+      #   if object.is_a? SkinnedMesh
+      #     object.skeleton.update
+      #   end
+      # end
     end
   end
 end
