@@ -38,7 +38,7 @@ module Mittsu
 
       @pixel_ratio = 1.0
       @sort_objects = true
-      
+
       init_collections
       init_clearing
       init_gamma
@@ -174,6 +174,7 @@ module Mittsu
       @state.reset
     end
 
+    # FIXME: REFACTOR
     def set_render_target(render_target = nil)
       # TODO: when OpenGLRenderTargetCube exists
       is_cube = false # render_target.is_a? OpenGLRenderTargetCube
@@ -253,6 +254,7 @@ module Mittsu
       @state.set_flip_sided(material.side == BackSide)
     end
 
+    # FIXME: REFACTOR
     def render_buffer(camera, lights, fog, material, geometry_group, object)
       return unless material.visible
 
@@ -415,6 +417,7 @@ module Mittsu
       end
     end
 
+    # FIXME: this could just be a hash
     def param_mittsu_to_gl(p)
       case p
       when RepeatWrapping then GL_REPEAT
@@ -600,21 +603,22 @@ module Mittsu
     end
 
     def reverse_painter_sort_stable(a, b)
-      if a.object.render_order != b.object.render_order
-        a.object.render_order - b.object.render_order
-      elsif a.z != b.z
-        b.z - a.z
+      if a[:object].render_order != b[:object].render_order
+        a[:object].render_order - b[:object].render_order
+      elsif a[:z] != b[:z]
+        b[:z] - a[:z]
       else
-        a.id - b.id
+        a[:id] - b[:id]
       end
     end
 
+    # FIXME: move to OpenGLObject ?
     def project_object(object)
       return unless object.visible
-      if object.is_a? Scene # || object.is_a? Group # TODO: when Group is defined
+      if object.is_a?(Scene) || object.is_a?(Group)
         # skip
       else
-        init_object(object)
+        object.implementation(self).init
         if object.is_a? Light
           @lights << object
         # if object.is_a? Sprite # TODO
@@ -689,11 +693,6 @@ module Mittsu
       end
     end
 
-    def init_object(object)
-      object_impl = object.implementation(self)
-      object_impl.init
-    end
-
     def add_buffer(objlist, buffer, object)
       id = object.id
       (objlist[id] ||= []) << {
@@ -705,43 +704,43 @@ module Mittsu
       }
     end
 
-    def unroll_immediate_buffer_material(globject)
-  		object = globject[:object]
+    def unroll_immediate_buffer_material(opengl_object)
+  		object = opengl_object[:object]
   		material = object.material
 
   		if material.transparent
-  			globject[:transparent]
-  			globject[:opaque] = nil
+  			opengl_object[:transparent]
+  			opengl_object[:opaque] = nil
   		else
-  			globject[:opaque] = material
-  			globject[:transparent] = nil
+  			opengl_object[:opaque] = material
+  			opengl_object[:transparent] = nil
   		end
     end
 
-    def unroll_buffer_material(globject)
-      object = globject[:object]
-      # buffer = globject[:buffer]
+    def unroll_buffer_material(opengl_object)
+      object = opengl_object[:object]
+      buffer = opengl_object[:buffer]
 
-      # geometry = object.geometry
+      geometry = object.geometry
       material = object.material
 
       if material
-        # TODO: when MeshFaceMaterial exists
-        # if material.is_a? MeshFaceMaterial
-        #   material_index = geometry.is_a? BufferGeometry ? 0 : buffer.material_index
-        #
-        #   material = material.materials[material_index]
-        # end
-        globject[:material] = material
+        if material.is_a? MeshFaceMaterial
+          material_index = geometry.is_a?(BufferGeometry) ? 0 : buffer.material_index
+          material = material.materials[material_index]
+        end
+
+        opengl_object[:material] = material
 
         if material.transparent
-          @transparent_objects << globject
+          @transparent_objects << opengl_object
         else
-          @opaque_objects << globject
+          @opaque_objects << opengl_object
         end
       end
     end
 
+    # FIXME: refactor
     def update_object(object)
       geometry = object.geometry
       object_impl = object.implementation(self)
@@ -794,6 +793,7 @@ module Mittsu
       # end
     end
 
+    # FIXME: refactor
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
       material_impl = material.implementation(self)
@@ -947,7 +947,7 @@ module Mittsu
         load_uniforms_generic(material_impl.uniforms_list)
       end
 
-      load_uniforms_matrices(p_uniforms, object)
+      object.implementation(self).load_uniforms_matrices(p_uniforms)
 
       if !p_uniforms['modelMatrix'].nil?
         glUniformMatrix4fv(p_uniforms['modelMatrix'], 1, GL_FALSE, array_to_ptr_easy(object.matrix_world.elements))
@@ -957,7 +957,6 @@ module Mittsu
     end
 
     def refresh_uniforms_common(uniforms, material)
-
       uniforms['opacity'].value = material.opacity
 
       uniforms['diffuse'].value = material.color
@@ -1219,10 +1218,7 @@ module Mittsu
       end
     end
 
-    def load_uniforms_matrices(uniforms, object)
-      object.implementation(self).load_uniforms_matrices(uniforms)
-    end
-
+    # FIXME: REFACTOR
     def setup_lights(lights)
       r, g, b = 0.0, 0.0, 0.0
 
