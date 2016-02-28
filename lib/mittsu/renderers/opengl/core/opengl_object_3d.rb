@@ -85,6 +85,9 @@ module Mittsu
       end
     end
 
+    # def init_geometry
+    # end
+
     def add_opengl_object
     end
   end

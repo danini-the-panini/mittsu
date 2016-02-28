@@ -564,7 +564,7 @@ module Mittsu
     end
 
     def implementation(renderer)
-      @_implementation ||= renderer.create_geometry_implementation(self)
+      @_implementation ||= renderer.create_implementation(self)
     end
 
     private

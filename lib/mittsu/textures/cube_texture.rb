@@ -15,9 +15,5 @@ module Mittsu
       texture.images = @images
       texture
     end
-
-    def implementation(renderer)
-      @_implementation ||= renderer.create_cube_texture_implementation(self)
-    end
   end
 end

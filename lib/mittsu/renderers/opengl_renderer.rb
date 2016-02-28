@@ -21,6 +21,7 @@ require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
+require 'mittsu/renderers/opengl/opengl_implementations'
 
 include ENV['DEBUG'] ? OpenGLDebug : OpenGL
 include Mittsu::OpenGLHelper
@@ -512,33 +513,8 @@ module Mittsu
       deallocate_material(material)
     end
 
-    # TODO: find a better way to do this
-    def create_mesh_implementation(mesh)
-      OpenGLMesh.new(mesh, self)
-    end
-
-    def create_line_implementation(line)
-      OpenGLLine.new(line, self)
-    end
-
-    def create_geometry_implementation(geometry)
-      OpenGLGeometry.new(geometry, self)
-    end
-
-    def create_object3d_implementation(object)
-      OpenGLObject3D.new(object, self)
-    end
-
-    def create_material_implementation(material)
-      OpenGLMaterial.new(material, self)
-    end
-
-    def create_texture_implementation(texture)
-      OpenGLTexture.new(texture, self)
-    end
-
-    def create_cube_texture_implementation(cube_texture)
-      OpenGLCubeTexture.new(cube_texture, self)
+    def create_implementation(thing)
+      OPENGL_IMPLEMENTATIONS[thing.class].new(thing, self)
     end
 
     def clamp_to_max_size(image, max_size = @_max_texture_size)

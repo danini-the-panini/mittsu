@@ -337,7 +337,7 @@ module Mittsu
     end
 
     def implementation(renderer)
-      @_implementation ||= renderer.create_object3d_implementation(self)
+      @_implementation ||= renderer.create_implementation(self)
     end
 
     private
