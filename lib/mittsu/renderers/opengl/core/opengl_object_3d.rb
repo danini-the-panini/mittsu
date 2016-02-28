@@ -25,60 +25,36 @@ module Mittsu
 
       if geometry.nil?
         # ImmediateRenderObject
-      elsif geometry[:_opengl_init].nil?
-        geometry[:_opengl_init] = true
+      else
         geometry_impl = geometry.implementation(@renderer)
-        geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
-        case @object
-        when BufferGeometry
-          @renderer.info[:memory][:geometries] += 1
-        when Mesh
-          geometry_impl.init_geometry_groups(@object)
-        when Line
-          if geometry_impl.vertex_buffer.nil?
-            geometry_impl.create_line_buffers
-            geometry_impl.init_line_buffers(@object)
-
-            geometry.vertices_need_update = true
-            geometry.colors_need_update = true
-            geometry.line_distances_need_update
+        if !geometry_impl.initted
+          geometry_impl.initted = true
+          geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
+          if @object.is_a?(BufferGeometry)
+            @renderer.info[:memory][:geometries] += 1
+          else
+            init_geometry
           end
-        # TODO: when PointCloud exists
-        # when PointCloud
-        #   if geometry[:_opengl_vertex_buffer].nil?
-        #     create_particle_buffers(geometry)
-        #     init_particle_buffers(geometry, object)
-        #
-        #     geometry.vertices_need_update = true
-        #     geometry.colors_need_update = true
-        #   end
+          # TODO: when PointCloud exists
+          # when PointCloud
+          #   if geometry[:_opengl_vertex_buffer].nil?
+          #     create_particle_buffers(geometry)
+          #     init_particle_buffers(geometry, object)
+          #
+          #     geometry.vertices_need_update = true
+          #     geometry.colors_need_update = true
+          #   end
         end
       end
 
       if !@active
         @active = true
-        case @object
-        when Mesh
-          case geometry
-          when BufferGeometry
-            # TODO!!!
-            @renderer.send(:add_buffer, @renderer.instance_variable_get(:@_opengl_objects), geometry, @object)
-          when Geometry
-            geometry_impl = geometry.implementation(self)
-            geometry_impl.groups.each do |group|
-            # TODO!!!
-              @renderer.send(:add_buffer, @renderer.instance_variable_get(:@_opengl_objects), group, @object)
-            end
-          end
-        when Line #, PointCloud TODO
-            # TODO!!!
-          @renderer.send(:add_buffer, @renderer.instance_variable_get(:@_opengl_objects), geometry, @object)
-        else
-          # TODO: when ImmediateRenderObject exists
-          # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
-          #   add_buffer_immediate(@renderer.instance_variable_get(:@_opengl_objects_immediate), @object)
-          # end
-        end
+
+        add_opengl_object
+        # TODO: when ImmediateRenderObject exists
+        # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
+        #   add_buffer_immediate(@renderer.instance_variable_get(:@_opengl_objects_immediate), @object)
+        # end
       end
     end
 
@@ -106,6 +82,9 @@ module Mittsu
       else
         @object.material
       end
+    end
+
+    def add_opengl_object
     end
   end
 end

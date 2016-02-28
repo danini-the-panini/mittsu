@@ -206,9 +206,8 @@ module Mittsu
 
       # Plugins
 
-      # TODO: when plugins are ready
       @shadow_map_plugin = ShadowMapPlugin.new(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
-      #
+      # TODO: when plugins are ready
       # @sprite_plugin = SpritePlugin(self, @sprites)
       # @lens_flare_plugin = LensFlarePlugin(self, @lens_flares)
     end
@@ -779,6 +778,14 @@ module Mittsu
         puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to ??? x ???"
       end
       image
+    end
+
+    def add_opengl_object(buffer, object)
+      add_buffer(@_opengl_objects, buffer, object)
+    end
+
+    def remove_opengl_object(object)
+      @_opengl_objects.delete(object.id)
     end
 
     private

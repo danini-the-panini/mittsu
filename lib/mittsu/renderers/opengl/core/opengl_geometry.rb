@@ -4,7 +4,7 @@ module Mittsu
   class OpenGLGeometry
     include OpenGLGeometryLike
 
-    attr_accessor :groups
+    attr_accessor :groups, :initted
     attr_reader :id
 
     def initialize(geometry, renderer)
@@ -20,8 +20,7 @@ module Mittsu
       add_buffers = false
 
       if @groups.nil? || @geometry.groups_need_update
-        # TODO!!!
-        @renderer.instance_variable_get(:@_opengl_objects).delete object.id
+        @renderer.remove_opengl_object(object)
 
         @groups = make_groups(material.is_a?(MeshFaceMaterial))
 
@@ -34,7 +33,6 @@ module Mittsu
         # initialize VBO on the first access
         if geometry_group.vertex_buffer.nil?
           geometry_group.create_mesh_buffers
-          # TODO!!!
           geometry_group.init_mesh_buffers(object)
 
           @geometry.vertices_need_update = true
@@ -51,8 +49,7 @@ module Mittsu
         end
 
         if add_buffers || !object_impl.active?
-          # TODO!!! FIXME!!!!
-          @renderer.send(:add_buffer, @renderer.instance_variable_get(:@_opengl_objects), geometry_group, object)
+          @renderer.add_opengl_object(geometry_group, object)
         end
       end
 

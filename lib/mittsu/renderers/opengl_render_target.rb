@@ -113,7 +113,6 @@ module Mittsu
         end
 
         glBindTexture(GL_TEXTURE_2D, @opengl_texture)
-        #TODO!!! FIXME!!!
         set_parameters(GL_TEXTURE_2D, is_target_power_of_two)
 
         glTexImage2D(GL_TEXTURE_2D, 0, gl_format, @width, @height, 0, gl_format, gl_type, nil)

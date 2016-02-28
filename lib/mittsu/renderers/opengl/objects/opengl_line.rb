@@ -34,5 +34,22 @@ module Mittsu
 
       material.attributes && material_impl.clear_custom_attributes
     end
+
+    def init_geometry
+      geometry = @object.geometry
+      geometry_impl = geometry.implementation(@renderer)
+      if geometry_impl.vertex_buffer.nil?
+        geometry_impl.create_line_buffers
+        geometry_impl.init_line_buffers(@object)
+
+        geometry.vertices_need_update = true
+        geometry.colors_need_update = true
+        geometry.line_distances_need_update
+      end
+    end
+
+    def add_opengl_object
+      @renderer.add_opengl_object(@object.geometry, @object)
+    end
   end
 end

@@ -57,5 +57,22 @@ module Mittsu
 
       material.attributes && material_impl.clear_custom_attributes(material)
     end
+
+    def init_geometry
+      @object.geometry.implementation(@renderer).init_geometry_groups(@object)
+    end
+
+    def add_opengl_object
+      geometry = @object.geometry
+      case geometry
+      when BufferGeometry
+        @renderer.add_opengl_object(geometry, @object)
+      when Geometry
+        geometry_impl = geometry.implementation(self)
+        geometry_impl.groups.each do |group|
+          @renderer.add_opengl_object(group, @object)
+        end
+      end
+    end
   end
 end
