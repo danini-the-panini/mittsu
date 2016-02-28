@@ -34,156 +34,22 @@ module Mittsu
     def initialize(parameters = {})
       puts "OpenGLRenderer (Revision #{REVISION})"
 
+      fetch_parameters(parameters)
+
       @pixel_ratio = 1.0
-
-      @_alpha = parameters.fetch(:alpha, false)
-      @_depth = parameters.fetch(:depth, true)
-      @_stencil = parameters.fetch(:stencil, true)
-      @_antialias = parameters.fetch(:antialias, false)
-      @_premultiplied_alpha = parameters.fetch(:premultiplied_alpha, true)
-      @_preserve_drawing_buffer = parameters.fetch(:preserve_drawing_buffer, false)
-      @logarithmic_depth_buffer = parameters.fetch(:logarithmic_depth_buffer, false)
-
-      @_clear_color = Color.new(0x000000)
-      @_clear_alpha = 0.0
-
-      @width = parameters.fetch(:width, 800)
-      @height = parameters.fetch(:height, 600)
-      @title = parameters.fetch(:title, "Mittsu #{REVISION}")
-
-      @lights = []
-
-      @_opengl_objects = {}
-      @_opengl_objects_immediate = []
-
-      @opaque_objects = []
-      @transparent_objects = []
-
-      @sprites = []
-      @lens_flares = []
-
-      # public properties
-
-      # @dom_element = _canvas
-      # @context = nil
-
-      # clearing
-
-      @auto_clear = true
-      @auto_clear_color = true
-      @auto_clear_depth = true
-      @auto_clear_stencil = true
-
-      # scene graph
-
       @sort_objects = true
+      
+      init_collections
+      init_clearing
+      init_gamma
+      init_shadow_properties
+      init_morphs
+      init_info
+      init_state_cache
+      init_camera_matrix_cache
+      init_light_arrays_cache
 
-      # physically based shading
-
-      @gamma_factor = 2.0 # backwards compat???
-      @gamma_input = false
-      @gamma_output = false
-
-      # shadow map
-
-      @shadow_map_enabled = false
-      @shadow_map_type = PCFShadowMap
-      @shadow_map_cull_face = CullFaceFront
-      @shadow_map_debug = false
-      @shadow_map_cascade = false
-
-      # morphs
-
-      @max_morph_targets = 8
-      @max_morph_normals = 4
-
-      # info
-
-      @info = {
-        memory: {
-          programs: 0,
-          geometries: 0,
-          textures: 0
-        },
-        render: {
-          calls: 0,
-          vertices: 0,
-          faces: 0,
-          points: 0
-        }
-      }
-
-      # internal properties
-
-      @programs = []
-
-      # internal state cache
-
-      @_current_program = nil
-      @_current_framebuffer = nil
-      @_current_material_id = -1
-      @_current_geometry_program = ''
-      @_current_camera = nil
-
-      @_used_texture_units = 0
-      @_viewport_x = 0
-      @_viewport_y = 0
-      @_current_width = 0
-      @_current_height = 0
-
-      # frustum
-
-      @_frustum = Frustum.new
-
-      # camera matrices cache
-
-      @_proj_screen_matrix = Matrix4.new
-      @_vector3 = Vector3.new
-
-      # light arrays cache
-
-      @_direction = Vector3.new
-      @_lights_need_update = true
-      # TODO: re-imagine this thing as a bunch of classes...
-      @_lights = {
-        ambient: [0, 0, 0],
-        directional: { length: 0, colors: [], positions: [] },
-        point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
-        spot: { length: 0, colors: [], positions: [], distances: [], directions: [], angles_cos: [], exponents: [], decays: [] },
-        hemi: { length: 0, sky_colors: [], ground_colors: [], positions: []}
-      }
-
-      @shader_ids = {
-        # MeshDepthMaterial => :depth, # TODO...
-        # MeshNormalMaterial => :normal, # TODO...
-        MeshBasicMaterial => :basic,
-        MeshLambertMaterial => :lambert,
-        MeshPhongMaterial => :phong,
-        LineBasicMaterial => :basic,
-        # LineDashedMaterial => :dashed, # TODO...
-        # PointCloudMaterial => :particle_basic # TODO...
-      }
-
-      # initialize
-
-      begin
-        # attributes = {
-        #   alpha: _alpha,
-        #   depth: _depth,
-        #   stencil: _stencil,
-        #   antialias: _antialias,
-        #   premultiplied_alpha: _premultiplied_alpha,
-        #   preserve_drawing_buffer: _preserve_drawing_buffer
-        # }
-
-        @window = GLFW::Window.new(@width, @height, @title)
-
-        @_viewport_width, @_viewport_height = *(@window.framebuffer_size)
-
-        # TODO: handle losing opengl context??
-      rescue => error
-        puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
-      end
+      create_window
 
       @state = OpenGLState.new(self.method(:param_mittsu_to_gl))
 
@@ -192,24 +58,9 @@ module Mittsu
       reset_gl_state
       set_default_gl_state
 
-      # GPU capabilities
+      get_gpu_capabilities
 
-      @_max_textures = glGetParameter(GL_MAX_TEXTURE_IMAGE_UNITS)
-      @_max_vertex_textures = glGetParameter(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-      @_max_texture_size = glGetParameter(GL_MAX_TEXTURE_SIZE)
-      @_max_cubemap_size = glGetParameter(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
-
-      @_supports_vertex_textures = @_max_vertex_textures > 0
-      @_supports_bone_textures = @_supports_vertex_textures && false # TODO: extensions.get('OES_texture_float') ????
-
-      #
-
-      # Plugins
-
-      @shadow_map_plugin = ShadowMapPlugin.new(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
-      # TODO: when plugins are ready
-      # @sprite_plugin = SpritePlugin(self, @sprites)
-      # @lens_flare_plugin = LensFlarePlugin(self, @lens_flares)
+      init_plugins
     end
 
     def supports_bone_textures?
@@ -1744,6 +1595,152 @@ module Mittsu
       #     object.skeleton.update
       #   end
       # end
+    end
+
+    def init_clearing
+      @_clear_color = Color.new(0x000000)
+      @_clear_alpha = 0.0
+
+      @auto_clear = true
+      @auto_clear_color = true
+      @auto_clear_depth = true
+      @auto_clear_stencil = true
+    end
+
+    def init_gamma
+      @gamma_factor = 2.0 # backwards compat???
+      @gamma_input = false
+      @gamma_output = false
+    end
+
+    def init_shadow_properties
+      @shadow_map_enabled = false
+      @shadow_map_type = PCFShadowMap
+      @shadow_map_cull_face = CullFaceFront
+      @shadow_map_debug = false
+      @shadow_map_cascade = false
+    end
+
+    def init_morphs
+      @max_morph_targets = 8
+      @max_morph_normals = 4
+    end
+
+    def init_collections
+      @lights = []
+
+      @_opengl_objects = {}
+      @_opengl_objects_immediate = []
+
+      @opaque_objects = []
+      @transparent_objects = []
+
+      @sprites = []
+      @lens_flares = []
+
+      @programs = []
+    end
+
+    def init_info
+      @info = {
+        memory: {
+          programs: 0,
+          geometries: 0,
+          textures: 0
+        },
+        render: {
+          calls: 0,
+          vertices: 0,
+          faces: 0,
+          points: 0
+        }
+      }
+    end
+
+    def init_state_cache
+      @_current_program = nil
+      @_current_framebuffer = nil
+      @_current_material_id = -1
+      @_current_geometry_program = ''
+      @_current_camera = nil
+
+      @_used_texture_units = 0
+      @_viewport_x = 0
+      @_viewport_y = 0
+      @_current_width = 0
+      @_current_height = 0
+    end
+
+    def init_camera_matrix_cache
+      @_frustum = Frustum.new
+      @_proj_screen_matrix = Matrix4.new
+      @_vector3 = Vector3.new
+    end
+
+    def init_light_arrays_cache
+      @_direction = Vector3.new
+      @_lights_need_update = true
+      # TODO: re-imagine this thing as a bunch of classes...
+      @_lights = {
+        ambient: [0, 0, 0],
+        directional: { length: 0, colors: [], positions: [] },
+        point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
+        spot: { length: 0, colors: [], positions: [], distances: [], directions: [], angles_cos: [], exponents: [], decays: [] },
+        hemi: { length: 0, sky_colors: [], ground_colors: [], positions: []}
+      }
+    end
+
+    def fetch_parameters(parameters)
+      @_alpha = parameters.fetch(:alpha, false)
+      @_depth = parameters.fetch(:depth, true)
+      @_stencil = parameters.fetch(:stencil, true)
+      @_antialias = parameters.fetch(:antialias, false)
+      @_premultiplied_alpha = parameters.fetch(:premultiplied_alpha, true)
+      @_preserve_drawing_buffer = parameters.fetch(:preserve_drawing_buffer, false)
+      @logarithmic_depth_buffer = parameters.fetch(:logarithmic_depth_buffer, false)
+
+      @width = parameters.fetch(:width, 800)
+      @height = parameters.fetch(:height, 600)
+      @title = parameters.fetch(:title, "Mittsu #{REVISION}")
+    end
+
+    def get_gpu_capabilities
+      @_max_textures = glGetParameter(GL_MAX_TEXTURE_IMAGE_UNITS)
+      @_max_vertex_textures = glGetParameter(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+      @_max_texture_size = glGetParameter(GL_MAX_TEXTURE_SIZE)
+      @_max_cubemap_size = glGetParameter(GL_MAX_CUBE_MAP_TEXTURE_SIZE)
+
+      @_supports_vertex_textures = @_max_vertex_textures > 0
+      @_supports_bone_textures = @_supports_vertex_textures && false # TODO: extensions.get('OES_texture_float') ????
+    end
+
+    def init_plugins
+      @shadow_map_plugin = ShadowMapPlugin.new(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
+
+      # TODO: when these custom plugins are implemented
+      # @sprite_plugin = SpritePlugin.new(self, @sprites)
+      # @lens_flare_plugin = LensFlarePlugin.new(self, @lens_flares)
+    end
+
+    def create_window
+      begin
+        # attributes = {
+        #   alpha: _alpha,
+        #   depth: _depth,
+        #   stencil: _stencil,
+        #   antialias: _antialias,
+        #   premultiplied_alpha: _premultiplied_alpha,
+        #   preserve_drawing_buffer: _preserve_drawing_buffer
+        # }
+
+        @window = GLFW::Window.new(@width, @height, @title)
+
+        @_viewport_width, @_viewport_height = *(@window.framebuffer_size)
+
+        # TODO: handle losing opengl context??
+      rescue => error
+        puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
+      end
     end
   end
 end

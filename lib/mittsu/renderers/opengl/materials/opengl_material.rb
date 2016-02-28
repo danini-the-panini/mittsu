@@ -1,5 +1,16 @@
 module Mittsu
   class OpenGLMaterial
+    SHADER_IDS = {
+      # MeshDepthMaterial => :depth, # TODO...
+      # MeshNormalMaterial => :normal, # TODO...
+      MeshBasicMaterial => :basic,
+      MeshLambertMaterial => :lambert,
+      MeshPhongMaterial => :phong,
+      LineBasicMaterial => :basic,
+      # LineDashedMaterial => :dashed, # TODO...
+      # PointCloudMaterial => :particle_basic # TODO...
+    }
+
     attr_reader :shader, :uniforms_list
 
     def initialize(material, renderer)
@@ -10,8 +21,7 @@ module Mittsu
     def init(lights, fog, object)
       @material.add_event_listener(:dispose, @renderer.method(:on_material_dispose))
 
-      # TODO!!!
-      shader_id = @renderer.instance_variable_get(:@shader_ids)[@material.class]
+      shader_id = SHADER_IDS[@material.class]
 
       if shader_id
         shader = ShaderLib[shader_id]
