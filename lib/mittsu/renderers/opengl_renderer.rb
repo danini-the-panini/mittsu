@@ -211,42 +211,6 @@ module Mittsu
       #
       # @sprite_plugin = SpritePlugin(self, @sprites)
       # @lens_flare_plugin = LensFlarePlugin(self, @lens_flares)
-
-      # Events
-
-      @on_object_removed = -> (event) {
-        object = event.target
-        object.traverse do |child|
-          child.remove_event_listener(:remove, @on_object_removed)
-          remove_child(child)
-        end
-      }
-
-      @on_geometry_dispose = -> (event) {
-        geometry = event.target
-        geometry.remove_event_listener(:dispose, @on_geometry_dispose)
-        deallocate_geometry(geometry)
-      }
-
-      @on_texture_dispose = -> (event) {
-        texture = event.target
-        texture.remove_event_listener(:dispose, @on_texture_dispose)
-        deallocate_texture(texture)
-        @info[:memory][:textures] -= 1
-      }
-
-      @on_render_target_dispose = -> (event) {
-        render_target = event.target
-        render_target.remove_event_listener(:dispose, @on_render_target_dispose)
-        deallocate_render_target(render_target)
-        @info[:memory][:textures] -= 1
-      }
-
-      @on_material_dispose = -> (event) {
-        material = event.target
-        material.remove_event_listener(:dispose, @on_material_dispose)
-        deallocate_material(material)
-      }
     end
 
     def supports_bone_textures?
@@ -740,6 +704,42 @@ module Mittsu
       # TODO: needs extensions.get ...
 
       @_compressed_texture_formats ||= []
+    end
+
+    # Events
+
+    def on_object_removed(event)
+      object = event.target
+      object.traverse do |child|
+        child.remove_event_listener(:remove, method(:on_object_removed))
+        remove_child(child)
+      end
+    end
+
+    def on_geometry_dispose(event)
+      geometry = event.target
+      geometry.remove_event_listener(:dispose, method(:on_geometry_dispose))
+      deallocate_geometry(geometry)
+    end
+
+    def on_texture_dispose(event)
+      texture = event.target
+      texture.remove_event_listener(:dispose, method(:on_texture_dispose))
+      deallocate_texture(texture)
+      @info[:memory][:textures] -= 1
+    end
+
+    def on_render_target_dispose(event)
+      render_target = event.target
+      render_target.remove_event_listener(:dispose, method(:on_render_target_dispose))
+      deallocate_render_target(render_target)
+      @info[:memory][:textures] -= 1
+    end
+
+    def on_material_dispose(event)
+      material = event.target
+      material.remove_event_listener(:dispose, method(:on_material_dispose))
+      deallocate_material(material)
     end
 
     # TODO: find a better way to do this

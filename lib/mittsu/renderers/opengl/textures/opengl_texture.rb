@@ -11,8 +11,7 @@ module Mittsu
     def update
       if !@initted
         @initted = true
-        # TODO!!!
-        # texture.add_event_listener :dispose, @on_texture_dispose
+        @texture.add_event_listener(:dispose, @renderer.method(:on_texture_dispose))
         @opengl_texture = glCreateTexture
         @renderer.info[:memory][:textures] += 1
       end

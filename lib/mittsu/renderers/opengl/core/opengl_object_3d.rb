@@ -18,7 +18,7 @@ module Mittsu
         @model_view_matrix = Matrix4.new
         @normal_matrix = Matrix3.new
 
-        # @object.add_event_listener(:removed, @on_object_removed)
+        @object.add_event_listener(:removed, @renderer.method(:on_object_removed))
       end
 
       geometry = @object.geometry
@@ -28,7 +28,7 @@ module Mittsu
       elsif geometry[:_opengl_init].nil?
         geometry[:_opengl_init] = true
         geometry_impl = geometry.implementation(@renderer)
-        # geometry.add_event_listener(:dispose, @on_geometry_dispose)
+        geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
         case @object
         when BufferGeometry
           @renderer.info[:memory][:geometries] += 1

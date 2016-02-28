@@ -89,8 +89,7 @@ module Mittsu
       @depth_buffer = true if @depth_buffer.nil?
       @stencil_buffer = true if @stencil_buffer.nil?
 
-      # TODO!!!
-      # add_event_listener(:dispose, @on_render_target_dispose)
+      add_event_listener(:dispose, @renderer.method(:on_render_target_dispose))
 
       @opengl_texture = glCreateTexture
 

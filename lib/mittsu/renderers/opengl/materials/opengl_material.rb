@@ -8,8 +8,7 @@ module Mittsu
     end
 
     def init(lights, fog, object)
-      # TODO!!!
-      # @material.add_event_listener(:dispose, @on_material_dispose)
+      @material.add_event_listener(:dispose, @renderer.method(:on_material_dispose))
 
       # TODO!!!
       shader_id = @renderer.instance_variable_get(:@shader_ids)[@material.class]

@@ -4,8 +4,7 @@ module Mittsu
       if @texture.image.length == 6
         if @texture.needs_update?
           if !@texture.image[:_opengl_texture_cube]
-            # TODO!!!
-            # @texture.add_event_listener(:dispose, @on_texture_dispose)
+            @texture.add_event_listener(:dispose, @renderer.method(:on_texture_dispose))
             @texture.image[:_opengl_texture_cube] = glCreateTexture
             @renderer.info[:memory][:textures] += 1
           end
