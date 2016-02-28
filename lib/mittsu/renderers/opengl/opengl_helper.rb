@@ -173,6 +173,66 @@ module Mittsu
         uniforms['diffuse'].value = material.color
         uniforms['opacity'].value = material.opacity
       end
+
+      def refresh_uniforms_lights(uniforms, lights)
+        uniforms['ambientLightColor'].value = lights[:ambient]
+
+        uniforms['directionalLightColor'].value = lights[:directional][:colors]
+        uniforms['directionalLightDirection'].value = lights[:directional][:positions]
+
+        uniforms['pointLightColor'].value = lights[:point][:colors]
+        uniforms['pointLightPosition'].value = lights[:point][:positions]
+        uniforms['pointLightDistance'].value = lights[:point][:distances]
+        uniforms['pointLightDecay'].value = lights[:point][:decays]
+
+        uniforms['spotLightColor'].value = lights[:spot][:colors]
+        uniforms['spotLightPosition'].value = lights[:spot][:positions]
+        uniforms['spotLightDistance'].value = lights[:spot][:distances]
+        uniforms['spotLightDirection'].value = lights[:spot][:directions]
+        uniforms['spotLightAngleCos'].value = lights[:spot][:angles_cos]
+        uniforms['spotLightExponent'].value = lights[:spot][:exponents]
+        uniforms['spotLightDecay'].value = lights[:spot][:decays]
+
+        uniforms['hemisphereLightSkyColor'].value = lights[:hemi][:sky_colors]
+        uniforms['hemisphereLightGroundColor'].value = lights[:hemi][:ground_colors]
+        uniforms['hemisphereLightDirection'].value = lights[:hemi][:positions]
+      end
+
+      def refresh_uniforms_lambert(uniforms, material)
+        uniforms['emissive'].value = material.emissive
+
+        if material.wrap_around
+          uniforms['wrapRGB'].value.copy(material.wrap_rgb)
+        end
+      end
+
+      def set_color_linear(array, offset, color, intensity)
+        array[offset]     = color.r * intensity
+        array[offset + 1] = color.g * intensity
+        array[offset + 2] = color.b * intensity
+      end
+
+      def painter_sort_stable(a, b)
+        if a[:object].render_order != b[:object].render_order
+          a[:object].render_order - b[:object].render_order
+        elsif a[:material].id != b[:material].id
+          a[:material].id - b[:material].id
+        elsif a[:z] != b[:z]
+          a[:z] - b[:z]
+        else
+          a[:id] - b[:id]
+        end
+      end
+
+      def reverse_painter_sort_stable(a, b)
+        if a[:object].render_order != b[:object].render_order
+          a[:object].render_order - b[:object].render_order
+        elsif a[:z] != b[:z]
+          b[:z] - a[:z]
+        else
+          a[:id] - b[:id]
+        end
+      end
     end
   end
 end

@@ -590,28 +590,6 @@ module Mittsu
       clear_color(@_clear_color.r, @_clear_color.g, @_clear_color.b, @_clear_alpha)
     end
 
-    def painter_sort_stable(a, b)
-      if a[:object].render_order != b[:object].render_order
-        a[:object].render_order - b[:object].render_order
-      elsif a[:material].id != b[:material].id
-        a[:material].id - b[:material].id
-      elsif a[:z] != b[:z]
-        a[:z] - b[:z]
-      else
-        a[:id] - b[:id]
-      end
-    end
-
-    def reverse_painter_sort_stable(a, b)
-      if a[:object].render_order != b[:object].render_order
-        a[:object].render_order - b[:object].render_order
-      elsif a[:z] != b[:z]
-        b[:z] - a[:z]
-      else
-        a[:id] - b[:id]
-      end
-    end
-
     # FIXME: move to OpenGLObject ?
     def project_object(object)
       return unless object.visible
@@ -904,7 +882,7 @@ module Mittsu
           end
 
           if refresh_lights
-            refresh_uniforms_lights(m_uniforms, @_lights)
+            OpenGLHelper.refresh_uniforms_lights(m_uniforms, @_lights)
             OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, true)
           else
             OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, false)
@@ -929,7 +907,7 @@ module Mittsu
         when MeshPhongMaterial
           OpenGLHelper.refresh_uniforms_phong(m_uniforms, material)
         when MeshLambertMaterial
-          refresh_uniforms_lambert(m_uniforms, material)
+          OpenGLHelper.refresh_uniforms_lambert(m_uniforms, material)
         # when MeshDepthMaterial
         #   m_uniforms.m_near.value = camera.near
         #   m_uniforms.m_far.value = camera.far
@@ -1207,7 +1185,7 @@ module Mittsu
           dir_positions[dir_offset + 1] = @_direction.y
           dir_positions[dir_offset + 2] = @_direction.z
 
-          set_color_linear(dir_colors, dir_offset, color, intensity)
+          OpenGLHelper.set_color_linear(dir_colors, dir_offset, color, intensity)
 
           dir_length += 1
 
@@ -1219,7 +1197,7 @@ module Mittsu
 
           point_offset = point_length * 3;
 
-          set_color_linear(point_colors, point_offset, color, intensity)
+          OpenGLHelper.set_color_linear(point_colors, point_offset, color, intensity)
 
           @_vector3.set_from_matrix_position(light.matrix_world)
 
@@ -1241,7 +1219,7 @@ module Mittsu
 
           spot_offset = spot_length * 3
 
-          set_color_linear(spot_colors, spot_offset, color, intensity)
+          OpenGLHelper.set_color_linear(spot_colors, spot_offset, color, intensity)
 
           @_direction.set_from_matrix_position(light.matrix_world)
 
@@ -1283,8 +1261,8 @@ module Mittsu
           sky_color = light.color
           ground_color = light.ground_color
 
-          set_color_linear(hemi_sky_colors, hemi_offset, sky_color, intensity )
-          set_color_linear(hemi_ground_colors, hemi_offset, ground_color, intensity)
+          OpenGLHelper.set_color_linear(hemi_sky_colors, hemi_offset, sky_color, intensity )
+          OpenGLHelper.set_color_linear(hemi_ground_colors, hemi_offset, ground_color, intensity)
 
           hemi_length += 1
 
@@ -1319,44 +1297,6 @@ module Mittsu
       zlights[:ambient][0] = r
       zlights[:ambient][1] = g
       zlights[:ambient][2] = b
-    end
-
-    def refresh_uniforms_lights(uniforms, lights)
-      uniforms['ambientLightColor'].value = lights[:ambient]
-
-      uniforms['directionalLightColor'].value = lights[:directional][:colors]
-      uniforms['directionalLightDirection'].value = lights[:directional][:positions]
-
-      uniforms['pointLightColor'].value = lights[:point][:colors]
-      uniforms['pointLightPosition'].value = lights[:point][:positions]
-      uniforms['pointLightDistance'].value = lights[:point][:distances]
-      uniforms['pointLightDecay'].value = lights[:point][:decays]
-
-      uniforms['spotLightColor'].value = lights[:spot][:colors]
-      uniforms['spotLightPosition'].value = lights[:spot][:positions]
-      uniforms['spotLightDistance'].value = lights[:spot][:distances]
-      uniforms['spotLightDirection'].value = lights[:spot][:directions]
-      uniforms['spotLightAngleCos'].value = lights[:spot][:angles_cos]
-      uniforms['spotLightExponent'].value = lights[:spot][:exponents]
-      uniforms['spotLightDecay'].value = lights[:spot][:decays]
-
-      uniforms['hemisphereLightSkyColor'].value = lights[:hemi][:sky_colors]
-      uniforms['hemisphereLightGroundColor'].value = lights[:hemi][:ground_colors]
-      uniforms['hemisphereLightDirection'].value = lights[:hemi][:positions]
-    end
-
-    def refresh_uniforms_lambert(uniforms, material)
-      uniforms['emissive'].value = material.emissive
-
-      if material.wrap_around
-        uniforms['wrapRGB'].value.copy(material.wrap_rgb)
-      end
-    end
-
-    def set_color_linear(array, offset, color, intensity)
-      array[offset]     = color.r * intensity
-      array[offset + 1] = color.g * intensity
-      array[offset + 2] = color.b * intensity
     end
 
     def get_texture_unit
@@ -1412,8 +1352,8 @@ module Mittsu
     end
 
     def sort_objects_for_render
-      @opaque_objects.sort { |a,b| painter_sort_stable(a,b) }
-      @transparent_objects.sort { |a,b| reverse_painter_sort_stable(a,b) }
+      @opaque_objects.sort { |a,b| OpenGLHelper.painter_sort_stable(a,b) }
+      @transparent_objects.sort { |a,b| OpenGLHelper.reverse_painter_sort_stable(a,b) }
     end
 
     def set_matrices_for_immediate_objects(camera)
