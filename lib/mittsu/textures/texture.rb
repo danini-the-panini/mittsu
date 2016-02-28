@@ -88,5 +88,9 @@ module Mittsu
     def dispose
       dispatch_event type: :dispose
     end
+
+    def implementation(renderer)
+      @_implementation ||= renderer.create_texture_implementation(self)
+    end
   end
 end

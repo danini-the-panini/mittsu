@@ -16,6 +16,7 @@ require 'mittsu/renderers/opengl/core/opengl_object_3d'
 require 'mittsu/renderers/opengl/objects/opengl_mesh'
 require 'mittsu/renderers/opengl/objects/opengl_line'
 require 'mittsu/renderers/opengl/materials/opengl_material'
+require 'mittsu/renderers/opengl/textures/opengl_texture'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
@@ -362,70 +363,14 @@ module Mittsu
       # TODO: when OpenGLRenderTargetCube exists
       is_cube = false # render_target.is_a? OpenGLRenderTargetCube
 
-      if render_target && render_target[:_opengl_framebuffer].nil?
-        render_target.depth_buffer = true if render_target.depth_buffer.nil?
-        render_target.stencil_buffer = true if render_target.stencil_buffer.nil?
-
-        render_target.add_event_listener(:dispose, @on_render_target_dispose)
-
-        render_target[:_opengl_texture] = glCreateTexture
-
-        @info[:memory][:textures] += 1
-
-        # Setup texture, create render and frame buffers
-
-        is_target_power_of_two = Math.power_of_two?(render_target.width) && Math.power_of_two?(render_target.height)
-        gl_format = param_mittsu_to_gl(render_target.format)
-        gl_type = param_mittsu_to_gl(render_target.type)
-
-        if is_cube
-          # TODO
-        else
-          render_target[:_opengl_framebuffer] = glCreateFramebuffer
-
-          if render_target.share_depth_from
-            render_target[:_opengl_renderbuffer] = render_target.share_depth_from[:_opengl_renderbuffer]
-          else
-            render_target[:_opengl_renderbuffer] = glCreateRenderbuffer
-          end
-
-          glBindTexture(GL_TEXTURE_2D, render_target[:_opengl_texture])
-          set_texture_parameters(GL_TEXTURE_2D, render_target, is_target_power_of_two)
-
-          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, render_target.width, render_target.height, 0, gl_format, gl_type, nil)
-
-          setup_framebuffer(render_target[:_opengl_framebuffer], render_target, GL_TEXTURE_2D)
-
-          if render_target.share_depth_from
-            if render_target.depth_buffer && !render_target.stencil_buffer
-              glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_target[:_opengl_renderbuffer])
-            elsif render_target.depth_buffer && render_target.stencil_buffer
-              glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_target[:_opengl_renderbuffer])
-            end
-          else
-            setup_renderbuffer(render_target[:_opengl_renderbuffer], render_target)
-          end
-
-          glGenerateMipmap(GL_TEXTURE_2D) if is_target_power_of_two
-        end
-
-        # Release everything
-
-        if is_cube
-          # TODO
-        else
-          glBindTexture(GL_TEXTURE_2D, 0)
-        end
-
-        glBindRenderbuffer(GL_RENDERBUFFER, 0)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
-      end
-
       if render_target
+        render_target_impl = render_target.implementation(self)
+        render_target_impl.set if render_target_impl.framebuffer.nil?
+
         if is_cube
           # TODO
         else
-          framebuffer = render_target[:_opengl_framebuffer]
+          framebuffer = render_target_impl.framebuffer
         end
 
         width = render_target.width
@@ -729,88 +674,71 @@ module Mittsu
 
     def set_texture(texture, slot)
       glActiveTexture(GL_TEXTURE0 + slot)
+      texture_impl = texture.implementation(self)
 
       if texture.needs_update?
-        upload_texture(texture)
+        texture_impl.update
       else
-        glBindTexture(GL_TEXTURE_2D, texture[:_opengl_texture])
+        glBindTexture(GL_TEXTURE_2D, texture_impl.opengl_texture)
       end
     end
 
-    def upload_texture(texture)
-      if texture[:_opengl_init].nil?
-        texture[:_opengl_init] = true
-        texture.add_event_listener :dispose, @on_texture_dispose
-        texture[:_opengl_texture] = glCreateTexture
-        @info[:memory][:textures] += 1
+    def param_mittsu_to_gl(p)
+      case p
+      when RepeatWrapping then GL_REPEAT
+      when ClampToEdgeWrapping then GL_CLAMP_TO_EDGE
+      when MirroredRepeatWrapping then GL_MIRRORED_REPEAT
+
+      when NearestFilter then GL_NEAREST
+      when NearestMipMapNearestFilter then GL_NEAREST_MIPMAP_NEAREST
+      when NearestMipMapLinearFilter then GL_NEAREST_MIPMAP_LINEAR
+
+      when LinearFilter then GL_LINEAR
+      when LinearMipMapNearestFilter then GL_LINEAR_MIPMAP_NEAREST
+      when LinearMipMapLinearFilter then GL_LINEAR_MIPMAP_LINEAR
+
+      when UnsignedByteType then GL_UNSIGNED_BYTE
+      when UnsignedShort4444Type then GL_UNSIGNED_SHORT_4_4_4_4
+      when UnsignedShort5551Type then GL_UNSIGNED_SHORT_5_5_5_1
+      when UnsignedShort565Type then GL_UNSIGNED_SHORT_5_6_5
+
+      when ByteType then GL_BYTE
+      when ShortType then GL_SHORT
+      when UnsignedShortType then GL_UNSIGNED_SHORT
+      when IntType then GL_INT
+      when UnsignedIntType then GL_UNSIGNED_INT
+      when FloatType then GL_FLOAT
+
+      when AlphaFormat then GL_ALPHA
+      when RGBFormat then GL_RGB
+      when RGBAFormat then GL_RGBA
+      when LuminanceFormat then GL_LUMINANCE
+      when LuminanceAlphaFormat then GL_LUMINANCE_ALPHA
+
+      when AddEquation then GL_FUNC_ADD
+      when SubtractEquation then GL_FUNC_SUBTRACT
+      when ReverseSubtractEquation then GL_FUNC_REVERSE_SUBTRACT
+
+      when ZeroFactor then GL_ZERO
+      when OneFactor then GL_ONE
+      when SrcColorFactor then GL_SRC_COLOR
+      when OneMinusSrcColorFactor then GL_ONE_MINUS_SRC_COLOR
+      when SrcAlphaFactor then GL_SRC_ALPHA
+      when OneMinusSrcAlphaFactor then GL_ONE_MINUS_SRC_ALPHA
+      when DstAlphaFactor then GL_DST_ALPHA
+      when OneMinusDstAlphaFactor then GL_ONE_MINUS_DST_ALPHA
+
+      when DstColorFactor then GL_DST_COLOR
+      when OneMinusDstColorFactor then GL_ONE_MINUS_DST_COLOR
+      when SrcAlphaSaturateFactor then GL_SRC_ALPHA_SATURATE
+      else 0
       end
+    end
 
-      glBindTexture(GL_TEXTURE_2D, texture[:_opengl_texture])
+    def compressed_texture_formats
+      # TODO: needs extensions.get ...
 
-      # glPixelStorei(GL_UNPACK_FLIP_Y_WEBGL, texture.flip_y) ???
-      # glPixelStorei(GL_UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiply_alpha) ???
-      glPixelStorei(GL_UNPACK_ALIGNMENT, texture.unpack_alignment)
-
-      texture.image = clamp_to_max_size(texture.image, @_max_texture_size)
-
-      image = texture.image
-      is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-      gl_format = param_mittsu_to_gl(texture.format)
-      gl_type = param_mittsu_to_gl(texture.type)
-
-      set_texture_parameters(GL_TEXTURE_2D, texture, is_image_power_of_two)
-
-      mipmaps = texture.mipmaps
-
-      if texture.is_a?(DataTexture)
-        # use manually created mipmaps if available
-        # if there are no manual mipmaps
-        # set 0 level mipmap and then use GL to generate other mipmap levels
-
-        if !mipmaps.empty? && is_image_power_of_two
-          mipmaps.each_with_index do |mipmap, i|
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-        else
-          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, image.width, image.height, 0, gl_format, gl_type, image.data)
-        end
-      elsif texture.is_a?(CompressedTexture)
-        mipmaps.each_with_index do |mipmap, i|
-          if texture.format != RGBAFormat && texture.format != RGBFormat
-            if get_compressed_texture_formats.index(gl_format)
-              glCompressedTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, mipmap.data)
-            else
-              puts 'WARNING: Mittsu::OpenGLRenderer: Attempt to load unsupported compressed texture format in #upload_texture'
-            end
-          else
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-        end
-      else # regular texture (image, video, canvas)
-        # use manually created mipmaps if available
-        # if there are no manual mipmaps
-        # set 0 level mipmap and then use GL to generate other mipmap levels
-
-        if !mipmaps.empty? && is_image_power_of_two
-          mipmaps.each_with_index do |mipmap, i|
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-
-          texture.generate_mipmaps = false
-        else
-          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, texture.image.width, texture.image.height, 0, gl_format, gl_type, texture.image.data)
-        end
-      end
-
-      if texture.generate_mipmaps && is_image_power_of_two
-        glGenerateMipmap(GL_TEXTURE_2D)
-      end
-
-      texture.needs_update = false
-
-      if texture.on_update
-        texture.on_update.()
-      end
+      @_compressed_texture_formats ||= []
     end
 
     # TODO: find a better way to do this
@@ -832,6 +760,20 @@ module Mittsu
 
     def create_material_implementation(material)
       OpenGLMaterial.new(material, self)
+    end
+
+    def create_texture_implementation(texture)
+      OpenGLTexture.new(texture, self)
+    end
+
+    def clamp_to_max_size(image, max_size = @_max_texture_size)
+      width, height = image.width, image.height
+      if width > max_size || height > max_size
+        # TODO: scale the image ...
+
+        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to ??? x ???"
+      end
+      image
     end
 
     private
@@ -863,11 +805,6 @@ module Mittsu
       glViewport(@_viewport_x, @_viewport_y, @_viewport_width, @_viewport_height)
 
       clear_color(@_clear_color.r, @_clear_color.g, @_clear_color.b, @_clear_alpha)
-    end
-
-    def get_compressed_texture_formats
-      return @_compressed_texture_formats ||= []
-      # TODO: needs extensions.get ...
     end
 
     def painter_sort_stable(a, b)
@@ -1755,95 +1692,8 @@ module Mittsu
       texture_unit
     end
 
-    def clamp_to_max_size(image, max_size)
-      width, height = image.width, image.height
-      if width > max_size || height > max_size
-        # TODO: scale the image ...
-
-        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to ??? x ???"
-      end
-      image
-    end
-
-    def param_mittsu_to_gl(p)
-      case p
-      when RepeatWrapping then GL_REPEAT
-      when ClampToEdgeWrapping then GL_CLAMP_TO_EDGE
-      when MirroredRepeatWrapping then GL_MIRRORED_REPEAT
-
-      when NearestFilter then GL_NEAREST
-      when NearestMipMapNearestFilter then GL_NEAREST_MIPMAP_NEAREST
-      when NearestMipMapLinearFilter then GL_NEAREST_MIPMAP_LINEAR
-
-      when LinearFilter then GL_LINEAR
-      when LinearMipMapNearestFilter then GL_LINEAR_MIPMAP_NEAREST
-      when LinearMipMapLinearFilter then GL_LINEAR_MIPMAP_LINEAR
-
-      when UnsignedByteType then GL_UNSIGNED_BYTE
-      when UnsignedShort4444Type then GL_UNSIGNED_SHORT_4_4_4_4
-      when UnsignedShort5551Type then GL_UNSIGNED_SHORT_5_5_5_1
-      when UnsignedShort565Type then GL_UNSIGNED_SHORT_5_6_5
-
-      when ByteType then GL_BYTE
-      when ShortType then GL_SHORT
-      when UnsignedShortType then GL_UNSIGNED_SHORT
-      when IntType then GL_INT
-      when UnsignedIntType then GL_UNSIGNED_INT
-      when FloatType then GL_FLOAT
-
-      when AlphaFormat then GL_ALPHA
-      when RGBFormat then GL_RGB
-      when RGBAFormat then GL_RGBA
-      when LuminanceFormat then GL_LUMINANCE
-      when LuminanceAlphaFormat then GL_LUMINANCE_ALPHA
-
-      when AddEquation then GL_FUNC_ADD
-      when SubtractEquation then GL_FUNC_SUBTRACT
-      when ReverseSubtractEquation then GL_FUNC_REVERSE_SUBTRACT
-
-      when ZeroFactor then GL_ZERO
-      when OneFactor then GL_ONE
-      when SrcColorFactor then GL_SRC_COLOR
-      when OneMinusSrcColorFactor then GL_ONE_MINUS_SRC_COLOR
-      when SrcAlphaFactor then GL_SRC_ALPHA
-      when OneMinusSrcAlphaFactor then GL_ONE_MINUS_SRC_ALPHA
-      when DstAlphaFactor then GL_DST_ALPHA
-      when OneMinusDstAlphaFactor then GL_ONE_MINUS_DST_ALPHA
-
-      when DstColorFactor then GL_DST_COLOR
-      when OneMinusDstColorFactor then GL_ONE_MINUS_DST_COLOR
-      when SrcAlphaSaturateFactor then GL_SRC_ALPHA_SATURATE
-      else 0
-      end
-    end
-
-    def set_texture_parameters(texture_type, texture, is_image_power_of_two)
-      if is_image_power_of_two
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, param_mittsu_to_gl(texture.wrap_s))
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, param_mittsu_to_gl(texture.wrap_t))
-
-        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, param_mittsu_to_gl(texture.mag_filter))
-        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, param_mittsu_to_gl(texture.min_filter))
-      else
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-
-        if texture.wrap_s != ClampToEdgeWrapping || texture.wrap_t != ClampToEdgeWrapping
-          puts "WARNING: Mittsu::OpenGLRenderer: Texture is not power of two. Texture.wrap_s and Texture.wrap_t should be set to Mittsu::ClampToEdgeWrapping. (#{texture.source_file})"
-        end
-
-        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, filter_fallback(texture.mag_filter))
-        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, filter_fallback(texture.min_filter))
-
-        if texture.min_filter != NearestFilter && texture.min_filter != LinearFilter
-          puts "WARNING: Mittsu::OpenGLRenderer: Texture is not a power of two. Texture.min_filter should be set to Mittsu::NearestFilter or Mittsu::LinearFilter. (#{texture.source_file})"
-        end
-
-        # TODO: anisotropic extension ???
-      end
-    end
-
     def set_cube_texture(texture, slot)
+      texture_impl = texture.implementation(self)
       if texture.image.length == 6
         if texture.needs_update?
           if !texture.image[:_opengl_texture_cube]
@@ -1875,7 +1725,8 @@ module Mittsu
           gl_format = param_mittsu_to_gl(texture.format)
           gl_type = param_mittsu_to_gl(texture.type)
 
-          set_texture_parameters(GL_TEXTURE_CUBE_MAP, texture, is_image_power_of_two)
+          # TODO!!! FIXME!!!
+          texture_impl.send(:set_parameters, GL_TEXTURE_CUBE_MAP, is_image_power_of_two)
 
           6.times do |i|
             if !is_compressed
@@ -1907,38 +1758,11 @@ module Mittsu
 
           texture.needs_update = false
 
-          # TODO wat?
-          # texture.on_update if texture.on_update
+          texture.on_update.call if texture.on_update
         else
           glActiveTexture(GL_TEXTURE0 + slot)
           glBindTexture(GL_TEXTURE_CUBE_MAP, texture.image[:_opengl_texture_cube])
         end
-      end
-    end
-
-    def setup_framebuffer(framebuffer, render_target, texture_target)
-      glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture_target, render_target[:_opengl_texture], 0)
-    end
-
-    def setup_renderbuffer(renderbuffer, render_target)
-      glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer)
-
-      if render_target.depth_buffer && !render_target.stencil_buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, render_target.width, render_target.height)
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer)
-
-        # TODO: investigate this (?):
-    		# THREE.js - For some reason this is not working. Defaulting to RGBA4.
-    		# } else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
-        #
-    		# 	_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
-    		# 	_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
-      elsif render_target.depth_buffer && render_target.stencil_buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_STENCIL, render_target.width, render_target.height)
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer)
-      else
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, render_target.width, render_target.height)
       end
     end
   end
