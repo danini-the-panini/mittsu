@@ -179,7 +179,7 @@ module Mittsu
 
       if render_target
         render_target_impl = render_target.implementation(self)
-        render_target_impl.set if render_target_impl.framebuffer.nil?
+        render_target_impl.setup_buffers
 
         if is_cube
           # TODO
@@ -281,17 +281,6 @@ module Mittsu
       #
       #   @info[:render][:calls] += 1
       #   @info[:render][:points] += geometry_group.particle_count
-    end
-
-    def set_texture(texture, slot)
-      glActiveTexture(GL_TEXTURE0 + slot)
-      texture_impl = texture.implementation(self)
-
-      if texture.needs_update?
-        texture_impl.update
-      else
-        glBindTexture(GL_TEXTURE_2D, texture_impl.opengl_texture)
-      end
     end
 
     def compressed_texture_formats
@@ -652,7 +641,7 @@ module Mittsu
             texture_unit = get_texture_unit
 
             glUniform1i(p_uniforms.bone_texture, texture_unit)
-            self.set_texture(object.skeleton.bone_texture, texture_unit)
+            object.skeleton.bone_texture.implementation(self).set(texture_unit)
           end
 
           if !p_uniforms.bone_texture_width.nil?
@@ -670,8 +659,8 @@ module Mittsu
       end
 
       if refresh_material
-        if fog && material.fog
-        end
+        # TODO: when fog is implemented
+        # refresh_uniforms_fog(m_uniforms, fog) if fog && material.fog
 
         if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
           if @light_renderer.lights_need_update
@@ -717,8 +706,6 @@ module Mittsu
         if object.receive_shadow && !material_impl.shadow_pass
           OpenGLHelper.refresh_uniforms_shadow(m_uniforms, lights)
         end
-
-        # load common uniforms
 
         load_uniforms_generic(material_impl.uniforms_list)
       end
@@ -876,16 +863,11 @@ module Mittsu
 
           next unless texture
 
-          if texture.is_a?(CubeTexture) || (texture.image.is_a?(Array) && texture.image.length == 6)
-            texture_impl = texture.implementation(self)
-            texture_impl.set(texture_unit)
-
+          texture_impl = texture.implementation(self)
+          texture_impl.set(texture_unit)
           # TODO: when OpenGLRenderTargetCube is defined
           # elsif texture.is_a?(OpenGLRenderTargetCube)
             # set_cube_texture_dynamic(texture, texture_unit)
-          else
-            set_texture(texture, texture_unit)
-          end
         when :tv
           # array of Mittsu::Texture (2d)
           uniform.array ||= []
@@ -901,7 +883,7 @@ module Mittsu
 
             next unless tex
 
-            set_texture(tex, tex_unit)
+            tex.implementation(self).set(tex_unit)
           end
         else
           puts "WARNING: Mittsu::OpenGLRenderer: Unknown uniform type: #{type}"

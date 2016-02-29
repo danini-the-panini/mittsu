@@ -82,7 +82,9 @@ module Mittsu
       end
     end
 
-    def set
+    def setup_buffers
+      return unless @framebuffer.nil?
+
       # TODO: when OpenGLRenderTargetCube exists
       is_cube = false # render_target.is_a? OpenGLRenderTargetCube
 

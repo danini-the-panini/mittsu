@@ -8,6 +8,16 @@ module Mittsu
       @initted = false
     end
 
+    def set(slot)
+      glActiveTexture(GL_TEXTURE0 + slot)
+
+      if @texture.needs_update?
+        update
+      else
+        glBindTexture(GL_TEXTURE_2D, @opengl_texture)
+      end
+    end
+
     def update
       if !@initted
         @initted = true
