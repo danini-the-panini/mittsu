@@ -1,9 +1,8 @@
 require 'securerandom'
 require 'mittsu'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Object3D < HashObject
+  class Object3D
     include EventDispatcher
 
     attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_update, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry

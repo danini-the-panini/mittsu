@@ -142,9 +142,10 @@ module Mittsu
           scene.update_matrix_world if scene.auto_update
         end
 
-        if light.shadow_camera_visible && !light[:camera_helper]
-          light[:camera_helper] = CameraHelper.new(light.shadow_camera)
-          scene.add(light[:camera_helper])
+        light_impl = light.implementation(@renderer)
+        if light.shadow_camera_visible && !light_impl.camera_helper
+          light_impl.camera_helper = CameraHelper.new(light.shadow_camera)
+          scene.add(light_impl.camera_helper)
         end
 
         if light.virtual? && virtual_light.original_camera == camera
@@ -167,8 +168,8 @@ module Mittsu
         #
 
 
-        light[:camera_helper].visible = light.shadow_camera_visible if light[:camera_helper]
-        light[:camera_helper].update if light.shadow_camera_visible
+        light_impl.camera_helper.visible = light.shadow_camera_visible if light_impl.camera_helper
+        light_impl.camera_helper.update if light.shadow_camera_visible
 
         # compute shadow matrix
 

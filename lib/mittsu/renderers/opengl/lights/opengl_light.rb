@@ -1,5 +1,7 @@
 module Mittsu
   class OpenGLLight < OpenGLObject3D
+    attr_accessor :camera_helper
+
     def initialize(light, renderer)
       super
       @light = light
