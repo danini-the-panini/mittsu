@@ -41,6 +41,50 @@ module Mittsu
       glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, 0, 0)
     end
 
+    def update_other_buffers(object, material, attributes)
+      update_custom_attributes(attributes)
+
+      if attributes['color'] && attributes['color'] >= 0
+        update_color_buffer(attributes['color'])
+      elsif !material.default_attribute_values.nil?
+        glVertexAttrib3fv(attributes['color'], material.default_attribute_values.color)
+      end
+
+      if attributes['normal'] && attributes['normal'] >= 0
+        update_normal_buffer(attributes['normal'])
+      end
+
+      if attributes['tangent'] && attributes['tangent'] >= 0
+        update_tangent_buffer(attributes['tangent'])
+      end
+
+      if attributes['uv'] && attributes['uv'] >= 0
+        if object.geometry.face_vertex_uvs[0]
+          update_uv_buffer(attributes['uv'])
+        elsif !material.default_attribute_values.nil?
+          glVertexAttrib2fv(attributes['uv'], material.default_attribute_values.uv)
+        end
+      end
+
+      if attributes['uv2'] && attributes['uv2'] >= 0
+        if object.geometry.face_vertex_uvs[1]
+          update_uv2_buffer(attributes['uv2'])
+        elsif !material.default_attribute_values.nil?
+          glVertexAttrib2fv(attributes['uv2'], material.default_attribute_values.uv2)
+        end
+      end
+
+      if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
+        update_skin_buffers(attributes['skin_index'], attributes['skin_weight'])
+      end
+
+      if attributes['line_distances'] && attributes['line_distances'] >= 0
+        update_line_distances_buffer(attributes['line_distances'])
+      end
+    end
+
+    private
+
     def update_color_buffer(attribute)
       glBindBuffer(GL_ARRAY_BUFFER, @color_buffer)
       @renderer.state.enable_attribute(attribute)
@@ -95,8 +139,6 @@ module Mittsu
         end
       end
     end
-
-    private
 
     def update_custom_attribute(custom_attribute, belongs_to_attribute)
       return unless belongs_to_attribute >= 0

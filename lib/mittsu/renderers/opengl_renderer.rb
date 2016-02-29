@@ -260,71 +260,25 @@ module Mittsu
 
       program = set_program(camera, lights, fog, material, object)
 
+      buffers_need_update = switch_geometry_program(program, material, geometry_group)
+
+      @state.init_attributes if buffers_need_update
+
       attributes = program.attributes
 
-      update_buffers = false
-      wireframe_bit = material.wireframe ? 1 : 0
-      geometry_program = "#{geometry_group.id}_#{program.id}_#{wireframe_bit}"
-
-      if geometry_program != @_current_geometry_program
-        @_current_geometry_program = geometry_program
-        update_buffers = true
-      end
-
-      @state.init_attributes if update_buffers
-
-      # vertices
       if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
-        geometry_group.update_vertex_buffer(attributes['position']) if update_buffers
+        geometry_group.update_vertex_buffer(attributes['position']) if buffers_need_update
       elsif object.morph_target_base
         setup_morph_targets(material, geometry_group, object)
       end
 
-      if update_buffers
-        geometry_group.update_custom_attributes(attributes)
-
-        if attributes['color'] && attributes['color'] >= 0
-          geometry_group.update_color_buffer(attributes['color'])
-        elsif !material.default_attribute_values.nil?
-          glVertexAttrib3fv(attributes['color'], material.default_attribute_values.color)
-        end
-
-        if attributes['normal'] && attributes['normal'] >= 0
-          geometry_group.update_normal_buffer(attributes['normal'])
-        end
-
-        if attributes['tangent'] && attributes['tangent'] >= 0
-          geometry_group.update_tangent_buffer(attributes['tangent'])
-        end
-
-        if attributes['uv'] && attributes['uv'] >= 0
-          if object.geometry.face_vertex_uvs[0]
-            geometry_group.update_uv_buffer(attributes['uv'])
-          elsif !material.default_attribute_values.nil?
-            glVertexAttrib2fv(attributes['uv'], material.default_attribute_values.uv)
-          end
-        end
-
-        if attributes['uv2'] && attributes['uv2'] >= 0
-          if object.geometry.face_vertex_uvs[1]
-            geometry_group.update_uv2_buffer(attributes['uv2'])
-          elsif !material.default_attribute_values.nil?
-            glVertexAttrib2fv(attributes['uv2'], material.default_attribute_values.uv2)
-          end
-        end
-
-        if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
-          geometry_group.update_skin_buffers(attributes['skin_index'], attributes['skin_weight'])
-        end
-
-        if attributes['line_distances'] && attributes['line_distances'] >= 0
-          geometry_group.update_line_distances_buffer(attributes['line_distances'])
-        end
+      if buffers_need_update
+        geometry_group.update_other_buffers(object, material, attributes)
       end
 
       @state.disable_unused_attributes
 
-      object.implementation(self).render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
+      object.implementation(self).render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
 
       # TODO: render particles
       # when PointCloud
@@ -1268,6 +1222,18 @@ module Mittsu
         # TODO: handle losing opengl context??
       rescue => error
         puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
+      end
+    end
+
+    def switch_geometry_program(program, material, geometry_group)
+      wireframe_bit = material.wireframe ? 1 : 0
+      geometry_program = "#{geometry_group.id}_#{program.id}_#{wireframe_bit}"
+
+      if geometry_program != @_current_geometry_program
+        @_current_geometry_program = geometry_program
+        true
+      else
+        false
       end
     end
   end
