@@ -2,10 +2,9 @@ require 'securerandom'
 require 'mittsu/math'
 require 'mittsu/core/event_dispatcher'
 require 'mittsu/constants'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Texture < HashObject
+  class Texture
     include EventDispatcher
 
     DEFAULT_IMAGE = nil
