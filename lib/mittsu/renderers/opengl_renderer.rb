@@ -230,17 +230,12 @@ module Mittsu
       set_matrices_for_immediate_objects(camera)
 
       set_render_target(render_target)
-      if @auto_clear || force_clear
-        clear(@auto_clear_color, @auto_clear_depth, @auto_clear_stencil)
-      end
+      perform_auto_clear if @auto_clear || force_clear
       render_main_pass(scene, camera)
 
       render_custom_plugins_post_pass(scene, camera)
 
-      # generate mipmap if we're using any kind of mipmap filtering
-      if render_target && render_target.generate_mipmaps && render_target.min_filter != NearestFilter && render_target.min_filter != LinearFilter
-        render_target.implementation(self).update_mipmap
-      end
+      render_target.implementation(self).update_mipmap if render_target
 
       ensure_depth_buffer_writing
     end
@@ -250,7 +245,6 @@ module Mittsu
       @state.set_flip_sided(material.side == BackSide)
     end
 
-    # FIXME: REFACTOR
     def render_buffer(camera, lights, fog, material, geometry_group, object)
       return unless material.visible
 
@@ -259,17 +253,16 @@ module Mittsu
       update_object(object)
 
       program = set_program(camera, lights, fog, material, object)
-
+      attributes = program.attributes
       buffers_need_update = switch_geometry_program(program, material, geometry_group)
 
       @state.init_attributes if buffers_need_update
 
-      attributes = program.attributes
-
       if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
         geometry_group.update_vertex_buffer(attributes['position']) if buffers_need_update
       elsif object.morph_target_base
-        setup_morph_targets(material, geometry_group, object)
+        # TODO: when morphing is implemented
+        # setup_morph_targets(material, geometry_group, object)
       end
 
       if buffers_need_update
@@ -1090,6 +1083,10 @@ module Mittsu
       #     object.skeleton.update
       #   end
       # end
+    end
+
+    def perform_auto_clear
+      clear(@auto_clear_color, @auto_clear_depth, @auto_clear_stencil)
     end
 
     def init_clearing

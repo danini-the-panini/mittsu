@@ -154,6 +154,7 @@ module Mittsu
     end
 
     def update_mipmap
+      return if !@generate_mipmaps || @min_filter == NearestFilter || @min_filter == LinearFilter
       # TODO: when OpenGLRenderTargetCube exists
   		# 	glBindTexture(GL_TEXTURE_CUBE_MAP, @opengl_texture)
   		# 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
