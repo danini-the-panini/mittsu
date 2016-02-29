@@ -1,9 +1,8 @@
 require 'mittsu/math'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Uniform < HashObject
-    attr_accessor :type, :value, :needs_update
+  class Uniform
+    attr_accessor :type, :value, :needs_update, :array
 
     def initialize(type, value)
       super()

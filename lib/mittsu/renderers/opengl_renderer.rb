@@ -981,64 +981,64 @@ module Mittsu
           glUniform3fv(location, value.length / 3, array_to_ptr_easy(value))
         when :v2v
           # array of Mittsu::Vector2
-          uniform[:_array] ||= Array.new(2 * value.length) # Float32Array
+          uniform.array ||= Array.new(2 * value.length) # Float32Array
 
           value.each_with_index do |v, i|
             offset = i * 2
-            uniform[:_array][offset] = v.x
-            uniform[:_array][offset + 1] = v.y
+            uniform.array[offset] = v.x
+            uniform.array[offset + 1] = v.y
           end
 
-          glUniform2fv(location, value.length * 2, array_to_ptr_easy(uniform[:_array]))
+          glUniform2fv(location, value.length * 2, array_to_ptr_easy(uniform.array))
         when :v3v
           # array of Mittsu::Vector3
-          uniform[:_array] ||= Array.new(3 * value.length) # Float32Array
+          uniform.array ||= Array.new(3 * value.length) # Float32Array
 
           value.each_with_index do |v, i|
             offset = i * 3
-            uniform[:_array][offset] = v.x
-            uniform[:_array][offset + 1] = v.y
-            uniform[:_array][offset + 2] = v.z
+            uniform.array[offset] = v.x
+            uniform.array[offset + 1] = v.y
+            uniform.array[offset + 2] = v.z
           end
 
-          glUniform3fv(location, value.length * 3, array_to_ptr_easy(uniform[:_array]))
+          glUniform3fv(location, value.length * 3, array_to_ptr_easy(uniform.array))
         when :v4v
           # array of Mittsu::Vector4
-          uniform[:_array] ||= Array.new(4 * value.length) # Float32Array
+          uniform.array ||= Array.new(4 * value.length) # Float32Array
 
           value.each_with_index do |v, i|
             offset = i * 4
-            uniform[:_array][offset] = v.x
-            uniform[:_array][offset + 1] = v.y
-            uniform[:_array][offset + 2] = v.z
-            uniform[:_array][offset + 3] = v.w
+            uniform.array[offset] = v.x
+            uniform.array[offset + 1] = v.y
+            uniform.array[offset + 2] = v.z
+            uniform.array[offset + 3] = v.w
           end
 
-          glUniform4fv(location, value.length * 4, array_to_ptr_easy(uniform[:_array]))
+          glUniform4fv(location, value.length * 4, array_to_ptr_easy(uniform.array))
         when :m3
           # single Mittsu::Matrix3
           glUniformMatrix3fv(location, 1, GL_FALSE, array_to_ptr_easy(value.elements))
         when :m3v
           # array of Mittsu::Matrix3
-          uniform[:_array] ||= Array.new(9 * value.length) # Float32Array
+          uniform.array ||= Array.new(9 * value.length) # Float32Array
 
           value.each_with_index do |v, i|
-            value[i].flatten_to_array_offset(uniform[:_array], i * 9)
+            value[i].flatten_to_array_offset(uniform.array, i * 9)
           end
 
-          glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform[:_array]))
+          glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
         when :m4
           # single Mittsu::Matrix4
           glUniformMatrix4vf(location, 1, GL_FALSE, array_to_ptr_easy(value.elements))
         when :m4v
           # array of Mittsu::Matrix4
-          uniform[:_array] ||= Array.new(16 * value.length) # Float32Array
+          uniform.array ||= Array.new(16 * value.length) # Float32Array
 
           value.each_with_index do |v, i|
-            value[i].flatten_to_array_offset(uniform[:_array], i * 16)
+            value[i].flatten_to_array_offset(uniform.array, i * 16)
           end
 
-          glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform[:_array]))
+          glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
         when :t
           # single Mittsu::Texture (2d or cube)
           texture = value
@@ -1060,16 +1060,16 @@ module Mittsu
           end
         when :tv
           # array of Mittsu::Texture (2d)
-          uniform[:_array] ||= []
+          uniform.array ||= []
 
           uniform.value.each_index do |i|
-            uniform[:_array][i] = get_texture_unit
+            uniform.array[i] = get_texture_unit
           end
 
-          glUniform1iv(location, uniform[:_array].length, array_to_ptr_easy(uniform[:_array]))
+          glUniform1iv(location, uniform.array.length, array_to_ptr_easy(uniform.array))
 
           uniform.value.each_with_index do |tex, i|
-            tex_unit = uniform[:_array][i]
+            tex_unit = uniform.array[i]
 
             next unless tex
 
