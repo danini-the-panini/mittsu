@@ -26,8 +26,8 @@ module Mittsu
 
       image = @texture.image
       is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-      gl_format = @renderer.param_mittsu_to_gl(@texture.format)
-      gl_type = @renderer.param_mittsu_to_gl(@texture.type)
+      gl_format = GL_MITTSU_PARAMS[@texture.format]
+      gl_type = GL_MITTSU_PARAMS[@texture.type]
 
       set_parameters(GL_TEXTURE_2D, is_image_power_of_two)
 
@@ -86,11 +86,11 @@ module Mittsu
 
     def set_parameters(texture_type, is_image_power_of_two)
       if is_image_power_of_two
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, @renderer.param_mittsu_to_gl(@texture.wrap_s))
-        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, @renderer.param_mittsu_to_gl(@texture.wrap_t))
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, GL_MITTSU_PARAMS[@texture.wrap_s])
+        glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, GL_MITTSU_PARAMS[@texture.wrap_t])
 
-        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, @renderer.param_mittsu_to_gl(@texture.mag_filter))
-        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, @renderer.param_mittsu_to_gl(@texture.min_filter))
+        glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, GL_MITTSU_PARAMS[@texture.mag_filter])
+        glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, GL_MITTSU_PARAMS[@texture.min_filter])
       else
         glTexParameteri(texture_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)

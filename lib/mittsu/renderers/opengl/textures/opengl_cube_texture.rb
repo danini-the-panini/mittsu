@@ -29,8 +29,8 @@ module Mittsu
 
           image = cube_image[0]
           is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-          gl_format = @renderer.param_mittsu_to_gl(@texture.format)
-          gl_type = @renderer.param_mittsu_to_gl(@texture.type)
+          gl_format = GL_MITTSU_PARAMS[@texture.format]
+          gl_type = GL_MITTSU_PARAMS[@texture.type]
 
           set_parameters(GL_TEXTURE_CUBE_MAP, is_image_power_of_two)
 

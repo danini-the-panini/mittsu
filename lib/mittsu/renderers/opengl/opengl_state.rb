@@ -1,8 +1,6 @@
 module Mittsu
   class OpenGLState
-    def initialize(param_mittsu_to_gl)
-      @param_mittsu_to_gl = param_mittsu_to_gl
-
+    def initialize
       @new_attributes = Array.new(16) # Uint8Array
       @enabled_attributes = Array.new(16) # Uint8Array
 
@@ -90,14 +88,14 @@ module Mittsu
         blend_dst_alpha ||= blend_dst
 
         if blend_equation != @current_blend_equation || blend_equation_alpha != @current_blend_equation_alpha
-          glBlendEquationSeparate(@param_mittsu_to_gl[blend_equation], @param_mittsu_to_gl[blend_equation_alpha])
+          glBlendEquationSeparate(GL_MITTSU_PARAMS[blend_equation], GL_MITTSU_PARAMS[blend_equation_alpha])
 
           @current_blend_equation = blend_equation
           @current_blend_equation_alpha = blend_equation_alpha
         end
 
         if blend_src != @current_blend_src || blend_dst != @current_blend_dst || blend_src_alpha != @current_blend_src_alpha || blend_dst_alpha != @current_blend_dst_alpha
-          glBlendFuncSeparate(@param_mittsu_to_gl[blend_src], @param_mittsu_to_gl[blend_dst], @param_mittsu_to_gl[blend_src_alpha], @param_mittsu_to_gl[blend_dst_alpha])
+          glBlendFuncSeparate(GL_MITTSU_PARAMS[blend_src], GL_MITTSU_PARAMS[blend_dst], GL_MITTSU_PARAMS[blend_src_alpha], GL_MITTSU_PARAMS[blend_dst_alpha])
 
           @current_blend_src = nil
           @current_blend_dst = nil

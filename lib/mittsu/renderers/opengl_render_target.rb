@@ -98,8 +98,8 @@ module Mittsu
       # Setup texture, create render and frame buffers
 
       is_target_power_of_two = Math.power_of_two?(@width) && Math.power_of_two?(@height)
-      gl_format = @renderer.param_mittsu_to_gl(@format)
-      gl_type = @renderer.param_mittsu_to_gl(@type)
+      gl_format = GL_MITTSU_PARAMS[@format]
+      gl_type = GL_MITTSU_PARAMS[@type]
 
       if is_cube
         # TODO

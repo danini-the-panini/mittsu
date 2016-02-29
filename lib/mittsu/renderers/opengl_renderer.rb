@@ -20,6 +20,8 @@ require 'mittsu/renderers/shaders/uniforms_utils'
 include ENV['DEBUG'] ? OpenGLDebug : OpenGL
 include Mittsu::OpenGLHelper
 
+require 'mittsu/renderers/opengl/opengl_mittsu_params'
+
 module Mittsu
   class OpenGLRenderer
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
@@ -47,7 +49,7 @@ module Mittsu
 
       create_window
 
-      @state = OpenGLState.new(self.method(:param_mittsu_to_gl))
+      @state = OpenGLState.new
 
       # TODO: load extensions??
 
@@ -289,59 +291,6 @@ module Mittsu
         texture_impl.update
       else
         glBindTexture(GL_TEXTURE_2D, texture_impl.opengl_texture)
-      end
-    end
-
-    # FIXME: this could just be a hash
-    def param_mittsu_to_gl(p)
-      case p
-      when RepeatWrapping then GL_REPEAT
-      when ClampToEdgeWrapping then GL_CLAMP_TO_EDGE
-      when MirroredRepeatWrapping then GL_MIRRORED_REPEAT
-
-      when NearestFilter then GL_NEAREST
-      when NearestMipMapNearestFilter then GL_NEAREST_MIPMAP_NEAREST
-      when NearestMipMapLinearFilter then GL_NEAREST_MIPMAP_LINEAR
-
-      when LinearFilter then GL_LINEAR
-      when LinearMipMapNearestFilter then GL_LINEAR_MIPMAP_NEAREST
-      when LinearMipMapLinearFilter then GL_LINEAR_MIPMAP_LINEAR
-
-      when UnsignedByteType then GL_UNSIGNED_BYTE
-      when UnsignedShort4444Type then GL_UNSIGNED_SHORT_4_4_4_4
-      when UnsignedShort5551Type then GL_UNSIGNED_SHORT_5_5_5_1
-      when UnsignedShort565Type then GL_UNSIGNED_SHORT_5_6_5
-
-      when ByteType then GL_BYTE
-      when ShortType then GL_SHORT
-      when UnsignedShortType then GL_UNSIGNED_SHORT
-      when IntType then GL_INT
-      when UnsignedIntType then GL_UNSIGNED_INT
-      when FloatType then GL_FLOAT
-
-      when AlphaFormat then GL_ALPHA
-      when RGBFormat then GL_RGB
-      when RGBAFormat then GL_RGBA
-      when LuminanceFormat then GL_LUMINANCE
-      when LuminanceAlphaFormat then GL_LUMINANCE_ALPHA
-
-      when AddEquation then GL_FUNC_ADD
-      when SubtractEquation then GL_FUNC_SUBTRACT
-      when ReverseSubtractEquation then GL_FUNC_REVERSE_SUBTRACT
-
-      when ZeroFactor then GL_ZERO
-      when OneFactor then GL_ONE
-      when SrcColorFactor then GL_SRC_COLOR
-      when OneMinusSrcColorFactor then GL_ONE_MINUS_SRC_COLOR
-      when SrcAlphaFactor then GL_SRC_ALPHA
-      when OneMinusSrcAlphaFactor then GL_ONE_MINUS_SRC_ALPHA
-      when DstAlphaFactor then GL_DST_ALPHA
-      when OneMinusDstAlphaFactor then GL_ONE_MINUS_DST_ALPHA
-
-      when DstColorFactor then GL_DST_COLOR
-      when OneMinusDstColorFactor then GL_ONE_MINUS_DST_COLOR
-      when SrcAlphaSaturateFactor then GL_SRC_ALPHA_SATURATE
-      else 0
       end
     end
 
