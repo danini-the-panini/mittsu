@@ -1,9 +1,8 @@
 require 'securerandom'
 require 'mittsu'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Geometry < HashObject
+  class Geometry
     include EventDispatcher
 
     MorphNormal = Struct.new(:face_normals, :vertex_normals)
