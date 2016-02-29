@@ -254,11 +254,7 @@ module Mittsu
     def render_buffer(camera, lights, fog, material, geometry_group, object)
       return unless material.visible
 
-      # TODO: place to put this ???
-      vertex_array = geometry_group.vertex_array_object
-      if vertex_array
-        glBindVertexArray(vertex_array)
-      end
+      geometry_group.bind_vertex_array_object
 
       update_object(object)
 
@@ -279,75 +275,31 @@ module Mittsu
 
       # vertices
       if !material.morph_targets && attributes['position'] && attributes['position'] >= 0
-        if update_buffers
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.vertex_buffer)
-
-          @state.enable_attribute(attributes['position'])
-
-          glVertexAttribPointer(attributes['position'], 3, GL_FLOAT, GL_FALSE, 0, 0)
-        end
+        geometry_group.update_vertex_buffer(attributes['position']) if update_buffers
       elsif object.morph_target_base
         setup_morph_targets(material, geometry_group, object)
       end
 
       if update_buffers
-        # custom attributes
-
-        # use the per-geometry_group custom attribute arrays which are setup in init_mesh_buffers
-
-        if geometry_group.custom_attributes_list
-          geometry_group.custom_attributes_list.each do |attribute|
-            if attributes[attribute.buffer.belongs_to_attribute] >= 0
-              glBindBuffer(GL_ARRAY_BUFFER, attribute.buffer)
-
-              @state.enable_attribute(attributes[attribute.buffer.belongs_to_attribute])
-
-              glVertexAttribPointer(attributes[attribute.buffer.belongs_to_attribute], attribute.size, GL_FLOAT, GL_FALSE, 0, 0)
-            end
-          end
-        end
-
-        # colors
+        geometry_group.update_custom_attributes(attributes)
 
         if attributes['color'] && attributes['color'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.color_buffer)
-
-          @state.enable_attribute(attributes['color'])
-
-          glVertexAttribPointer(attributes['color'], 3, GL_FLOAT, GL_FALSE, 0, 0)
+          geometry_group.update_color_buffer(attributes['color'])
         elsif !material.default_attribute_values.nil?
           glVertexAttrib3fv(attributes['color'], material.default_attribute_values.color)
         end
 
-        # normals
-
         if attributes['normal'] && attributes['normal'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.normal_buffer)
-
-          @state.enable_attribute(attributes['normal'])
-
-          glVertexAttribPointer(attributes['normal'], 3, GL_FLOAT, GL_FALSE, 0, 0)
+          geometry_group.update_normal_buffer(attributes['normal'])
         end
-
-        # tangents
 
         if attributes['tangent'] && attributes['tangent'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.tangent_buffer)
-
-          @state.enable_attribute(attributes['tangent'])
-
-          glVertexAttribPointer(attributes['tangent'], 4, GL_FLOAT, GL_FALSE, 0, 0)
+          geometry_group.update_tangent_buffer(attributes['tangent'])
         end
-
-        # uvs
 
         if attributes['uv'] && attributes['uv'] >= 0
           if object.geometry.face_vertex_uvs[0]
-            glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv_buffer)
-
-            @state.enable_attribute(attributes['uv'])
-
-            glVertexAttribPointer(attributes['uv'], 2, GL_FLOAT, GL_FALSE, 0, 0)
+            geometry_group.update_uv_buffer(attributes['uv'])
           elsif !material.default_attribute_values.nil?
             glVertexAttrib2fv(attributes['uv'], material.default_attribute_values.uv)
           end
@@ -355,38 +307,18 @@ module Mittsu
 
         if attributes['uv2'] && attributes['uv2'] >= 0
           if object.geometry.face_vertex_uvs[1]
-            glBindBuffer(GL_ARRAY_BUFFER, geometry_group.uv2_buffer)
-
-            @state.enable_attribute(attributes['uv2'])
-
-            glVertexAttribPointer(attributes['uv2'], 2, GL_FLOAT, GL_FALSE, 0, 0)
+            geometry_group.update_uv2_buffer(attributes['uv2'])
           elsif !material.default_attribute_values.nil?
             glVertexAttrib2fv(attributes['uv2'], material.default_attribute_values.uv2)
           end
         end
 
         if material.skinning && attributes['skin_index'] && attributes['skin_weight'] && attributes['skin_index'] >= 0 && attributes['skin_weight'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_indices_buffer)
-
-          @state.enable_attribute(attributes['skin_index'])
-
-          glVertexAttribPointer(attributes['skin_index'], 4, GL_FLOAT, GL_FALSE, 0, 0)
-
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.skin_weight_buffer)
-
-          @state.enable_attribute(attributes['skin_weight'])
-
-          glVertexAttribPointer(attributes['skin_weight'], 4, GL_FLOAT, GL_FALSE, 0, 0)
+          geometry_group.update_skin_buffers(attributes['skin_index'], attributes['skin_weight'])
         end
 
-        # line distances
-
         if attributes['line_distances'] && attributes['line_distances'] >= 0
-          glBindBuffer(GL_ARRAY_BUFFER, geometry_group.line_distance_buffer)
-
-          @state.enable_attribute(attributes['line_distance'])
-
-          glVertexAttribPointer(attributes['line_distance'], 1, GL_FLOAT, GL_FALSE, 0, 0)
+          geometry_group.update_line_distances_buffer(attributes['line_distances'])
         end
       end
 
