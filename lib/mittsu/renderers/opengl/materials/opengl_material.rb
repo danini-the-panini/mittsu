@@ -11,6 +11,7 @@ module Mittsu
       # PointCloudMaterial => :particle_basic # TODO...
     }
 
+    attr_accessor :shadow_pass
     attr_reader :shader, :uniforms_list
 
     def initialize(material, renderer)

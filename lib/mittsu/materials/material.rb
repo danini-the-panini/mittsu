@@ -1,9 +1,8 @@
 require 'securerandom'
 require 'mittsu'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Material < HashObject
+  class Material
     include EventDispatcher
 
     attr_reader :id, :uuid, :type

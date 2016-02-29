@@ -886,7 +886,7 @@ module Mittsu
         #   m_uniforms.opactity.value = material.opacity
         end
 
-        if object.receive_shadow && !material[:_shadow_pass]
+        if object.receive_shadow && !material_impl.shadow_pass
           OpenGLHelper.refresh_uniforms_shadow(m_uniforms, lights)
         end
 
