@@ -175,27 +175,28 @@ module Mittsu
       end
 
       def refresh_uniforms_lights(uniforms, lights)
-        uniforms['ambientLightColor'].value = lights[:ambient]
 
-        uniforms['directionalLightColor'].value = lights[:directional][:colors]
-        uniforms['directionalLightDirection'].value = lights[:directional][:positions]
+        uniforms['ambientLightColor'].value = lights[:ambient].value
 
-        uniforms['pointLightColor'].value = lights[:point][:colors]
-        uniforms['pointLightPosition'].value = lights[:point][:positions]
-        uniforms['pointLightDistance'].value = lights[:point][:distances]
-        uniforms['pointLightDecay'].value = lights[:point][:decays]
+        uniforms['directionalLightColor'].value = lights[:directional].colors
+        uniforms['directionalLightDirection'].value = lights[:directional].positions
 
-        uniforms['spotLightColor'].value = lights[:spot][:colors]
-        uniforms['spotLightPosition'].value = lights[:spot][:positions]
-        uniforms['spotLightDistance'].value = lights[:spot][:distances]
-        uniforms['spotLightDirection'].value = lights[:spot][:directions]
-        uniforms['spotLightAngleCos'].value = lights[:spot][:angles_cos]
-        uniforms['spotLightExponent'].value = lights[:spot][:exponents]
-        uniforms['spotLightDecay'].value = lights[:spot][:decays]
+        uniforms['pointLightColor'].value = lights[:point].colors
+        uniforms['pointLightPosition'].value = lights[:point].positions
+        uniforms['pointLightDistance'].value = lights[:point].distances
+        uniforms['pointLightDecay'].value = lights[:point].decays
 
-        uniforms['hemisphereLightSkyColor'].value = lights[:hemi][:sky_colors]
-        uniforms['hemisphereLightGroundColor'].value = lights[:hemi][:ground_colors]
-        uniforms['hemisphereLightDirection'].value = lights[:hemi][:positions]
+        uniforms['spotLightColor'].value = lights[:spot].colors
+        uniforms['spotLightPosition'].value = lights[:spot].positions
+        uniforms['spotLightDistance'].value = lights[:spot].distances
+        uniforms['spotLightDirection'].value = lights[:spot].directions
+        uniforms['spotLightAngleCos'].value = lights[:spot].angles_cos
+        uniforms['spotLightExponent'].value = lights[:spot].exponents
+        uniforms['spotLightDecay'].value = lights[:spot].decays
+
+        uniforms['hemisphereLightSkyColor'].value = lights[:hemi].sky_colors
+        uniforms['hemisphereLightGroundColor'].value = lights[:hemi].ground_colors
+        uniforms['hemisphereLightDirection'].value = lights[:hemi].positions
       end
 
       def refresh_uniforms_lambert(uniforms, material)

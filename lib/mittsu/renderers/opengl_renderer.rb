@@ -6,22 +6,16 @@ OpenGL.load_lib
 
 require 'mittsu'
 require 'mittsu/renderers/glfw_window'
+require 'mittsu/renderers/opengl/opengl_implementations'
 require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_helper'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/opengl_geometry_group'
-require 'mittsu/renderers/opengl/core/opengl_geometry'
-require 'mittsu/renderers/opengl/core/opengl_object_3d'
-require 'mittsu/renderers/opengl/objects/opengl_mesh'
-require 'mittsu/renderers/opengl/objects/opengl_line'
-require 'mittsu/renderers/opengl/materials/opengl_material'
-require 'mittsu/renderers/opengl/textures/opengl_texture'
-require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
+require 'mittsu/renderers/opengl/opengl_light_renderer'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
-require 'mittsu/renderers/opengl/opengl_implementations'
 
 include ENV['DEBUG'] ? OpenGLDebug : OpenGL
 include Mittsu::OpenGLHelper
@@ -30,7 +24,7 @@ module Mittsu
   class OpenGLRenderer
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
 
-    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs
+    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs, :light_renderer
 
     def initialize(parameters = {})
       puts "OpenGLRenderer (Revision #{REVISION})"
@@ -48,7 +42,8 @@ module Mittsu
       init_info
       init_state_cache
       init_camera_matrix_cache
-      init_light_arrays_cache
+
+      @light_renderer = OpenGLLightRenderer.new(self)
 
       create_window
 
@@ -170,7 +165,7 @@ module Mittsu
       @_current_geometry_program = ''
       @_current_material_id = -1
 
-      @_lights_need_update = true
+      @light_renderer.reset
 
       @state.reset
     end
@@ -851,14 +846,13 @@ module Mittsu
         end
 
         if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
-          if @_lights_need_update
+          if @light_renderer.lights_need_update
             refresh_lights = true
-            setup_lights(lights)
-            @_lights_need_update = false
+            @light_renderer.setup(lights)
           end
 
           if refresh_lights
-            OpenGLHelper.refresh_uniforms_lights(m_uniforms, @_lights)
+            OpenGLHelper.refresh_uniforms_lights(m_uniforms, @light_renderer.cache)
             OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, true)
           else
             OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, false)
@@ -1087,194 +1081,6 @@ module Mittsu
       end
     end
 
-    # FIXME: REFACTOR
-    def setup_lights(lights)
-      r, g, b = 0.0, 0.0, 0.0
-
-      zlights = @_lights
-
-      dir_colors = zlights[:directional][:colors]
-      dir_positions = zlights[:directional][:positions]
-
-      point_colors = zlights[:point][:colors]
-      point_positions = zlights[:point][:positions]
-      point_distances = zlights[:point][:distances]
-      point_decays = zlights[:point][:decays]
-
-      spot_colors = zlights[:spot][:colors]
-      spot_positions = zlights[:spot][:positions]
-      spot_distances = zlights[:spot][:distances]
-      spot_directions = zlights[:spot][:directions]
-      spot_angles_cos = zlights[:spot][:angles_cos]
-      spot_exponents = zlights[:spot][:exponents]
-      spot_decays = zlights[:spot][:decays]
-
-      hemi_sky_colors = zlights[:hemi][:sky_colors]
-      hemi_ground_colors = zlights[:hemi][:ground_colors]
-      hemi_positions = zlights[:hemi][:positions]
-
-      dir_length = 0
-      point_length = 0
-      spot_length = 0
-      hemi_length = 0
-
-      dir_count = 0
-      point_count = 0
-      spot_count = 0
-      hemi_count = 0
-
-      dir_offset = 0
-      point_offset = 0
-      spot_offset = 0
-      hemi_offset = 0
-
-      lights.each do |light|
-
-        next if light.only_shadow
-
-        color = light.color
-        intensity = light.intensity
-        distance = light.distance
-
-        if light.is_a? AmbientLight
-
-          next unless light.visible
-
-          r += color.r
-          g += color.g
-          b += color.b
-
-        elsif light.is_a? DirectionalLight
-
-          dir_count += 1
-
-          next unless light.visible
-
-          @_direction.set_from_matrix_position(light.matrix_world)
-          @_vector3.set_from_matrix_position(light.target.matrix_world)
-          @_direction.sub(@_vector3)
-          @_direction.normalize
-
-          dir_offset = dir_length * 3
-
-          dir_positions[dir_offset]     = @_direction.x
-          dir_positions[dir_offset + 1] = @_direction.y
-          dir_positions[dir_offset + 2] = @_direction.z
-
-          OpenGLHelper.set_color_linear(dir_colors, dir_offset, color, intensity)
-
-          dir_length += 1
-
-        elsif light.is_a? PointLight
-
-          point_count += 1
-
-          next unless light.visible
-
-          point_offset = point_length * 3;
-
-          OpenGLHelper.set_color_linear(point_colors, point_offset, color, intensity)
-
-          @_vector3.set_from_matrix_position(light.matrix_world)
-
-          point_positions[point_offset]     = @_vector3.x
-          point_positions[point_offset + 1] = @_vector3.y
-          point_positions[point_offset + 2] = @_vector3.z
-
-          # distance is 0 if decay is 0, because there is no attenuation at all.
-          point_distances[point_length] = distance
-          point_decays[point_length] = light.distance.zero? ? 0.0 : light.decay
-
-          point_length += 1
-
-        elsif light.is_a? SpotLight
-
-          spot_count += 1
-
-          next unless light.visible
-
-          spot_offset = spot_length * 3
-
-          OpenGLHelper.set_color_linear(spot_colors, spot_offset, color, intensity)
-
-          @_direction.set_from_matrix_position(light.matrix_world)
-
-          spot_positions[spot_offset]     = @_direction.x
-          spot_positions[spot_offset + 1] = @_direction.y
-          spot_positions[spot_offset + 2] = @_direction.z
-
-          spot_distances[spot_length] = distance
-
-          @_vector3.set_from_matrix_position(light.target.matrix_world)
-          @_direction.sub(@_vector3)
-          @_direction.normalize
-
-          spot_directions[spot_offset]     = @_direction.x
-          spot_directions[spot_offset + 1] = @_direction.y
-          spot_directions[spot_offset + 2] = @_direction.z
-
-          spot_angles_cos[spot_length] = Math.cos(light.angle)
-          spot_exponents[spot_length] = light.exponent;
-          spot_decays[spot_length] = light.distance.zero? ? 0.0 : light.decay
-
-          spot_length += 1;
-
-        elsif light.is_a? HemisphereLight
-
-          hemi_count += 1
-
-          next unless light.visible
-
-          @_direction.set_from_matrix_position(light.matrix_world)
-          @_direction.normalize
-
-          hemi_offset = hemi_length * 3
-
-          hemi_positions[hemi_offset]     = @_direction.x
-          hemi_positions[hemi_offset + 1] = @_direction.y
-          hemi_positions[hemi_offset + 2] = @_direction.z
-
-          sky_color = light.color
-          ground_color = light.ground_color
-
-          OpenGLHelper.set_color_linear(hemi_sky_colors, hemi_offset, sky_color, intensity )
-          OpenGLHelper.set_color_linear(hemi_ground_colors, hemi_offset, ground_color, intensity)
-
-          hemi_length += 1
-
-        end
-
-      end
-
-      # null eventual remains from removed lights
-      # (this is to avoid if in shader)
-
-      (dir_length * 3).upto([dir_colors.length, dir_count * 3].max - 1).each { |i|
-        dir_colors[i] = 0.0
-      }
-      (point_length * 3).upto([point_colors.length, point_count * 3].max - 1).each { |i|
-        point_colors[i] = 0.0
-      }
-      (spot_length * 3).upto([spot_colors.length, spot_count * 3].max - 1).each { |i|
-        spot_colors[i] = 0.0
-      }
-      (hemi_length * 3).upto([hemi_ground_colors.length, hemi_count * 3].max - 1).each { |i|
-        hemi_ground_colors[i] = 0.0
-      }
-      (hemi_length * 3).upto([hemi_sky_colors.length, hemi_count * 3].max - 1).each { |i|
-        hemi_sky_colors[i] = 0.0
-      }
-
-      zlights[:directional][:length] = dir_length
-      zlights[:point][:length] = point_length
-      zlights[:spot][:length] = spot_length
-      zlights[:hemi][:length] = hemi_length
-
-      zlights[:ambient][0] = r
-      zlights[:ambient][1] = g
-      zlights[:ambient][2] = b
-    end
-
     def get_texture_unit
       texture_unit = @_used_texture_units
 
@@ -1296,7 +1102,7 @@ module Mittsu
       @_current_geometry_program = ''
       @_current_material_id = -1
       @_current_camera = nil
-      @_lights_need_update = true
+      @light_renderer.reset
     end
 
     def reset_objects_cache
@@ -1478,19 +1284,6 @@ module Mittsu
       @_frustum = Frustum.new
       @_proj_screen_matrix = Matrix4.new
       @_vector3 = Vector3.new
-    end
-
-    def init_light_arrays_cache
-      @_direction = Vector3.new
-      @_lights_need_update = true
-      # TODO: re-imagine this thing as a bunch of classes...
-      @_lights = {
-        ambient: [0, 0, 0],
-        directional: { length: 0, colors: [], positions: [] },
-        point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
-        spot: { length: 0, colors: [], positions: [], distances: [], directions: [], angles_cos: [], exponents: [], decays: [] },
-        hemi: { length: 0, sky_colors: [], ground_colors: [], positions: []}
-      }
     end
 
     def fetch_parameters(parameters)

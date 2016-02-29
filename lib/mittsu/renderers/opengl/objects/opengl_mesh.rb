@@ -3,7 +3,6 @@ module Mittsu
     def initialize(mesh, renderer)
       super
       @mesh = mesh
-      @renderer = renderer
     end
 
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
