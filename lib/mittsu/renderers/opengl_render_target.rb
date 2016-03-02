@@ -146,6 +146,11 @@ module Mittsu
       glBindFramebuffer(GL_FRAMEBUFFER, 0)
     end
 
+    def use
+      glBindFramebuffer(GL_FRAMEBUFFER, @framebuffer)
+      glViewport(0, 0, @width, @height)
+    end
+
     def dispose
       dispatch_event(type: :dispose)
     end

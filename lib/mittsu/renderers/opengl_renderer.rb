@@ -13,6 +13,7 @@ require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/opengl_geometry_group'
 require 'mittsu/renderers/opengl/opengl_light_renderer'
+require 'mittsu/renderers/opengl/opengl_default_target'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
@@ -94,13 +95,12 @@ module Mittsu
     end
 
     def set_viewport(x, y, width, height)
-      @_viewport_x = x * pixel_ratio
-      @_viewport_x = y * pixel_ratio
-
-      @_viewport_width = width * pixel_ratio
-      @_viewport_height = height * pixel_ratio
-
-      glViewport(@_viewport_x, @_viewport_y, @_viewport_width, @_viewport_height)
+      default_target.set_and_use_viewport(
+        x * pixel_ratio,
+        y * pixel_ratio,
+        width * pixel_ratio,
+        height * pixel_ratio
+      )
     end
 
     def set_scissor(x, y, width, height)
@@ -172,48 +172,22 @@ module Mittsu
       @state.reset
     end
 
-    # FIXME: REFACTOR
-    def set_render_target(render_target = nil)
+    def set_render_target(render_target = default_target)
       # TODO: when OpenGLRenderTargetCube exists
-      is_cube = false # render_target.is_a? OpenGLRenderTargetCube
+      # is_cube = render_target.is_a? OpenGLRenderTargetCube
 
-      if render_target
-        render_target_impl = render_target.implementation(self)
-        render_target_impl.setup_buffers
+      render_target_impl = render_target.implementation(self)
 
-        if is_cube
-          # TODO
-        else
-          framebuffer = render_target_impl.framebuffer
-        end
+      # TODO framebuffer logic for render target cube
+      render_target_impl.setup_buffers
 
-        width = render_target.width
-        height = render_target.height
-
-        vx = 0
-        vy = 0
-      else
-        framebuffer = nil
-
-        width = @_viewport_width
-        height = @_viewport_height
-
-        vx = @_viewport_x
-        vy = @_viewport_y
+      if render_target != @_current_render_target
+        render_target.use
+        @_current_render_target = render_target
       end
-
-      if framebuffer != @_current_framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer || 0)
-        glViewport(vx, vy, width, height)
-
-        @_current_framebuffer = framebuffer
-      end
-
-      @_current_width = width
-      @_current_height = height
     end
 
-    def render(scene, camera, render_target = nil, force_clear = false)
+    def render(scene, camera, render_target = default_target, force_clear = false)
       raise "ERROR: Mittsu::OpenGLRenderer#render: camera is not an instance of Mittsu::Camera" unless camera.is_a?(Camera)
 
       reset_cache_for_this_frame
@@ -237,7 +211,7 @@ module Mittsu
 
       render_custom_plugins_post_pass(scene, camera)
 
-      render_target.implementation(self).update_mipmap if render_target
+      render_target.implementation(self).update_mipmap
 
       ensure_depth_buffer_writing
     end
@@ -373,7 +347,7 @@ module Mittsu
       glBlendEquation(GL_FUNC_ADD)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-      glViewport(@_viewport_x, @_viewport_y, @_viewport_width, @_viewport_height)
+      default_target.use_viewport
 
       clear_color(@_clear_color.r, @_clear_color.g, @_clear_color.b, @_clear_alpha)
     end
@@ -1004,7 +978,7 @@ module Mittsu
     def render_custom_plugins_post_pass(scene, camera)
       # TODO: when these custom plugins are implemented
       # @sprite_plugin.render(scene, camera)
-      # lens_flare_plugin.render(scene, camera, @_current_width, @_current_height)
+      # lens_flare_plugin.render(scene, camera, @_current_render_target.width, @_current_render_target.height)
     end
 
     def update_skeleton_objects(scene)
@@ -1082,16 +1056,12 @@ module Mittsu
 
     def init_state_cache
       @_current_program = nil
-      @_current_framebuffer = nil
+      @_current_render_target = default_target
       @_current_material_id = -1
       @_current_geometry_program = ''
       @_current_camera = nil
 
       @_used_texture_units = 0
-      @_viewport_x = 0
-      @_viewport_y = 0
-      @_current_width = 0
-      @_current_height = 0
     end
 
     def init_camera_matrix_cache
@@ -1145,7 +1115,7 @@ module Mittsu
 
         @window = GLFW::Window.new(@width, @height, @title)
 
-        @_viewport_width, @_viewport_height = *(@window.framebuffer_size)
+        default_target.set_viewport_size(*(@window.framebuffer_size))
 
         # TODO: handle losing opengl context??
       rescue => error
@@ -1163,6 +1133,10 @@ module Mittsu
       else
         false
       end
+    end
+
+    def default_target
+      @_defualt_target ||= OpenGLDefaultTarget.new(self)
     end
   end
 end
