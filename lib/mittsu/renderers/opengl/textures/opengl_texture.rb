@@ -32,56 +32,13 @@ module Mittsu
       # glPixelStorei(GL_UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiply_alpha) ???
       glPixelStorei(GL_UNPACK_ALIGNMENT, @texture.unpack_alignment)
 
-      @texture.image = @renderer.clamp_to_max_size(@texture.image)
+      image = @texture.image = @renderer.clamp_to_max_size(@texture.image)
 
-      image = @texture.image
       is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-      gl_format = GL_MITTSU_PARAMS[@texture.format]
-      gl_type = GL_MITTSU_PARAMS[@texture.type]
 
       set_parameters(GL_TEXTURE_2D, is_image_power_of_two)
 
-      mipmaps = @texture.mipmaps
-
-      if @texture.is_a?(DataTexture)
-        # use manually created mipmaps if available
-        # if there are no manual mipmaps
-        # set 0 level mipmap and then use GL to generate other mipmap levels
-
-        if !mipmaps.empty? && is_image_power_of_two
-          mipmaps.each_with_index do |mipmap, i|
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-        else
-          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, image.width, image.height, 0, gl_format, gl_type, image.data)
-        end
-      elsif @texture.is_a?(CompressedTexture)
-        mipmaps.each_with_index do |mipmap, i|
-          if @texture.format != RGBAFormat && @texture.format != RGBFormat
-            if @renderer.compressed_texture_formats.include?(gl_format)
-              glCompressedTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, mipmap.data)
-            else
-              puts 'WARNING: Mittsu::OpenGLTexture: Attempt to load unsupported compressed texture format in #update_texture'
-            end
-          else
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-        end
-      else # regular texture (image, video, canvas)
-        # use manually created mipmaps if available
-        # if there are no manual mipmaps
-        # set 0 level mipmap and then use GL to generate other mipmap levels
-
-        if !mipmaps.empty? && is_image_power_of_two
-          mipmaps.each_with_index do |mipmap, i|
-            glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
-          end
-
-          @texture.generate_mipmaps = false
-        else
-          glTexImage2D(GL_TEXTURE_2D, 0, gl_format, @texture.image.width, @texture.image.height, 0, gl_format, gl_type, @texture.image.data)
-        end
-      end
+      update_specific
 
       if @texture.generate_mipmaps && is_image_power_of_two
         glGenerateMipmap(GL_TEXTURE_2D)
@@ -128,5 +85,27 @@ module Mittsu
 
       GL_LINEAR
   	end
+
+    def update_specific
+      gl_format = GL_MITTSU_PARAMS[@texture.format]
+      gl_type = GL_MITTSU_PARAMS[@texture.type]
+      mipmaps = @texture.mipmaps
+      image = @texture.image
+      is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
+
+      # use manually created mipmaps if available
+      # if there are no manual mipmaps
+      # set 0 level mipmap and then use GL to generate other mipmap levels
+
+      if !mipmaps.empty? && is_image_power_of_two
+        mipmaps.each_with_index do |mipmap, i|
+          glTexImage2D(GL_TEXTURE_2D, i, gl_format, mipmap.width, mipmap.height, 0, gl_format, gl_type, mipmap.data)
+        end
+
+        @texture.generate_mipmaps = false
+      else
+        glTexImage2D(GL_TEXTURE_2D, 0, gl_format, @texture.image.width, @texture.image.height, 0, gl_format, gl_type, @texture.image.data)
+      end
+    end
   end
 end

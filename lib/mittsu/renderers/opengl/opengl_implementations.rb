@@ -11,6 +11,8 @@ require 'mittsu/renderers/opengl/objects/opengl_line'
 require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/textures/opengl_texture'
 require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
+require 'mittsu/renderers/opengl/textures/opengl_data_texture'
+require 'mittsu/renderers/opengl/textures/opengl_compressed_texture'
 require 'mittsu/renderers/opengl/lights/opengl_light'
 require 'mittsu/renderers/opengl/lights/opengl_light'
 require 'mittsu/renderers/opengl/lights/opengl_spot_light'
@@ -34,6 +36,8 @@ module Mittsu
     HemisphereLight => OpenGLHemisphereLight,
     AmbientLight => OpenGLAmbientLight,
     DirectionalLight => OpenGLDirectionalLight,
+    DataTexture => OpenGLDataTexture,
+    CompressedTexture => OpenGLCompressedTexture
   }
   OPENGL_IMPLEMENTATIONS.default_proc = -> (hash, key) {
     super_klass = key.ancestors.find { |a| hash.has_key?(a) }
