@@ -1,5 +1,6 @@
 module Mittsu
   class OpenGLObject3D
+    attr_accessor :morph_target_influences
     attr_reader :model_view_matrix
     attr_writer :active
 
@@ -71,7 +72,7 @@ module Mittsu
           # TODO!!! FIXME!!!
           @renderer.send(:unroll_buffer_material, opengl_object)
 
-          opengl_object[:render] = true
+          opengl_object.render = true
           if @renderer.sort_objects?
             @_vector3.set_from_matrix_position(@object.matrix_world)
             @_vector3.apply_projection(@renderer.proj_screen_matrix)

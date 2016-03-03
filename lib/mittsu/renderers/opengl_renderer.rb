@@ -14,6 +14,7 @@ require 'mittsu/renderers/opengl/opengl_state'
 require 'mittsu/renderers/opengl/opengl_geometry_group'
 require 'mittsu/renderers/opengl/opengl_light_renderer'
 require 'mittsu/renderers/opengl/opengl_default_target'
+require 'mittsu/renderers/opengl/opengl_buffer'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
@@ -363,8 +364,8 @@ module Mittsu
     def render_objects(render_list, camera, lights, fog, override_material)
       material = nil
       render_list.each do |opengl_object|
-        object = opengl_object[:object]
-        buffer = opengl_object[:buffer]
+        object = opengl_object.object
+        buffer = opengl_object.buffer
 
         object.implementation(self).setup_matrices(camera)
 
@@ -372,7 +373,7 @@ module Mittsu
           material = override_material
           material_impl = material.implementation(self)
         else
-          material = opengl_object[:material]
+          material = opengl_object.material
           next unless material
           material_impl = material.implementation(self)
           material_impl.set
@@ -391,12 +392,16 @@ module Mittsu
     def render_objects_immediate(render_list, material_type, camera, lights, fog, override_material)
       material = nil
       render_list.each do |opengl_object|
-        object = opengl_object[:object]
+        object = opengl_object.object
         if object.visible
           if override_material
             material = override_material
           else
-            material = opengl_object[material_type]
+            material = case material_type
+            when :transparent then opengl_object.transparent
+            when :opaque then opengl_object.opaque
+            else nil
+            end
             next unless material
             material_impl = material.implementation(self)
             material_impl.set
@@ -408,31 +413,27 @@ module Mittsu
 
     def add_buffer(objlist, buffer, object)
       id = object.id
-      (objlist[id] ||= []) << {
-        id: id,
-        buffer: buffer,
-        object: object,
-        material: nil,
-        z: 0
-      }
+      (objlist[id] ||= []) << OpenGLBuffer.new(
+        buffer, object, nil, 0
+      )
     end
 
     def unroll_immediate_buffer_material(opengl_object)
-  		object = opengl_object[:object]
+  		object = opengl_object.object
   		material = object.material
 
   		if material.transparent
-  			opengl_object[:transparent]
-  			opengl_object[:opaque] = nil
+  			opengl_object.transparent
+  			opengl_object.opaque = nil
   		else
-  			opengl_object[:opaque] = material
-  			opengl_object[:transparent] = nil
+  			opengl_object.opaque = material
+  			opengl_object.transparent = nil
   		end
     end
 
     def unroll_buffer_material(opengl_object)
-      object = opengl_object[:object]
-      buffer = opengl_object[:buffer]
+      object = opengl_object.object
+      buffer = opengl_object.buffer
 
       geometry = object.geometry
       material = object.material
@@ -443,7 +444,7 @@ module Mittsu
           material = material.materials[material_index]
         end
 
-        opengl_object[:material] = material
+        opengl_object.material = material
 
         if material.transparent
           @transparent_objects << opengl_object
@@ -510,6 +511,7 @@ module Mittsu
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
       material_impl = material.implementation(self)
+      object_impl = object.implementation(self)
 
       if material.needs_update?
         deallocate_material(material) if material.program
@@ -519,8 +521,8 @@ module Mittsu
       end
 
       if material.morph_targets
-        if !object[:_opengl_morph_target_influences]
-          object[:_opengl_morph_target_influences] = Array.new(@max_morph_targets) # Float32Array
+        if !object_impl.morph_target_influences
+          object_impl.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
         end
       end
 
@@ -897,7 +899,7 @@ module Mittsu
 
     def set_matrices_for_immediate_objects(camera)
       @_opengl_objects_immediate.each do |opengl_object|
-        object = opengl_object[:object]
+        object = opengl_object.object
 
         if object.visible
           object.implementation(self).setup_matrices(camera)

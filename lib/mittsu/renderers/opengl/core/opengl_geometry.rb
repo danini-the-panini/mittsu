@@ -43,7 +43,7 @@ module Mittsu
           @geometry.tangents_need_update = true
           @geometry.colors_need_update = true
 
-          @renderer.info[:memory][:geometries] += 1
+  				add_buffers = true
         else
           add_buffers = false
         end
