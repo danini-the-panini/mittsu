@@ -585,7 +585,7 @@ module Mittsu
           glUniformMatrix4fv(p_uniforms.bind_matrix_inverse, GL_FALSE, object.bind_matrix_inverse.elements)
         end
 
-        if _supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
+        if @_supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
           if !p_uniforms.bone_texture.nil?
             texture_unit = get_texture_unit
 
@@ -619,38 +619,25 @@ module Mittsu
 
           if refresh_lights
             OpenGLHelper.refresh_uniforms_lights(m_uniforms, @light_renderer.cache)
-            OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, true)
-          else
-            OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, false)
           end
+
+          OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, refresh_lights)
         end
 
-        if material.is_a?(MeshBasicMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshPhongMaterial)
-          OpenGLHelper.refresh_uniforms_common(m_uniforms, material)
-        end
-
-        # refresh single material specific uniforms
+        material_impl.refresh_uniforms(m_uniforms)
 
         # TODO: when all of these things exist
-        case material
-        when LineBasicMaterial
-          OpenGLHelper.refresh_uniforms_line(m_uniforms, material)
         # when LineDashedMaterial
         #   refresh_uniforms_line(m_uniforms, material)
         #   refresh_uniforms_dash(m_uniforms, material)
         # when PointCloudMaterial
         #   refresh_uniforms_particle(m_uniforms, material)
-        when MeshPhongMaterial
-          OpenGLHelper.refresh_uniforms_phong(m_uniforms, material)
-        when MeshLambertMaterial
-          OpenGLHelper.refresh_uniforms_lambert(m_uniforms, material)
         # when MeshDepthMaterial
         #   m_uniforms.m_near.value = camera.near
         #   m_uniforms.m_far.value = camera.far
         #   m_uniforms.opacity.value = material.opacity
         # when MeshNormalMaterial
         #   m_uniforms.opactity.value = material.opacity
-        end
 
         if object.receive_shadow && !material_impl.shadow_pass
           OpenGLHelper.refresh_uniforms_shadow(m_uniforms, lights)

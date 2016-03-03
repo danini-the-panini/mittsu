@@ -195,7 +195,7 @@ module Mittsu
     end
 
     def needs_face_normals?
-      !@material.is_a?(MeshPhongMaterial) && @material.shading == FlatShading
+      @material.shading == FlatShading
     end
 
     def clear_custom_attributes
@@ -209,6 +209,10 @@ module Mittsu
         return true if attribute.needs_update
       end
       false
+    end
+
+    def refresh_uniforms(_)
+      # NOOP
     end
 
     private
