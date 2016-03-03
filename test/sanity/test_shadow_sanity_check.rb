@@ -17,12 +17,12 @@ class TestShadowSanityCheck < Minitest::Test
     floor.receive_shadow = true
     scene.add(floor)
 
-    NB = 15
-    NR = 5
-    balls = NB.times.map do |index|
-      NR.times.map do |r|
+    nb = 15
+    nr = 5
+    balls = nb.times.map do |index|
+      nr.times.map do |r|
         ring = (3 + r)
-        i = r * 0.1 + (index.to_f / NB.to_f) * Math::PI * 2
+        i = r * 0.1 + (index.to_f / nb.to_f) * Math::PI * 2
         Mittsu::Mesh.new(
           Mittsu::SphereGeometry.new(0.5, 16, 16),
           Mittsu::MeshLambertMaterial.new(color: r.even? ? 0x00ffff : 0xff00ff)
