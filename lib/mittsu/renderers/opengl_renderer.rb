@@ -27,7 +27,7 @@ module Mittsu
   class OpenGLRenderer
     attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
 
-    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs, :light_renderer
+    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs, :light_renderer, :proj_screen_matrix
 
     def initialize(parameters = {})
       puts "OpenGLRenderer (Revision #{REVISION})"
@@ -116,6 +116,14 @@ module Mittsu
       enable ? glEnable(GL_SCISSOR_TEST) : glDisable(GL_SCISSOR_TEST)
     end
 
+    def object_in_frustum?(object)
+      @_frustum.intersects_object?(object)
+    end
+
+    def sort_objects?
+      @sort_objects
+    end
+
     # clearing
 
     def get_clear_color
@@ -198,7 +206,7 @@ module Mittsu
       update_skeleton_objects(scene)
 
       update_screen_projection(camera)
-      project_object(scene)
+      scene.implementation(self).project
       sort_objects_for_render if @sort_objects
 
       render_custom_plugins_pre_pass(scene, camera)
@@ -350,41 +358,6 @@ module Mittsu
       default_target.use_viewport
 
       clear_color(@_clear_color.r, @_clear_color.g, @_clear_color.b, @_clear_alpha)
-    end
-
-    # FIXME: move to OpenGLObject ?
-    def project_object(object)
-      return unless object.visible
-      if object.is_a?(Scene) || object.is_a?(Group)
-        # skip
-      else
-        object.implementation(self).init
-        if object.is_a? Light
-          @lights << object
-        # if object.is_a? Sprite # TODO
-        #   @sprites << object
-        # if object.is_a? LensFlare # TODO
-        #   @lens_flares << object
-        else
-          opengl_objects = @_opengl_objects[object.id]
-          if opengl_objects && (!object.frustum_culled || @_frustum.intersects_object?(object))
-            opengl_objects.each do |opengl_object|
-              unroll_buffer_material(opengl_object)
-              opengl_object[:render] = true
-              if @sort_objects
-                @_vector3.set_from_matrix_position(object.matrix_world)
-                @_vector3.apply_projection(@_proj_screen_matrix)
-
-                opengl_object[:z] = @_vector3.z
-              end
-            end
-          end
-        end
-      end
-
-      object.children.each do |child|
-        project_object(child)
-      end
     end
 
     def render_objects(render_list, camera, lights, fog, override_material)
@@ -913,8 +886,8 @@ module Mittsu
     def update_screen_projection(camera)
       camera.matrix_world_inverse.inverse(camera.matrix_world)
 
-      @_proj_screen_matrix.multiply_matrices(camera.projection_matrix, camera.matrix_world_inverse)
-      @_frustum.set_from_matrix(@_proj_screen_matrix)
+      @proj_screen_matrix.multiply_matrices(camera.projection_matrix, camera.matrix_world_inverse)
+      @_frustum.set_from_matrix(@proj_screen_matrix)
     end
 
     def sort_objects_for_render
@@ -1066,7 +1039,7 @@ module Mittsu
 
     def init_camera_matrix_cache
       @_frustum = Frustum.new
-      @_proj_screen_matrix = Matrix4.new
+      @proj_screen_matrix = Matrix4.new
       @_vector3 = Vector3.new
     end
 

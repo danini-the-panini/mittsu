@@ -6,6 +6,7 @@ module Mittsu
     def initialize(object, renderer)
       @object = object
       @renderer = renderer
+      @_vector3 = Vector3.new
     end
 
     def active?
@@ -30,7 +31,7 @@ module Mittsu
         if !geometry_impl.initted
           geometry_impl.initted = true
           geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
-          if @object.is_a?(BufferGeometry)
+          if geometry.is_a?(BufferGeometry)
             @renderer.info[:memory][:geometries] += 1
           else
             init_geometry
@@ -56,6 +57,31 @@ module Mittsu
         #   add_buffer_immediate(@renderer.instance_variable_get(:@_opengl_objects_immediate), @object)
         # end
       end
+    end
+
+    def project
+      return unless @object.visible
+      init
+
+      # TODO!!! FIXME!!!
+      opengl_objects = @renderer.instance_variable_get(:@_opengl_objects)[@object.id]
+
+      if opengl_objects && (!@object.frustum_culled || @renderer.object_in_frustum?(@object))
+        opengl_objects.each do |opengl_object|
+          # TODO!!! FIXME!!!
+          @renderer.send(:unroll_buffer_material, opengl_object)
+
+          opengl_object[:render] = true
+          if @renderer.sort_objects?
+            @_vector3.set_from_matrix_position(@object.matrix_world)
+            @_vector3.apply_projection(@renderer.proj_screen_matrix)
+
+            opengl_object[:z] = @_vector3.z
+          end
+        end
+      end
+
+      project_children
     end
 
     def setup_matrices(camera)
@@ -85,10 +111,20 @@ module Mittsu
       end
     end
 
-    # def init_geometry
-    # end
+    def init_geometry
+      # NOOP
+    end
 
     def add_opengl_object
+      # NOOP
+    end
+
+    protected
+
+    def project_children
+      @object.children.each do |child|
+        child.implementation(@renderer).project
+      end
     end
   end
 end

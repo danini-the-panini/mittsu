@@ -25,6 +25,14 @@ module Mittsu
       @cache.length += 1
     end
 
+    def project
+      return unless @light.visible
+      init
+      # TODO!!! FIXME!!!
+      @renderer.instance_variable_get(:@lights) << @light
+      project_children
+    end
+
     def setup_specific
       raise "Unknown Light Impl: #{@light.class} => #{self.class}"
     end

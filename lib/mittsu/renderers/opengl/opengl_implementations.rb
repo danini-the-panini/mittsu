@@ -3,11 +3,14 @@ require 'mittsu/core/object_3d'
 require 'mittsu/objects'
 require 'mittsu/materials'
 require 'mittsu/textures'
+require 'mittsu/scenes'
 
 require 'mittsu/renderers/opengl/core/opengl_geometry'
 require 'mittsu/renderers/opengl/core/opengl_object_3d'
 require 'mittsu/renderers/opengl/objects/opengl_mesh'
 require 'mittsu/renderers/opengl/objects/opengl_line'
+require 'mittsu/renderers/opengl/objects/opengl_group'
+require 'mittsu/renderers/opengl/scenes/opengl_scene'
 require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/textures/opengl_texture'
 require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
@@ -37,7 +40,9 @@ module Mittsu
     AmbientLight => OpenGLAmbientLight,
     DirectionalLight => OpenGLDirectionalLight,
     DataTexture => OpenGLDataTexture,
-    CompressedTexture => OpenGLCompressedTexture
+    CompressedTexture => OpenGLCompressedTexture,
+    Scene => OpenGLScene,
+    Group => OpenGLGroup
   }
   OPENGL_IMPLEMENTATIONS.default_proc = -> (hash, key) {
     super_klass = key.ancestors.find { |a| hash.has_key?(a) }
