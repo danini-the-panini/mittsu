@@ -2,21 +2,23 @@ require 'opengl'
 require 'glfw'
 
 GLFW_LIB_EXT = OpenGL.get_platform == :OPENGL_PLATFORM_MACOSX ? 'dylib' : 'so'
-GLFW_LIB = begin
-  "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp.strip}.#{GLFW_LIB_EXT}"
-rescue
-  "libglfw.#{GLFW_LIB_EXT}"
-end
-GLFW_LIB_PATH = begin
-  s = `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
-  s.empty? ? nil : s
-rescue
-  nil
-end
+if !OpenGL.get_platform == :OPENGL_PLATFORM_TEST
+  GLFW_LIB = begin
+    "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp.strip}.#{GLFW_LIB_EXT}"
+  rescue
+    "libglfw.#{GLFW_LIB_EXT}"
+  end
+  GLFW_LIB_PATH = begin
+    s = `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
+    s.empty? ? nil : s
+  rescue
+    nil
+  end
 
-GLFW.load_lib GLFW_LIB, GLFW_LIB_PATH
+  GLFW.load_lib GLFW_LIB, GLFW_LIB_PATH
 
-include GLFW
+  include GLFW
+end
 
 module Mittsu
   module GLFW

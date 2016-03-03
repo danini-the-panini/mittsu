@@ -1065,24 +1065,20 @@ module Mittsu
     end
 
     def create_window
-      begin
-        # attributes = {
-        #   alpha: _alpha,
-        #   depth: _depth,
-        #   stencil: _stencil,
-        #   antialias: _antialias,
-        #   premultiplied_alpha: _premultiplied_alpha,
-        #   preserve_drawing_buffer: _preserve_drawing_buffer
-        # }
+      # attributes = {
+      #   alpha: _alpha,
+      #   depth: _depth,
+      #   stencil: _stencil,
+      #   antialias: _antialias,
+      #   premultiplied_alpha: _premultiplied_alpha,
+      #   preserve_drawing_buffer: _preserve_drawing_buffer
+      # }
 
-        @window = GLFW::Window.new(@width, @height, @title)
+      @window = GLFW::Window.new(@width, @height, @title)
 
-        default_target.set_viewport_size(*(@window.framebuffer_size))
+      default_target.set_viewport_size(*(@window.framebuffer_size))
 
-        # TODO: handle losing opengl context??
-      rescue => error
-        puts "ERROR: Mittsu::OpenGLRenderer: #{error.inspect}"
-      end
+      # TODO: handle losing opengl context??
     end
 
     def switch_geometry_program(program, material, geometry_group)

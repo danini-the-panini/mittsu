@@ -1,6 +1,6 @@
 module Mittsu
   class Line < Object3D
-    attr_accessor :geometry, :material, :mode, :type
+    attr_accessor :geometry, :material, :mode, :type, :morph_target_base
 
     def initialize(geometry = nil, material = nil, mode = nil)
       super()
