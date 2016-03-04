@@ -215,6 +215,18 @@ module Mittsu
       # NOOP
     end
 
+    def needs_camera_position_uniform?
+      @material.env_map
+    end
+
+    def needs_view_matrix_uniform?
+      @material.skinning
+    end
+
+    def needs_lights?
+      @material.lights
+    end
+
     private
 
     def allocate_lights(lights)

@@ -16,5 +16,17 @@ module Mittsu
         uniforms['wrapRGB'].value.copy(@material.wrap_rgb)
       end
     end
+
+    def needs_camera_position_uniform?
+      true
+    end
+
+    def needs_view_matrix_uniform?
+      true
+    end
+
+    def needs_lights?
+      true
+    end
   end
 end

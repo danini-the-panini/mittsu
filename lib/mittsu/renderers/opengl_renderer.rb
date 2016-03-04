@@ -531,8 +531,8 @@ module Mittsu
       refresh_lights = false
 
       program = material.program
-      p_uniforms = program.uniforms
-      m_uniforms = material_impl.shader[:uniforms]
+      program_uniforms = program.uniforms
+      material_uniforms = material_impl.shader[:uniforms]
 
       if program.id != @_current_program
         glUseProgram(program.program)
@@ -551,105 +551,85 @@ module Mittsu
       end
 
       if refresh_program || camera != @_current_camera
-        glUniformMatrix4fv(p_uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
-
-        if @logarithmic_depth_buffer
-          glUniform1f(p_uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
-        end
-
-        @_current_camera = camera if camera != @_current_camera
-
-        # load material specific uniforms
-        # (shader material also gets them for the sake of genericity)
-
-        if material.is_a?(ShaderMaterial) || material.is_a?(MeshPhongMaterial) || material.env_map
-          if !p_uniforms['cameraPosition'].nil?
-            @_vector3.set_from_matrix_position(camera.matrix_world)
-            glUniform3f(p_uniforms['cameraPosition'], @_vector3.x, @_vector3.y, @_vector3.z)
-          end
-        end
-
-        if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.is_a?(MeshBasicMaterial) || material.is_a?(ShaderMaterial) || material.skinning
-          if !p_uniforms['viewMatrix'].nil?
-            glUniformMatrix4fv(p_uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
-          end
-        end
+        @_current_camera = camera
+        update_camera_uniforms(program_uniforms, camera, material)
       end
 
       if material.skinning
-        if object.bind_matrix && !p_uniforms.bind_matrix.nil?
-          glUniformMatrix4fv(p_uniforms.bind_matrix, GL_FALSE, object.bind_matrix.elements)
-        end
-
-        if object.bind_matrix_inverse && !p_uniforms.bind_matrix_inverse.nil?
-          glUniformMatrix4fv(p_uniforms.bind_matrix_inverse, GL_FALSE, object.bind_matrix_inverse.elements)
-        end
-
-        if @_supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
-          if !p_uniforms.bone_texture.nil?
-            texture_unit = get_texture_unit
-
-            glUniform1i(p_uniforms.bone_texture, texture_unit)
-            object.skeleton.bone_texture.implementation(self).set(texture_unit)
-          end
-
-          if !p_uniforms.bone_texture_width.nil?
-            glUniform1i(p_uniforms.bone_texture_width, object.skeleton.bone_texture_width)
-          end
-
-          if !p_uniforms.bone_texture_height.nil?
-            glUniform1i(p_uniforms.bone_texture_height, object.skeleton.bone_texture_height)
-          end
-        elsif object.skeleton && object.skeleton.bone_matrices
-          if !p_uniforms.bone_global_matrices.nil?
-            glUniformMatrix4fv(p_uniforms.bone_global_matrices, GL_FALSE, object.skeleton.bone_matrices)
-          end
-        end
+        # TODO: when skinning is implemented. Then also refactor
+        # if object.bind_matrix && !program_uniforms['bindMatrix'].nil?
+        #   glUniformMatrix4fv(program_uniforms['bindMatrix'], GL_FALSE, object.bind_matrix.elements)
+        # end
+        #
+        # if object.bind_matrix_inverse && !program_uniforms['bindMatrixInverse'].nil?
+        #   glUniformMatrix4fv(program_uniforms['bindMatrixInverse'], GL_FALSE, object.bind_matrix_inverse.elements)
+        # end
+        #
+        # if @_supports_bone_textures && object.skeleton && object.skeleton.use_vertex_texture
+        #   if !program_uniforms['boneTexture'].nil?
+        #     texture_unit = get_texture_unit
+        #
+        #     glUniform1i(program_uniforms['boneTexture'], texture_unit)
+        #     object.skeleton.bone_texture.implementation(self).set(texture_unit)
+        #   end
+        #
+        #   if !program_uniforms['boneTextureWidth'].nil?
+        #     glUniform1i(program_uniforms['boneTextureWidth'], object.skeleton.bone_texture_width)
+        #   end
+        #
+        #   if !program_uniforms['boneTextureHeight'].nil?
+        #     glUniform1i(program_uniforms['boneTextureHeight'], object.skeleton.bone_texture_height)
+        #   end
+        # elsif object.skeleton && object.skeleton.bone_matrices
+        #   if !program_uniforms['boneGlobalMatrices'].nil?
+        #     glUniformMatrix4fv(program_uniforms['boneGlobalMatrices'], GL_FALSE, object.skeleton.bone_matrices)
+        #   end
+        # end
       end
 
       if refresh_material
         # TODO: when fog is implemented
-        # refresh_uniforms_fog(m_uniforms, fog) if fog && material.fog
+        # refresh_uniforms_fog(material_uniforms, fog) if fog && material.fog
 
-        if material.is_a?(MeshPhongMaterial) || material.is_a?(MeshLambertMaterial) || material.lights
+        if material_impl.needs_lights?
           if @light_renderer.lights_need_update
             refresh_lights = true
             @light_renderer.setup(lights)
           end
 
           if refresh_lights
-            OpenGLHelper.refresh_uniforms_lights(m_uniforms, @light_renderer.cache)
+            OpenGLHelper.refresh_uniforms_lights(material_uniforms, @light_renderer.cache)
           end
 
-          OpenGLHelper.mark_uniforms_lights_needs_update(m_uniforms, refresh_lights)
+          OpenGLHelper.mark_uniforms_lights_needs_update(material_uniforms, refresh_lights)
         end
 
-        material_impl.refresh_uniforms(m_uniforms)
+        material_impl.refresh_uniforms(material_uniforms)
 
         # TODO: when all of these things exist
         # when LineDashedMaterial
-        #   refresh_uniforms_line(m_uniforms, material)
-        #   refresh_uniforms_dash(m_uniforms, material)
+        #   refresh_uniforms_line(material_uniforms, material)
+        #   refresh_uniforms_dash(material_uniforms, material)
         # when PointCloudMaterial
-        #   refresh_uniforms_particle(m_uniforms, material)
+        #   refresh_uniforms_particle(material_uniforms, material)
         # when MeshDepthMaterial
-        #   m_uniforms.m_near.value = camera.near
-        #   m_uniforms.m_far.value = camera.far
-        #   m_uniforms.opacity.value = material.opacity
+        #   material_uniforms.m_near.value = camera.near
+        #   material_uniforms.m_far.value = camera.far
+        #   material_uniforms.opacity.value = material.opacity
         # when MeshNormalMaterial
-        #   m_uniforms.opactity.value = material.opacity
+        #   material_uniforms.opactity.value = material.opacity
 
         if object.receive_shadow && !material_impl.shadow_pass
-          OpenGLHelper.refresh_uniforms_shadow(m_uniforms, lights)
+          OpenGLHelper.refresh_uniforms_shadow(material_uniforms, lights)
         end
 
         load_uniforms_generic(material_impl.uniforms_list)
       end
 
-      object.implementation(self).load_uniforms_matrices(p_uniforms)
+      object.implementation(self).load_uniforms_matrices(program_uniforms)
 
-      if !p_uniforms['modelMatrix'].nil?
-        glUniformMatrix4fv(p_uniforms['modelMatrix'], 1, GL_FALSE, array_to_ptr_easy(object.matrix_world.elements))
+      if !program_uniforms['modelMatrix'].nil?
+        glUniformMatrix4fv(program_uniforms['modelMatrix'], 1, GL_FALSE, array_to_ptr_easy(object.matrix_world.elements))
       end
 
       program
@@ -1095,6 +1075,25 @@ module Mittsu
 
     def default_target
       @_defualt_target ||= OpenGLDefaultTarget.new(self)
+    end
+
+    def update_camera_uniforms(uniforms, camera, material)
+      material_impl = material.implementation(self)
+
+      glUniformMatrix4fv(uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
+
+      if @logarithmic_depth_buffer
+        glUniform1f(uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
+      end
+
+      if material_impl.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?
+        @_vector3.set_from_matrix_position(camera.matrix_world)
+        glUniform3f(uniforms['cameraPosition'], @_vector3.x, @_vector3.y, @_vector3.z)
+      end
+
+      if material_impl.needs_view_matrix_uniform? && !uniforms['viewMatrix'].nil?
+        glUniformMatrix4fv(uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
+      end
     end
   end
 end

@@ -16,6 +16,7 @@ require 'mittsu/renderers/opengl/materials/opengl_mesh_basic_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_lambert_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_phong_material'
 require 'mittsu/renderers/opengl/materials/opengl_line_basic_material'
+require 'mittsu/renderers/opengl/materials/opengl_shader_material'
 require 'mittsu/renderers/opengl/textures/opengl_texture'
 require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
 require 'mittsu/renderers/opengl/textures/opengl_data_texture'
@@ -50,7 +51,8 @@ module Mittsu
     MeshBasicMaterial => OpenGLMeshBasicMaterial,
     MeshLambertMaterial => OpenGLMeshLambertMaterial,
     MeshPhongMaterial => OpenGLMeshPhongMaterial,
-    LineBasicMaterial => OpenGLLineBasicMaterial
+    LineBasicMaterial => OpenGLLineBasicMaterial,
+    ShaderMaterial => OpenGLShaderMaterial
   }
   OPENGL_IMPLEMENTATIONS.default_proc = -> (hash, key) {
     super_klass = key.ancestors.find { |a| hash.has_key?(a) }
