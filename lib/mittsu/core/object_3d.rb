@@ -307,7 +307,7 @@ module Mittsu
       }
       @_geometries = {}
       @_materials = {}
-      @_output[:object] = parse_object(self)
+      @_output[:object] = self.jsonify
       @_output
     end
 
@@ -339,9 +339,28 @@ module Mittsu
       @_implementation ||= renderer.create_implementation(self)
     end
 
-    private
+    protected
 
-    def parse_geometry(geometry)
+    def jsonify
+      data = {}
+      data[:uuid] = self.uuid
+      data[:type] = self.type
+      data[:name] = self.name unless self.name.nil? || self.name.empty?
+      data[:user_data] = self.user_data unless self.user_data.nil? || self.user_data.empty?
+      data[:visible] = self.visible unless self.visible
+      data[:matrix] = self.matrix.to_a
+
+      if !self.children.length.empty?
+        data[:children] = []
+        self.children.each do |child|
+          data[:children] << child.jsonify
+        end
+      end
+
+      # TODO: implement jsonify for PointCloud
+    end
+
+    def jsonify_geometry(geometry)
       @_output[:geometries] ||= []
       if @_geometries[geometry.uuid].nil?
         json = geometry.to_json
@@ -352,7 +371,7 @@ module Mittsu
       geometry.uuid
     end
 
-    def parse_material(material)
+    def jsonify_material(material)
       @_output[:materials] ||= []
       if @_materials[material.uuid].nil?
         json = material.to_json
@@ -361,64 +380,6 @@ module Mittsu
         @_output[:materials] << json
       end
       material.uuid
-    end
-
-    def parse_object(object)
-      data = {}
-      data[:uuid] = object.uuid
-      data[:type] = object.type
-      data[:name] = object.name unless object.name.nil? || object.name.empty?
-      data.user_data = object.user_data unless object.user_data.nil? || object.user_data.empty?
-      data[:visible] = object.visible unless object.visible
-
-      case object
-      when PerspectiveCamera
-        data[:fov] = object.fov
-        data[:aspect] = object.aspect
-        data[:near] = object.near
-        data[:far] = object.far
-      when OrthographicCamera
-        data[:left] = object.left
-        data[:right] = object.right
-        data[:top] = object.top
-        data[:bottom] = object.bottom
-        data[:near] = object.near
-        data[:far] = object.far
-      when AmbientLight
-        data[:color] = object.color.get_hex
-      when DirectionalLight
-        data[:color] = object.color.get_hex
-        data[:intensity] = object.intensity
-      when PointLight
-        data[:color] = object.color.get_hex
-        data[:intensity] = object.intensity
-        data[:distance] = object.distance
-        data[:decay] = object.decay
-      when SpotLight
-        data[:color] = object.color.get_hex
-        data[:intensity] = object.intensity
-        data[:distance] = object.distance
-        data[:angle] = object.angle
-        data[:exponent] = object.exponent
-        data[:decay] = object.decay
-      when HemisphereLight
-        data[:color] = object.color.get_hex
-        data[:ground_color] = object.ground_color.get_hex
-      when Mesh, Line, PointCloud
-        data[:geometry] = parse_geometry(object.geometry)
-        data[:material] = parse_material(object.material)
-        data[:mode] = object.mode if object.is_a? Line
-      when Sprite
-        data[:material] = parse_material(object.material)
-      end
-      data[:matrix] = object.matrix.to_a
-      if !object.children.length.empty?
-        data[:children] = []
-        object.children.each do |child|
-          data[:children] << parse_object(child)
-        end
-      end
-      data
     end
   end
 end

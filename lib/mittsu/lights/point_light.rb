@@ -23,5 +23,16 @@ module Mittsu
       light.decay = @decay
       light
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:color] = self.color.get_hex
+      data[:intensity] = self.intensity
+      data[:distance] = self.distance
+      data[:decay] = self.decay
+      data
+    end
   end
 end
