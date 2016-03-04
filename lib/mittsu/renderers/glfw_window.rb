@@ -2,7 +2,7 @@ require 'opengl'
 require 'glfw'
 
 GLFW_LIB_EXT = OpenGL.get_platform == :OPENGL_PLATFORM_MACOSX ? 'dylib' : 'so'
-if !OpenGL.get_platform == :OPENGL_PLATFORM_TEST
+if OpenGL.get_platform != :OPENGL_PLATFORM_TEST
   GLFW_LIB = begin
     "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp.strip}.#{GLFW_LIB_EXT}"
   rescue
