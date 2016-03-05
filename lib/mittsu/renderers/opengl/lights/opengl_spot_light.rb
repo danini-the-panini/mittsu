@@ -39,5 +39,9 @@ module Mittsu
       @cache.exponents[index] = @light.exponent;
       @cache.decays[index] = @light.distance.zero? ? 0.0 : @light.decay
     end
+
+    def to_sym
+      :spot
+    end
   end
 end

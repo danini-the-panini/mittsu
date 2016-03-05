@@ -44,5 +44,9 @@ module Mittsu
         colors[i] = 0.0
       }
     end
+
+    def to_sym
+      :other
+    end
   end
 end

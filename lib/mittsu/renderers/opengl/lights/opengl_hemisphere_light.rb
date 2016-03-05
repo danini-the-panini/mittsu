@@ -34,5 +34,9 @@ module Mittsu
       super(cache, cache.ground_colors)
       super(cache, cache.sky_colors)
     end
+
+    def to_sym
+      :hemi
+    end
   end
 end

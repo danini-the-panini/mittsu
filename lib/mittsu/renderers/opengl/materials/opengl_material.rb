@@ -89,25 +89,12 @@ module Mittsu
     private
 
     def allocate_lights(lights)
-      dir_lights = 0
-      point_lights = 0
-      spot_lights = 0
-      hemi_lights = 0
-
-      lights.each do |light|
-        next if light.only_shadow || !light.visible
-
-        dir_lights   += 1 if light.is_a? DirectionalLight
-        point_lights += 1 if light.is_a? PointLight
-        spot_lights  += 1 if light.is_a? SpotLight
-        hemi_lights  += 1 if light.is_a? HemisphereLight
-      end
-
-      {
-        directional: dir_lights,
-        point: point_lights,
-        spot: spot_lights,
-        hemi: hemi_lights
+      lights.reject { |light|
+        light.only_shadow || !light.visible
+      }.each_with_object({
+        directional: 0, point: 0, spot: 0, hemi: 0, other: 0
+      }) { |light, counts|
+        counts[light.implementation(@renderer).to_sym] += 1
       }
     end
 

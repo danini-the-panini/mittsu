@@ -28,5 +28,9 @@ module Mittsu
       @cache.distances[index] = @light.distance
       @cache.decays[index] = @light.distance.zero? ? 0.0 : @light.decay
     end
+
+    def to_sym
+      :point
+    end
   end
 end

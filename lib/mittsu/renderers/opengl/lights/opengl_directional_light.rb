@@ -27,5 +27,9 @@ module Mittsu
 
       OpenGLHelper.set_color_linear(@cache.colors, offset, @light.color, @light.intensity)
     end
+
+    def to_sym
+      :directional
+    end
   end
 end
