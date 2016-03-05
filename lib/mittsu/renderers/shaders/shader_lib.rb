@@ -426,7 +426,7 @@ module Mittsu
         uniforms: UniformsUtils.clone(shader.uniforms),
         vertex_shader: shader.vertex_shader,
         fragment_shader: shader.fragment_shader
-      }
+      }.merge(options)
     end
 
     def self.[](id)

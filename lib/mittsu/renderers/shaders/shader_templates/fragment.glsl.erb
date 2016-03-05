@@ -1,0 +1,105 @@
+#version 330
+
+// (parameters[:bump_map] || parameters[:normal_map] || parameters[:flat_shading]) ? '#extension GL_OES_standard_derivatives : enable' : '', # TODO: does extension exist in OpenGL?
+
+<%= custom_defines %>
+
+#define MAX_DIR_LIGHTS <%= parameters[:max_dir_lights] %>
+#define MAX_POINT_LIGHTS <%= parameters[:max_point_lights] %>
+#define MAX_SPOT_LIGHTS <%= parameters[:max_spot_lights] %>
+#define MAX_HEMI_LIGHTS <%= parameters[:max_hemi_lights] %>
+
+#define MAX_SHADOWS <%= parameters[:max_shadows] %>
+
+<% if parameters[:alpha_test] %>
+  #define ALPHATEST <%= parameters[:alpha_test].to_f %>
+<% end %>
+
+<% if @renderer.gamma_input %>
+  #define GAMMA_INPUT
+<% end %>
+<% if @renderer.gamma_output %>
+  #define GAMMA_OUTPUT
+<% end %>
+#define GAMMA_FACTOR <%= gamma_factor_define %>
+
+<% if parameters[:use_fog] && parameters[:fog] %>
+  #define USE_FOG
+<% end %>
+<% if parameters[:use_fog] && parameters[:fog_exp] %>
+  #define FOG_EXP2
+<% end %>
+
+<% if parameters[:map] %>
+  #define USE_MAP
+<% end %>
+<% if parameters[:env_map] %>
+  #define USE_ENVMAP
+<% end %>
+<% if parameters[:env_map] %>
+  #define <%= env_map_type_define %>
+<% end %>
+<% if parameters[:env_map] %>
+  #define <%= env_map_mode_define %>
+<% end %>
+<% if parameters[:env_map] %>
+  #define <%= env_map_blending_define %>
+<% end %>
+<% if parameters[:light_map] %>
+  #define USE_LIGHTMAP
+<% end %>
+<% if parameters[:bump_map] %>
+  #define USE_BUMPMAP
+<% end %>
+<% if parameters[:normal_map] %>
+  #define USE_NORMALMAP
+<% end %>
+<% if parameters[:specular_map] %>
+  #define USE_SPECULARMAP
+<% end %>
+<% if parameters[:alpha_map] %>
+  #define USE_ALPHAMAP
+<% end %>
+<% if parameters[:vertex_colors] %>
+  #define USE_COLOR
+<% end %>
+
+<% if parameters[:flat_shading] %>
+  #define FLAT_SHADED
+<% end %>
+
+<% if parameters[:metal] %>
+  #define METAL
+<% end %>
+<% if parameters[:wrap_around] %>
+  #define WRAP_AROUND
+<% end %>
+<% if parameters[:double_sided] %>
+  #define DOUBLE_SIDED
+<% end %>
+<% if parameters[:flip_sided] %>
+  #define FLIP_SIDED
+<% end %>
+
+<% if parameters[:shadow_map_enabled] %>
+  #define USE_SHADOWMAP
+<% end %>
+<% if parameters[:shadow_map_enabled] %>
+  #define <%= shadow_map_type_define %>
+<% end %>
+<% if parameters[:shadow_map_debug] %>
+  #define SHADOWMAP_DEBUG
+<% end %>
+<% if parameters[:'shadow_map_cascade'] %>
+  #define SHADOWMAP_CASCADE
+<% end %>
+
+<% if parameters[:logarithmic_depth_buffer] %>
+  #define USE_LOGDEPTHBUF
+<% end %>
+// @renderer._glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+
+uniform mat4 viewMatrix;
+uniform vec3 cameraPosition;
+
+layout(location = 0) out vec4 fragColor;

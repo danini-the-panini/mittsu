@@ -1,0 +1,143 @@
+#version 330
+
+<%= custom_defines %>
+
+<% if parameters[:supports_vertex_textures] %>
+  #define VERTEX_TEXTURES
+<% end %>
+
+<% if @renderer.gamma_input %>
+  #define GAMMA_INPUT
+<% end %>
+<% if @renderer.gamma_output %>
+  #define GAMMA_OUTPUT
+<% end %>
+#define GAMMA_FACTOR <%= gamma_factor_define %>
+
+#define MAX_DIR_LIGHTS <%= parameters[:max_dir_lights] %>
+#define MAX_POINT_LIGHTS <%= parameters[:max_point_lights] %>
+#define MAX_SPOT_LIGHTS <%= parameters[:max_spot_lights] %>
+#define MAX_HEMI_LIGHTS <%= parameters[:max_hemi_lights] %>
+
+#define MAX_SHADOWS <%= parameters[:max_shadows] %>
+
+#define MAX_BONES <%= parameters[:max_bones] %>
+
+<% if parameters[:map] %>
+  #define USE_MAP
+<% end %>
+<% if parameters[:env_map] %>
+  #define USE_ENVMAP
+<% end %>
+<% if parameters[:env_map] %>
+  #define <%= env_map_mode_define %>
+<% end %>
+<% if parameters[:light_map] %>
+  #define USE_LIGHTMAP
+<% end %>
+<% if parameters[:bump_map] %>
+  #define USE_BUMPMAP
+<% end %>
+<% if parameters[:normal_map] %>
+  #define USE_NORMALMAP
+<% end %>
+<% if parameters[:specular_map] %>
+  #define USE_SPECULARMAP
+<% end %>
+<% if parameters[:alpha_map] %>
+  #define USE_ALPHAMAP
+<% end %>
+<% if parameters[:vertex_colors] %>
+  #define USE_COLOR
+<% end %>
+
+<% if parameters[:flat_shading] %>
+  #define FLAT_SHADED
+<% end %>
+
+<% if parameters[:skinning] %>
+  #define USE_SKINNING
+<% end %>
+<% if parameters[:use_vertex_texture] %>
+  #define BONE_TEXTURE
+<% end %>
+
+<% if parameters[:morph_targets] %>
+  #define USE_MORPHTARGETS
+<% end %>
+<% if parameters[:morph_normals] %>
+  #define USE_MORPHNORMALS
+<% end %>
+<% if parameters[:wrap_around] %>
+  #define WRAP_AROUND
+<% end %>
+<% if parameters[:double_sided] %>
+  #define DOUBLE_SIDED
+<% end %>
+<% if parameters[:flip_sided] %>
+  #define FLIP_SIDED
+<% end %>
+
+<% if parameters[:shadow_map_enabled] %>
+  #define USE_SHADOWMAP
+<% end %>
+<% if parameters[:shadow_map_enabled] %>
+  #define <%= shadow_map_type_define %>
+<% end %>
+<% if parameters[:shadow_map_debug] %>
+  #define SHADOWMAP_DEBUG
+<% end %>
+<% if parameters[:shadow_map_cascade] %>
+  #define SHADOWMAP_CASCADE
+<% end %>
+
+<% if parameters[:size_attenuation] %>
+  #define USE_SIZEATTENUATION
+<% end %>
+
+<% if parameters[:logarithmic_depth_buffer] %>
+  #define USE_LOGDEPTHBUF
+<% end %>
+// @renderer._glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+
+
+uniform mat4 modelMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat3 normalMatrix;
+uniform vec3 cameraPosition;
+
+in vec3 position;
+in vec3 normal;
+in vec2 uv;
+in vec2 uv2;
+
+#ifdef USE_COLOR
+  in vec3 color;
+#endif
+
+#ifdef USE_MORPHTARGETS
+  in vec3 morphTarget0;
+  in vec3 morphTarget1;
+  in vec3 morphTarget2;
+  in vec3 morphTarget3;
+
+  #ifdef USE_MORPHNORMALS
+    in vec3 morphNormal0;
+    in vec3 morphNormal1;
+    in vec3 morphNormal2;
+    in vec3 morphNormal3;
+  #else
+    in vec3 morphTarget4;
+    in vec3 morphTarget5;
+    in vec3 morphTarget6;
+    in vec3 morphTarget7;
+  #endif
+
+#endif
+
+#ifdef USE_SKINNING
+  in vec4 skinIndex;
+  in vec4 skinWeight;
+#endif
