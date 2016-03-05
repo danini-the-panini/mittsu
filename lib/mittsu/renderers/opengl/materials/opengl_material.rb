@@ -19,146 +19,11 @@ module Mittsu
 
       init_shader
 
-      # heuristics to create shader paramaters according to lights in the scene
-      # (not to blow over max_lights budget)
+      @material.program = find_or_create_program(lights, fog, object)
 
-      max_light_count = allocate_lights(lights)
-      max_shadows = allocate_shadows(lights)
-      max_bones = allocate_bones(object)
+      handle_morph_attributes(@material.program.attributes)
 
-      parameters = {
-        supports_vertex_textures: @renderer.supports_vertex_textures?,
-
-        map: !!@material.map,
-        env_map: !!@material.env_map,
-        env_map_mode: @material.env_map && @material.env_map.mapping,
-        light_map: !!@material.light_map,
-        bump_map: !!@material.light_map,
-        normal_map: !!@material.normal_map,
-        specular_map: !!@material.specular_map,
-        alpha_map: !!@material.alpha_map,
-
-        combine: @material.combine,
-
-        vertex_colors: @material.vertex_colors,
-
-        fog: fog,
-        use_fog: @material.fog,
-        # fog_exp: fog.is_a?(FogExp2), # TODO: when FogExp2 exists
-
-        flat_shading: @material.shading == FlatShading,
-
-        size_attenuation: @material.size_attenuation,
-        logarithmic_depth_buffer: @renderer.logarithmic_depth_buffer,
-
-        skinning: @material.skinning,
-        max_bones: max_bones,
-        use_vertex_texture: @renderer.supports_bone_textures?,
-
-        morph_targets: @material.morph_targets,
-        morph_normals: @material.morph_normals,
-        max_morph_targets: @renderer.max_morph_targets,
-        max_morph_normals: @renderer.max_morph_normals,
-
-        max_dir_lights: max_light_count[:directional],
-        max_point_lights: max_light_count[:point],
-        max_spot_lights: max_light_count[:spot],
-        max_hemi_lights: max_light_count[:hemi],
-
-        max_shadows: max_shadows,
-        shadow_map_enabled: @renderer.shadow_map_enabled? && object.receive_shadow && max_shadows > 0,
-        shadow_map_type: @renderer.shadow_map_type,
-        shadow_map_debug: @renderer.shadow_map_debug,
-        shadow_map_cascade: @renderer.shadow_map_cascade,
-
-        alpha_test: @material.alpha_test,
-        metal: @material.metal,
-        wrap_around: @material.wrap_around,
-        double_sided: @material.side == DoubleSide,
-        flip_sided: @material.side == BackSide
-      }
-
-      # generate code
-
-      chunks = []
-
-      if shader_id
-        chunks << shader_id
-      else
-        chunks << @material.fragment_shader
-        chunks << @material.vertex_shader
-      end
-
-      if !@material.defines.nil?
-        @material.defines.each do |(name, define)|
-          chunks << name
-          chunks << define
-        end
-      end
-
-      parameters.each do |(name, parameter)|
-        chunks << name
-        chunks << parameter
-      end
-
-      code = chunks.join
-
-      program = nil
-
-      # check if code has been already compiled
-
-      @renderer.programs.each do |program_info|
-        if program_info.code == code
-          program = program_info
-          program.used_times += 1
-          break
-        end
-      end
-
-      if program.nil?
-        program = OpenGLProgram.new(@renderer, code, @material, parameters)
-        @renderer.programs.push(program)
-
-        @renderer.info[:memory][:programs] = @renderer.programs.length
-      end
-
-      @material.program = program
-
-      attributes = program.attributes
-
-      if @material.morph_targets
-        @material.num_supported_morph_targets = 0
-        base = 'morphTarget'
-
-        @renderer.max_morph_targets.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            @material.num_supported_morph_targets += 1
-          end
-        end
-      end
-
-      if @material.morph_normals
-        @material.num_supported_morph_normals = 0
-        base = 'morphNormal'
-
-        @renderer.max_morph_normals.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            @material.num_supported_morph_normals += 1
-          end
-        end
-      end
-
-      @uniforms_list = []
-
-      @shader[:uniforms].each_key do |u|
-        location = @material.program.uniforms[u]
-
-        if location
-          @uniforms_list << [@shader[:uniforms][u], location]
-        end
-      end
+      @uniforms_list = get_uniforms_list
     end
 
     def set
@@ -287,6 +152,147 @@ module Mittsu
       # end
 
       max_bones
+    end
+
+    def handle_morph_attributes(attributes)
+      if @material.morph_targets
+        @material.num_supported_morph_targets = 0
+        base = 'morphTarget'
+
+        @renderer.max_morph_targets.times do |i|
+          id = base + i
+          if attributes[id] >= 0
+            @material.num_supported_morph_targets += 1
+          end
+        end
+      end
+
+      if @material.morph_normals
+        @material.num_supported_morph_normals = 0
+        base = 'morphNormal'
+
+        @renderer.max_morph_normals.times do |i|
+          id = base + i
+          if attributes[id] >= 0
+            @material.num_supported_morph_normals += 1
+          end
+        end
+      end
+    end
+
+    def get_uniforms_list
+      @shader[:uniforms].map { |(key, uniform)|
+        location = @material.program.uniforms[key]
+        if location
+          [uniform, location]
+        end
+      }.compact
+    end
+
+    def program_parameters(lights, fog, object)
+      # heuristics to create shader paramaters according to lights in the scene
+      # (not to blow over max_lights budget)
+
+      max_light_count = allocate_lights(lights)
+      max_shadows = allocate_shadows(lights)
+      max_bones = allocate_bones(object)
+
+      {
+        supports_vertex_textures: @renderer.supports_vertex_textures?,
+
+        map: !!@material.map,
+        env_map: !!@material.env_map,
+        env_map_mode: @material.env_map && @material.env_map.mapping,
+        light_map: !!@material.light_map,
+        bump_map: !!@material.light_map,
+        normal_map: !!@material.normal_map,
+        specular_map: !!@material.specular_map,
+        alpha_map: !!@material.alpha_map,
+
+        combine: @material.combine,
+
+        vertex_colors: @material.vertex_colors,
+
+        fog: fog,
+        use_fog: @material.fog,
+        # fog_exp: fog.is_a?(FogExp2), # TODO: when FogExp2 exists
+
+        flat_shading: @material.shading == FlatShading,
+
+        size_attenuation: @material.size_attenuation,
+        logarithmic_depth_buffer: @renderer.logarithmic_depth_buffer,
+
+        skinning: @material.skinning,
+        max_bones: max_bones,
+        use_vertex_texture: @renderer.supports_bone_textures?,
+
+        morph_targets: @material.morph_targets,
+        morph_normals: @material.morph_normals,
+        max_morph_targets: @renderer.max_morph_targets,
+        max_morph_normals: @renderer.max_morph_normals,
+
+        max_dir_lights: max_light_count[:directional],
+        max_point_lights: max_light_count[:point],
+        max_spot_lights: max_light_count[:spot],
+        max_hemi_lights: max_light_count[:hemi],
+
+        max_shadows: max_shadows,
+        shadow_map_enabled: @renderer.shadow_map_enabled? && object.receive_shadow && max_shadows > 0,
+        shadow_map_type: @renderer.shadow_map_type,
+        shadow_map_debug: @renderer.shadow_map_debug,
+        shadow_map_cascade: @renderer.shadow_map_cascade,
+
+        alpha_test: @material.alpha_test,
+        metal: @material.metal,
+        wrap_around: @material.wrap_around,
+        double_sided: @material.side == DoubleSide,
+        flip_sided: @material.side == BackSide
+      }
+    end
+
+    def program_slug(parameters)
+      chunks = []
+
+      if shader_id
+        chunks << shader_id
+      else
+        chunks << @material.fragment_shader
+        chunks << @material.vertex_shader
+      end
+
+      if !@material.defines.nil?
+        @material.defines.each do |(name, define)|
+          chunks << name
+          chunks << define
+        end
+      end
+
+      parameters.each do |(name, parameter)|
+        chunks << name
+        chunks << parameter
+      end
+
+      chunks.join
+    end
+
+    def find_or_create_program(lights, fog, object)
+      parameters = program_parameters(lights, fog, object)
+      code = program_slug(parameters)
+
+      program = @renderer.programs.find do |program_info|
+        program_info.code == code
+      end
+
+      if program.nil?
+        program = OpenGLProgram.new(@renderer, code, @material, parameters)
+        @renderer.programs.push(program)
+
+        @renderer.info[:memory][:programs] = @renderer.programs.length
+      else
+        program.used_times += 1
+      end
+
+      program
     end
   end
 end
