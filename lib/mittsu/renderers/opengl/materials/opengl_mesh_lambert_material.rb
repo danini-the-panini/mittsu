@@ -17,5 +17,13 @@ module Mittsu
     def needs_lights?
       true
     end
+
+    def init_shader
+      @shader = ShaderLib.create_shader(shader_id)
+    end
+
+    def shader_id
+      :lambert
+    end
   end
 end

@@ -1,15 +1,10 @@
 module Mittsu
   class OpenGLMaterial
-    SHADER_IDS = {
-      # MeshDepthMaterial => :depth, # TODO...
-      # MeshNormalMaterial => :normal, # TODO...
-      MeshBasicMaterial => :basic,
-      MeshLambertMaterial => :lambert,
-      MeshPhongMaterial => :phong,
-      LineBasicMaterial => :basic,
-      # LineDashedMaterial => :dashed, # TODO...
-      # PointCloudMaterial => :particle_basic # TODO...
-    }
+    # TODO: init_shader for these material-types
+    # MeshDepthMaterial => :depth, # TODO...
+    # MeshNormalMaterial => :normal, # TODO...
+    # LineDashedMaterial => :dashed, # TODO...
+    # PointCloudMaterial => :particle_basic # TODO...
 
     attr_accessor :shadow_pass
     attr_reader :shader, :uniforms_list
@@ -22,22 +17,7 @@ module Mittsu
     def init(lights, fog, object)
       @material.add_event_listener(:dispose, @renderer.method(:on_material_dispose))
 
-      shader_id = SHADER_IDS[@material.class]
-
-      if shader_id
-        shader = ShaderLib[shader_id]
-        @shader = {
-          uniforms: UniformsUtils.clone(shader.uniforms),
-          vertex_shader: shader.vertex_shader,
-          fragment_shader: shader.fragment_shader
-        }
-      else
-        @shader = {
-          uniforms: @material.uniforms,
-          vertex_shader: @material.vertex_shader,
-          fragment_shader: @material.fragment_shader
-        }
-      end
+      init_shader
 
       # heuristics to create shader paramaters according to lights in the scene
       # (not to blow over max_lights budget)
@@ -225,6 +205,20 @@ module Mittsu
 
     def needs_lights?
       @material.lights
+    end
+
+    protected
+
+    def init_shader
+      @shader = {
+        uniforms: @material.uniforms,
+        vertex_shader: @material.vertex_shader,
+        fragment_shader: @material.fragment_shader
+      }
+    end
+
+    def shader_id
+      nil
     end
 
     private

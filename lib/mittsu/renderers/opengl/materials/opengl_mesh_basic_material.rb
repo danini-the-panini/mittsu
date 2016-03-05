@@ -54,5 +54,15 @@ module Mittsu
       uniforms['reflectivity'].value = @material.reflectivity
       uniforms['refractionRatio'].value = @material.refraction_ratio
     end
+
+    protected
+
+    def init_shader
+      @shader = ShaderLib.create_shader(shader_id)
+    end
+
+    def shader_id
+      :basic
+    end
   end
 end
