@@ -21,7 +21,7 @@ module Mittsu
 
       @material.program = find_or_create_program(lights, fog, object)
 
-      handle_morph_attributes(@material.program.attributes)
+      count_supported_morph_attributes(@material.program.attributes)
 
       @uniforms_list = get_uniforms_list
     end
@@ -141,29 +141,19 @@ module Mittsu
       max_bones
     end
 
-    def handle_morph_attributes(attributes)
+    def count_supported_morph_attributes(attributes)
       if @material.morph_targets
-        @material.num_supported_morph_targets = 0
-        base = 'morphTarget'
-
-        @renderer.max_morph_targets.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            @material.num_supported_morph_targets += 1
-          end
-        end
+        @material.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphTarget', @renderer.max_morph_normals)
       end
-
       if @material.morph_normals
-        @material.num_supported_morph_normals = 0
-        base = 'morphNormal'
+        @material.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphNormal', @renderer.max_morph_normals)
+      end
+    end
 
-        @renderer.max_morph_normals.times do |i|
-          id = base + i
-          if attributes[id] >= 0
-            @material.num_supported_morph_normals += 1
-          end
-        end
+    def count_supported_morph_attribute(attributes, base, max)
+      max.times.reduce do |num, i|
+        attribute = attributes["#{base}#{i}"]
+        attribute && attribute >= 0 ? num + 1 : num
       end
     end
 
