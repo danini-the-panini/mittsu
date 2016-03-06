@@ -350,7 +350,7 @@ module Mittsu
       data[:visible] = self.visible unless self.visible
       data[:matrix] = self.matrix.to_a
 
-      if !self.children.length.empty?
+      if !self.children.empty?
         data[:children] = []
         self.children.each do |child|
           data[:children] << child.jsonify
@@ -358,6 +358,8 @@ module Mittsu
       end
 
       # TODO: implement jsonify for PointCloud
+
+      data
     end
 
     def jsonify_geometry(geometry)

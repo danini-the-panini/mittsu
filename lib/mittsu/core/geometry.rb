@@ -525,12 +525,12 @@ module Mittsu
           faces << get_color_index(vertex_colors[2], colors_hash, colors)
         end
       end
-      output.data = {}
-      output.data.vertices = vertices
-      output.data.normals = normals
-      output.data.colors = colors unless colors.empty?
-      output.data.uvs = [uvs] unless uvs.empty? # temporal backward compatibility
-      output.data.faces = faces
+      output[:data] = {}
+      output[:data][:vertices] = vertices
+      output[:data][:normals] = normals
+      output[:data][:colors] = colors unless colors.empty?
+      output[:data][:uvs] = [uvs] unless uvs.empty? # temporal backward compatibility
+      output[:data][:faces] = faces
 
       #
 
