@@ -66,7 +66,7 @@ module Mittsu
       return unless attribute_exists?(attribute)
       if object.geometry.colors.length > 0 || object.geometry.faces.length > 0
         update_attribute(attribute, @color_buffer, 3)
-      elsif
+      elsif material.default_attribute_values
         glVertexAttrib3fv(attribute, material.default_attribute_values.color)
       end
     end
