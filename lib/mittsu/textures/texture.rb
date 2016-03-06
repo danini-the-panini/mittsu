@@ -2,10 +2,9 @@ require 'securerandom'
 require 'mittsu/math'
 require 'mittsu/core/event_dispatcher'
 require 'mittsu/constants'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Texture < HashObject
+  class Texture
     include EventDispatcher
 
     DEFAULT_IMAGE = nil
@@ -87,6 +86,10 @@ module Mittsu
 
     def dispose
       dispatch_event type: :dispose
+    end
+
+    def implementation(renderer)
+      @_implementation ||= renderer.create_implementation(self)
     end
   end
 end

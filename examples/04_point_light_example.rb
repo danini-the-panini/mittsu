@@ -11,9 +11,9 @@ renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT
 
 sphere_geometry = Mittsu::SphereGeometry.new(1.0)
 box_geometry = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
-green_material = Mittsu::MeshLambertMaterial.new(color: 0x00ff00)
-blue_material = Mittsu::MeshLambertMaterial.new(color: 0x0000ff)
-magenta_material = Mittsu::MeshLambertMaterial.new(color: 0xff00ff)
+green_material = Mittsu::MeshPhongMaterial.new(color: 0x00ff00)
+blue_material = Mittsu::MeshPhongMaterial.new(color: 0x0000ff)
+magenta_material = Mittsu::MeshPhongMaterial.new(color: 0xff00ff)
 cube = Mittsu::Mesh.new(box_geometry, green_material)
 sphere1 = Mittsu::Mesh.new(sphere_geometry, blue_material)
 sphere1.position.set(3.0, 0.0, 0.0)
@@ -23,6 +23,12 @@ sphere2.position.set(-3.0, 0.0, 0.0)
 scene.add(cube)
 scene.add(sphere1)
 scene.add(sphere2)
+
+room_material = Mittsu::MeshPhongMaterial.new(color: 0xffffff)
+room_material.side = Mittsu::BackSide
+room = Mittsu::Mesh.new(box_geometry, room_material)
+room.scale.set(10.0, 10.0, 10.0)
+scene.add(room)
 
 light = Mittsu::PointLight.new(0xffffff, 0.5, 10.0, 1.5) # white, half intensity
 dot = Mittsu::Mesh.new(box_geometry, Mittsu::MeshBasicMaterial.new(color: 0xffffff))

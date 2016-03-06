@@ -239,5 +239,14 @@ module Mittsu
       super(object, recursive)
       return object
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:geometry] = jsonify_geometry(self.geometry)
+      data[:material] = jsonify_material(self.material)
+      data
+    end
   end
 end

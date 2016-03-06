@@ -127,5 +127,14 @@ module Mittsu
     	light.shadow_cascade_near_z = @shadow_cascade_near_z.dup
     	light.shadow_cascade_far_z  = @shadow_cascade_far_z.dup
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:color] = self.color.get_hex
+      data[:intensity] = self.intensity
+      data
+    end
   end
 end

@@ -1,6 +1,6 @@
 module Mittsu
   class Line < Object3D
-    attr_accessor :geometry, :material, :mode, :type
+    attr_accessor :geometry, :material, :mode, :type, :morph_target_base
 
     def initialize(geometry = nil, material = nil, mode = nil)
       super()
@@ -138,6 +138,16 @@ module Mittsu
     def clone(object = Line.new(@geometry, @material, @mode))
       super(object)
       object
+    end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:geometry] = jsonify_geometry(self.geometry)
+      data[:material] = jsonify_material(self.material)
+      data[:mode] = self.mode
+      data
     end
   end
 end

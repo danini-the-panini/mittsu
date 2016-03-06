@@ -49,10 +49,10 @@ module Mittsu
         skinning: true
       )
 
-      @depth_material[:_shadow_pass] = true
-      @depth_material_morph[:_shadow_pass] = true
-      @depth_material_skin[:_shadow_pass] = true
-      @depth_material_morph_skin[:_shadow_pass] = true
+      @depth_material.implementation(renderer).shadow_pass = true
+      @depth_material_morph.implementation(renderer).shadow_pass = true
+      @depth_material_skin.implementation(renderer).shadow_pass = true
+      @depth_material_morph_skin.implementation(renderer).shadow_pass = true
     end
 
     def render(scene, camera)
@@ -142,9 +142,10 @@ module Mittsu
           scene.update_matrix_world if scene.auto_update
         end
 
-        if light.shadow_camera_visible && !light[:camera_helper]
-          light[:camera_helper] = CameraHelper.new(light.shadow_camera)
-          scene.add(light[:camera_helper])
+        light_impl = light.implementation(@renderer)
+        if light.shadow_camera_visible && !light_impl.camera_helper
+          light_impl.camera_helper = CameraHelper.new(light.shadow_camera)
+          scene.add(light_impl.camera_helper)
         end
 
         if light.virtual? && virtual_light.original_camera == camera
@@ -167,8 +168,8 @@ module Mittsu
         #
 
 
-        light[:camera_helper].visible = light.shadow_camera_visible if light[:camera_helper]
-        light[:camera_helper].update if light.shadow_camera_visible
+        light_impl.camera_helper.visible = light.shadow_camera_visible if light_impl.camera_helper
+        light_impl.camera_helper.update if light.shadow_camera_visible
 
         # compute shadow matrix
 
@@ -273,7 +274,8 @@ module Mittsu
 
         if opengl_objects && object.cast_shadow && (object.frustum_culled == false || @frustum.intersects_object?(object) == true)
           opengl_objects.each do |opengl_object|
-            object[:_model_view_matrix].multiply_matrices(shadow_camera.matrix_world_inverse, object.matrix_world)
+            object_impl = object.implementation(@renderer)
+            object_impl.model_view_matrix.multiply_matrices(shadow_camera.matrix_world_inverse, object.matrix_world)
             @render_list << opengl_object
           end
         end

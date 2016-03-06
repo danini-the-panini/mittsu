@@ -111,5 +111,16 @@ module Mittsu
 
       camera
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:fov] = self.fov
+      data[:aspect] = self.aspect
+      data[:near] = self.near
+      data[:far] = self.far
+      data
+    end
   end
 end

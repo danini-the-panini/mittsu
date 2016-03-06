@@ -100,5 +100,18 @@ module Mittsu
 
       return light
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:color] = self.color.get_hex
+      data[:intensity] = self.intensity
+      data[:distance] = self.distance
+      data[:angle] = self.angle
+      data[:exponent] = self.exponent
+      data[:decay] = self.decay
+      data
+    end
   end
 end

@@ -29,7 +29,7 @@ module OpenGLDebug
       r = OpenGLProxy.send(m, *args)
       call = "#{m}(#{args.map { |s| s.to_s[0..20] }.join(', ')})"
       ret = r.nil? ? '' : " => #{r}"
-      puts "#{call}#{ret}"
+      puts "#{call}#{ret} (#{caller[0]})"
       e = OpenGLProxy.glGetError
       raise "ERROR: #{m} => #{ERROR_STRINGS[e]}" unless e == OpenGL::GL_NO_ERROR
       r

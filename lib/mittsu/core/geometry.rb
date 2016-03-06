@@ -1,9 +1,8 @@
 require 'securerandom'
 require 'mittsu'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Geometry < HashObject
+  class Geometry
     include EventDispatcher
 
     MorphNormal = Struct.new(:face_normals, :vertex_normals)
@@ -17,7 +16,7 @@ module Mittsu
 
     def initialize
       super
-      
+
       @id = (@@id ||= 1).tap { @@id += 1 }
 
       @name = ''
@@ -561,6 +560,10 @@ module Mittsu
 
     def dispose
       self.dispatch_event type: :dispose
+    end
+
+    def implementation(renderer)
+      @_implementation ||= renderer.create_implementation(self)
     end
 
     private

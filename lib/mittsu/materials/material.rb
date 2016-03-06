@@ -1,9 +1,8 @@
 require 'securerandom'
 require 'mittsu'
-require 'mittsu/core/hash_object'
 
 module Mittsu
-  class Material < HashObject
+  class Material
     include EventDispatcher
 
     attr_reader :id, :uuid, :type
@@ -134,6 +133,10 @@ module Mittsu
 
     def dispose
       dispatch_event type: :dispose
+    end
+
+    def implementation(renderer)
+      @_implementation ||= renderer.create_implementation(self)
     end
 
     private

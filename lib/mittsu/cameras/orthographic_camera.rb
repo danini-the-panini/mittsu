@@ -49,5 +49,18 @@ module Mittsu
 
       camera
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:left] = self.left
+      data[:right] = self.right
+      data[:top] = self.top
+      data[:bottom] = self.bottom
+      data[:near] = self.near
+      data[:far] = self.far
+      data
+    end
   end
 end

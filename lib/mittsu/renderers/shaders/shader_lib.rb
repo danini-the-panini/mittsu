@@ -11,8 +11,9 @@ module Mittsu
       @fragment_shader = options.fetch(:fragment_shader)
     end
   end
+  private_constant :ShaderLib_Instance
 
-  ShaderLib = {
+  SHADER_LIB_HASH = {
     basic: ShaderLib_Instance.new(
       uniforms: UniformsUtils.merge([
         UniformsLib[:common],
@@ -417,4 +418,19 @@ module Mittsu
       ].join("\n")
     )
   }
+
+  class ShaderLib
+    def self.create_shader(id, options={})
+      shader = self[id]
+      {
+        uniforms: UniformsUtils.clone(shader.uniforms),
+        vertex_shader: shader.vertex_shader,
+        fragment_shader: shader.fragment_shader
+      }.merge(options)
+    end
+
+    def self.[](id)
+      SHADER_LIB_HASH[id]
+    end
+  end
 end

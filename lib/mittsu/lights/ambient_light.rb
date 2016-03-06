@@ -12,5 +12,13 @@ module Mittsu
       super(light)
       light
     end
+
+    protected
+
+    def jsonify
+      data = super
+      data[:color] = self.color.get_hex
+      data
+    end
   end
 end
