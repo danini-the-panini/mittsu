@@ -65,12 +65,12 @@ module OpenGLStub
   end
 
   def glGetIntegerv(_, params)
-    params[0..-1] = [123].pack('L')
+    params[0..-1] = [4096].pack('L')
     nil
   end
 
   def glGetShaderiv(_, _, params)
-    params[0..-1] = [123].pack('L')
+    params[0..-1] = [4096].pack('L')
     nil
   end
   alias :glGetProgramiv :glGetShaderiv
