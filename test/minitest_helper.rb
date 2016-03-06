@@ -1,3 +1,5 @@
+require 'pry'
+
 require 'codeclimate-test-reporter'
 require 'simplecov'
 require 'coveralls'

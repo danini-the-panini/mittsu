@@ -2,15 +2,13 @@ module Mittsu
   class MTLLoader
     include EventDispatcher
 
-    def initialize(base_url, options = {}) # TODO: cross_origin?
+    def initialize(base_url, options = {})
       @base_url = base_url
       @options = options
-      # @cross_origin = cross_origin
     end
 
     def load(url)
       loader = FileLoader.new
-      # loader.cross_origin = @cross_origin
 
       text = loader.load File.join(@base_url, url)
       parse(text)
@@ -36,14 +34,11 @@ module Mittsu
   			value = value.strip
 
   			if key == "newmtl"
-  				# New material
-
   				info = { name: value };
   				materials_info[value] = info
   			elsif info
   				if key == "ka" || key == "kd" || key == "ks"
-  					ss = value.split(delimiter_pattern).take(3)
-  					info[key] = [ss[0].to_f, ss[1].to_f, ss[2].to_f]
+  					info[key] = value.split(delimiter_pattern).take(3).map(&:to_f)
   				else
   					info[key] = value
   				end
@@ -81,8 +76,7 @@ module Mittsu
         converted = {}
 
         materials_info.each do |mn, mat|
-          covmat = {}
-          converted[mn] = covmat
+          covmat = converted[mn] ={}
 
           mat.each do |prop, value|
             save = true
@@ -97,7 +91,7 @@ module Mittsu
               end
 
               if @options && @options[:ignore_zero_rgbs]
-                if value.take(3).any?(&:zero?)
+                if value.take(3).all?(&:zero?)
                   # ignore
                   save = false
                 end
@@ -108,7 +102,7 @@ module Mittsu
   						#   factor of 1.0 is fully opaque, a factor of 0 is fully dissolved (completely transparent)
 
               if @options && @options[:invert_transparency]
-                value = 1.0 - value
+                value = 1.0 - value.to_f
               end
             end
 
@@ -155,7 +149,6 @@ module Mittsu
           texture = Texture.new
 
           loader = ImageLoader.new
-          # loader.cross_origin = @cross_origin # TODO: ???
           image = loader.load url
 
           texture.image = ensure_power_of_two(image)

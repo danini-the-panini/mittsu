@@ -17,7 +17,7 @@ class TestSkyboxSanityCheck < Minitest::Test
     geometry = Mittsu::SphereGeometry.new(2.0, 32, 16)
     texture = Mittsu::ImageUtils.load_texture_cube(
       6.times.map { |path|
-        File.expand_path "../../support/textures/test.png", __FILE__
+        File.expand_path "../../support/samples/test.png", __FILE__
       }
     )
     material = Mittsu::MeshBasicMaterial.new(env_map: texture)

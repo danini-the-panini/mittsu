@@ -215,7 +215,7 @@ module Mittsu
       self
     end
 
-    def equals(c)
+    def ==(c)
       (c.r == @r) && (c.g == @g) && (c.b == @b)
     end
 

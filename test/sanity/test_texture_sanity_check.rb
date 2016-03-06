@@ -12,7 +12,7 @@ class TestTextureSanityCheck < Minitest::Test
     renderer = Mittsu::OpenGLRenderer.new width: width, height: height, title: 'TestTextureSanityCheck'
 
     geometry = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
-    texture = Mittsu::ImageUtils.load_texture(File.expand_path "../../support/textures/test.png", __FILE__)
+    texture = Mittsu::ImageUtils.load_texture(File.expand_path "../../support/samples/test.png", __FILE__)
     material = Mittsu::MeshBasicMaterial.new(map: texture, normal_map: texture)
     cube = Mittsu::Mesh.new(geometry, material)
     scene.add(cube)
