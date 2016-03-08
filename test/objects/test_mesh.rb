@@ -41,8 +41,7 @@ class TestMesh < Minitest::Test
       }],
       materials: [{
         uuid: mesh.material.uuid,
-        type: 'MeshBasicMaterial',
-        color: mesh.material.color.hex
+        type: 'MeshBasicMaterial'
       }],
       object: {
         uuid: mesh.uuid,

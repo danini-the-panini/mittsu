@@ -109,14 +109,5 @@ module Mittsu
 
       material
     end
-
-    def to_json
-      output = super
-      output[:color] = @color.hex
-      output[:vertex_colors] = @vertex_colors unless @vertex_colors == NoColors
-      output[:blending] = @blending unless @blending == NormalBlending
-      output[:side] = @side unless @side == FrontSide
-      output
-    end
   end
 end
