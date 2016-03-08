@@ -270,7 +270,7 @@ module Mittsu
 
     def traverse_ancestors(&callback)
       if @parent
-        callback.yielf @parent
+        callback.yield @parent
         @parent.traverse_ancestors(&callback)
       end
     end
@@ -311,7 +311,8 @@ module Mittsu
       @_output
     end
 
-    def clone(object = Object3D.new, recursive = true)
+    def clone(object = nil, recursive = true)
+      object ||= Object3D.new
       object.name = @name
       object.up.copy(@up)
       object.position.copy(@position)
@@ -342,18 +343,18 @@ module Mittsu
     protected
 
     def jsonify
-      data = {}
-      data[:uuid] = self.uuid
-      data[:type] = self.type
-      data[:name] = self.name unless self.name.nil? || self.name.empty?
-      data[:user_data] = self.user_data unless self.user_data.nil? || self.user_data.empty?
-      data[:visible] = self.visible unless self.visible
-      data[:matrix] = self.matrix.to_a
+      data = {
+        uuid: @uuid,
+        type: @type,
+        matrix: @matrix.to_a
+      }
+      data[:name] = @name unless @name.nil? || @name.empty?
+      data[:user_data] = @user_data unless @user_data.nil? || @user_data.empty?
+      data[:visible] = @visible unless @visible
 
       if !self.children.empty?
-        data[:children] = []
-        self.children.each do |child|
-          data[:children] << child.jsonify
+        data[:children] = @children.map do |child|
+          child.jsonify
         end
       end
 
