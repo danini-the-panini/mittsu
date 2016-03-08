@@ -1,4 +1,4 @@
-newmtl Test Material
+newmtl test_material
 Ka 10 20 30
 Kd 40 50 60
 Ks 70 80 90

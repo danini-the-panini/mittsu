@@ -1,4 +1,4 @@
-newmtl Test Material
+newmtl test_material
 Ka 0.100 0.200 0.300
 Kd 0.000 0.000 0.000
 Ks 0.700 0.800 0.900
