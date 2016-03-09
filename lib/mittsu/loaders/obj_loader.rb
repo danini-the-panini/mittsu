@@ -187,28 +187,26 @@ module Mittsu
       end
     end
 
-    def handle_quad(faces, uvs, normal_inds)
-      if !normal_inds.nil? && !normal_inds.empty?
-        add_face(faces[0], faces[1], faces[3], [normal_inds[0], normal_inds[1], normal_inds[3]])
-        add_face(faces[1], faces[2], faces[3], [normal_inds[1], normal_inds[2], normal_inds[3]])
-      else
-        add_face(faces[0], faces[1], faces[3])
-        add_face(faces[1], faces[2], faces[3])
-      end
-
-      if !uvs.nil? && !uvs.empty?
-        add_uvs(uvs[0], uvs[1], uvs[3])
-        add_uvs(uvs[1], uvs[2], uvs[3])
-      end
-    end
-
-    def handle_face(faces, uvs = nil, normal_inds = nil)
+    def handle_face(faces, uvs = [], normal_inds = [])
       new_mesh if @mesh.nil?
       if faces[3].nil?
         handle_triangle(faces, uvs, normal_inds)
       else
         handle_quad(faces, uvs, normal_inds)
       end
+    end
+
+    def handle_quad(faces, uvs, normal_inds)
+      handle_quad_triangle(faces, uvs, normal_inds, [0, 1, 3])
+      handle_quad_triangle(faces, uvs, normal_inds, [1, 2, 3])
+    end
+
+    def handle_quad_triangle(faces, uvs, normal_inds, tri_inds)
+      handle_triangle(
+        faces.values_at(*tri_inds).compact,
+        uvs.values_at(*tri_inds).compact,
+        normal_inds.values_at(*tri_inds).compact
+      )
     end
   end
 end
