@@ -2,26 +2,24 @@ module Mittsu
   class OBJLoader
     include EventDispatcher
 
-    # v float float float
-    VERTEX_PATTERN = /v( +[\d|.|+|\-|e]+)( +[\d|.|+|\-|e]+)( +[\d|.|+|\-|e]+)/
+    FLOAT                = /[\d|.|+|\-|e]+/
 
-    # vn float float float
-    NORMAL_PATTERN = /vn( +[\d|.|+|\-|e]+)( +[\d|.|+|\-|e]+)( +[\d|.|+|\-|e]+)/
+    VERTEX_PATTERN       = /^v\s+(#{FLOAT})\s+(#{FLOAT})\s+(#{FLOAT})/
+    NORMAL_PATTERN       = /^vn\s+(#{FLOAT})\s+(#{FLOAT})\s+(#{FLOAT})/
+    UV_PATTERN           = /^vt\s+(#{FLOAT})\s+(#{FLOAT})/
 
-    # vt float flot
-    UV_PATTERN = /vt( +[\d|.|+|\-|e]+)( +[\d|.|+|\-|e]+)/
+    FACE_PATTERN         = /^f\s+/
+    FACE_V_PATTERN       = /^f\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+))?/
+    FACE_V_VT_PATTERN    = /^f\s+(\d+)\/(\d+)\s+(\d+)\/(\d+)\s+(\d+)\/(\d+)(?:\s+(\d+)\/(\d+))?/
+    FACE_V_VN_PATTERN    = /^f\s+(\d+)\/\/(\d+)\s+(\d+)\/\/(\d+)\s+(\d+)\/\/(\d+)(?:\s+(\d+)\/\/(\d+))?/
+    FACE_V_VT_VN_PATTERN = /^f\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\/(\d+)\/(\d+)(?:\s+(\d+)\/(\d+)\/(\d+))?/
 
-    # f vertex vertex vertex
-    FACE_PATTERN1 = /f( +\d+)( +\d+)( +\d+)( +\d+)?/
+    OBJECT_PATTERN       = /^o\s+(.+)$/
+    GROUP_PATTERN        = /^g\s+(.+)$/
+    SMOOTH_GROUP_PATTERN = /^s\s+(\d|true|false|on|off)$/
 
-    # f vertex/uv vertex/uv vertex/uv
-    FACE_PATTERN2 = /f( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))?/
-
-    # f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
-    FACE_PATTERN3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/
-
-    # f vertex//normal vertex//normal vertex//normal ...
-    FACE_PATTERN4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
+    USE_MTL_PATTERN      = /^usemtl\s+(.+)$/
+    LOAD_MTL_PATTERN     = /^mtllib\s+(.+)$/
 
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
@@ -35,94 +33,72 @@ module Mittsu
     end
 
     def parse(data)
-      @face_offset = 0
-      @group = Group.new
-
-      @vertices = []
-      @normals = []
-      @uvs = []
-
-      lines = data.split("\n")
-
-      lines.each do |line|
-        line = line.strip
-
-        next if line.empty? || line.start_with?('#')
-
-        case line
-        when VERTEX_PATTERN
-          # ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-          @vertices << vector($1.to_f, $2.to_f, $3.to_f)
-        when NORMAL_PATTERN
-          # ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-          @normals << vector($1.to_f, $2.to_f, $3.to_f)
-        when UV_PATTERN
-          # ["vt 0.1 0.2", "0.1", "0.2"]
-          @uvs << uv($1.to_f, $2.to_f)
-        when FACE_PATTERN1
-          # ["f 1 2 3", "1", "2", "3", undefined]
-          handle_face_line([ $1, $2, $3, $4 ])
-        when FACE_PATTERN2
-          # ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-          handle_face_line(
-            [ $2, $5, $8, $11 ], #faces
-            [ $3, $6, $9, $12 ] #uv
-          )
-        when FACE_PATTERN3
-          # ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
-          handle_face_line(
-            [ $2, $6, $10, $14 ], #faces
-            [ $3, $7, $11, $15 ], #uv
-            [ $4, $8, $12, $16 ] #normal
-          )
-        when FACE_PATTERN4
-          # ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
-          handle_face_line(
-            [ $2, $5, $8, $11 ], #faces
-            [ ], #uv
-            [ $3, $6, $9, $12 ] #normal
-          )
-        when /^o /
-          new_object(line[2..-1].strip)
-          @face_offset = @face_offset + @vertices.length
-          @vertices = []
-        when /^g /
-          # group
-          # no use for it in mittsu
-        when /^usemtl /
-          set_material(line[7..-1].strip)
-        when /^mtllib /
-          # mtl file
-
-          # TODO: ???
-          # if mtllib_callback
-          #   mtlfile = line[7..-1].strip
-          #   mtllib_callback.(mtlfile)
-          # end
-        when /^s /
-          # Smooth shading
-        else
-          raise "Mittsu::OBJMTLLoader: Unhandled line #{line}"
-        end
-      end
-
+      init_parsing
+      relevant_lines(data).each { |line| parse_line(line) }
       end_object
-
       @group
     end
 
     private
 
-    def vector(x, y, z)
-      Vector3.new(x, y, z)
+    def parse_line(line)
+      case line
+      when VERTEX_PATTERN       then handle_vertex($1.to_f, $2.to_f, $3.to_f)
+      when NORMAL_PATTERN       then handle_normal($1.to_f, $2.to_f, $3.to_f)
+      when UV_PATTERN           then handle_uv($1.to_f, $2.to_f)
+
+      when FACE_PATTERN         then parse_face(line)
+
+      when OBJECT_PATTERN       then new_object($1) and reset_vertices
+      when GROUP_PATTERN        # TODO
+      when SMOOTH_GROUP_PATTERN # TODO
+
+      when USE_MTL_PATTERN      then set_material($1)
+      when LOAD_MTL_PATTERN     # TODO
+      else                      raise "Mittsu::OBJMTLLoader: Unhandled line #{line}"
+      end
     end
 
-    def uv(u, v)
-      Vector2.new(u, v)
+    def parse_face(line)
+      case line
+      when FACE_V_PATTERN       then handle_face(
+        [$1, $2, $3, $4])   #face
+                            #(uv)
+                            #(normal)
+      when FACE_V_VT_PATTERN    then handle_face(
+        [$1, $3, $5, $7],   #face
+        [$2, $4, $6, $8])   #uv
+                            #(normal)
+      when FACE_V_VN_PATTERN    then handle_face(
+        [$1, $3, $5, $7 ],  #face
+        [],                 #(uv)
+        [$2, $4, $6, $8 ])  #normal
+      when FACE_V_VT_VN_PATTERN then handle_face(
+        [$1, $4, $7, $10],  #face
+        [$2, $5, $8, $11],  #uv
+        [$3, $6, $9, $12])  #normal
+      end
     end
 
     def face3(a, b, c, normals = nil)
       Face3.new(a, b, c, normals)
+    end
+
+    def init_parsing
+      @face_offset = 0
+      @group = Group.new
+      @vertices = []
+      @normals = []
+      @uvs = []
+    end
+
+    def reset_vertices
+      @face_offset = @face_offset + @vertices.length
+      @vertices = []
+    end
+
+    def relevant_lines(raw_lines)
+      raw_lines.split("\n").map(&:strip).reject(&:empty?).reject{|l| l.start_with? '#'}
     end
 
     def new_object(object_name = '')
@@ -164,6 +140,18 @@ module Mittsu
 
       @material = MeshLambertMaterial.new
       @material.name = material_name
+    end
+
+    def handle_vertex(x, y, z)
+      @vertices << Vector3.new(x, y, z)
+    end
+
+    def handle_normal(x, y, z)
+      @normals << Vector3.new(x, y, z)
+    end
+
+    def handle_uv(u, v)
+      @uvs << Vector2.new(u, v)
     end
 
     def add_face(a, b, c, normal_inds = nil)
@@ -214,7 +202,7 @@ module Mittsu
       end
     end
 
-    def handle_face_line(faces, uvs = nil, normal_inds = nil)
+    def handle_face(faces, uvs = nil, normal_inds = nil)
       new_mesh if @mesh.nil?
       if faces[3].nil?
         handle_triangle(faces, uvs, normal_inds)
