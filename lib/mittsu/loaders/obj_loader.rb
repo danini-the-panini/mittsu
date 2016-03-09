@@ -50,8 +50,8 @@ module Mittsu
       when FACE_PATTERN         then parse_face(line)
 
       when OBJECT_PATTERN       then new_object($1) and reset_vertices
-      when GROUP_PATTERN        # TODO
-      when SMOOTH_GROUP_PATTERN # TODO
+      when GROUP_PATTERN        # ignore
+      when SMOOTH_GROUP_PATTERN # ignore
 
       when USE_MTL_PATTERN      then set_material($1)
       when LOAD_MTL_PATTERN     # TODO
