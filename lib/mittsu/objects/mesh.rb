@@ -5,7 +5,7 @@ module Mittsu
   class Mesh < Object3D
     attr_accessor :material, :morph_target_base
 
-    def initialize(geometry = Geometry.new, material = MeshBasicMaterial.new(color: rand * 0xffffff))
+    def initialize(geometry = Geometry.new, material = MeshBasicMaterial.new(color: (rand * 0xffffff).to_i))
       super()
 
       @type = 'Mesh'
@@ -16,7 +16,7 @@ module Mittsu
     end
 
     def update_morph_targets
-      if !@morph_targets.nil? && !@morph_targets.empty?
+      if !@geometry.morph_targets.nil? && !@geometry.morph_targets.empty?
         @morph_targets_base = -1
         @morph_target_forced_order = []
         @morph_targets_influences = []
@@ -38,13 +38,13 @@ module Mittsu
     end
 
     def raycast(raycaster, intersects)
-      @_inverse_matrix = Matrix4.new
-      @_ray = Ray.new
-      @_sphere = Sphere.new
+      @_inverse_matrix ||= Matrix4.new
+      @_ray ||= Ray.new
+      @_sphere ||= Sphere.new
 
-      @_v_a = Vector3.new
-      @_v_b = Vector3.new
-      @_v_c = Vector3.new
+      @_v_a ||= Vector3.new
+      @_v_b ||= Vector3.new
+      @_v_c ||= Vector3.new
 
       # Checking bounding_sphere distance to ray
 
@@ -60,7 +60,7 @@ module Mittsu
       inverse_matrix.inverse(@matrix_world)
       ray.copy(raycaster.ray).apply_matrix4(inverse_matrix)
 
-      if !geometry.bounding_bounding_box
+      if !geometry.bounding_bounding_box.nil?
         return unless ray.intersection_box?(geometry.bounding_box)
       end
 
@@ -244,8 +244,8 @@ module Mittsu
 
     def jsonify
       data = super
-      data[:geometry] = jsonify_geometry(self.geometry)
-      data[:material] = jsonify_material(self.material)
+      data[:geometry] = jsonify_geometry(@geometry)
+      data[:material] = jsonify_material(@material)
       data
     end
   end

@@ -13,7 +13,7 @@ renderer.shadow_map_type = Mittsu::PCFSoftShadowMap
 
 loader = Mittsu::OBJMTLLoader.new
 
-object = loader.load('male02.obj', 'male02.mtl')
+object = loader.load(File.expand_path('../male02.obj', __FILE__), 'male02.mtl')
 
 object.receive_shadow = true
 object.cast_shadow = true

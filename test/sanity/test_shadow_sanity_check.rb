@@ -17,8 +17,8 @@ class TestShadowSanityCheck < Minitest::Test
     floor.receive_shadow = true
     scene.add(floor)
 
-    nb = 15
-    nr = 5
+    nb = 5
+    nr = 1
     balls = nb.times.map do |index|
       nr.times.map do |r|
         ring = (3 + r)
