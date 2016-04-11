@@ -1,0 +1,14 @@
+newmtl test_material
+Ka 0.100 0.200 0.300
+Kd 0.000 0.000 0.000
+Ks 0.700 0.800 0.900
+Ns 123.45
+d 0.123 # opacity
+illum 1234
+# comment!
+map_Ka test.png
+map_Kd test.png
+map_Ks test.png
+map_Ns test.png
+map_d test.png
+map_bump test.png

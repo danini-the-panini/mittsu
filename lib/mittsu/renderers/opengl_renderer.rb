@@ -317,7 +317,7 @@ module Mittsu
       if width > max_size || height > max_size
         # TODO: scale the image ...
 
-        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to ??? x ???"
+        puts "WARNING: Mittsu::OpenGLRenderer: image is too big (#{width} x #{height}). Resized to #{@_max_texture_size} x #{@_max_texture_size}"
       end
       image
     end

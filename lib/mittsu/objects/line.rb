@@ -8,7 +8,7 @@ module Mittsu
       @type = 'Line'
 
       @geometry = geometry || Geometry.new
-      @material = material || LineBasicMaterial.new(color: rand * 0xffffff)
+      @material = material || LineBasicMaterial.new(color: (rand * 0xffffff).to_i)
 
       @mode = mode || LineStrip
 

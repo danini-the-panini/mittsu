@@ -1,3 +1,5 @@
+require 'pry'
+
 require 'codeclimate-test-reporter'
 require 'simplecov'
 require 'coveralls'
@@ -35,5 +37,13 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'minitest'
 Dir[__dir__ + '/support/*.rb'].each {|file| require file }
 require 'mittsu'
+
+class Minitest::Test
+  def assert_color_equal expected, actual
+    assert_in_delta expected.r, actual.r
+    assert_in_delta expected.g, actual.g
+    assert_in_delta expected.b, actual.b
+  end
+end
 
 require 'minitest/autorun'
