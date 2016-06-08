@@ -1,0 +1,35 @@
+#rb_include common
+#rb_include map_pars_vertex
+#rb_include lightmap_pars_vertex
+#rb_include envmap_pars_vertex
+#rb_include color_pars_vertex
+#rb_include morphtarget_pars_vertex
+#rb_include skinning_pars_vertex
+#rb_include shadowmap_pars_vertex
+#rb_include logdepthbuf_pars_vertex
+
+void main() {
+
+  #rb_include map_vertex
+  #rb_include lightmap_vertex
+  #rb_include color_vertex
+  #rb_include skinbase_vertex
+
+  #ifdef USE_ENVMAP
+
+    #rb_include morphnormal_vertex
+    #rb_include skinnormal_vertex
+    #rb_include defaultnormal_vertex
+
+  #endif
+
+  #rb_include morphtarget_vertex
+  #rb_include skinning_vertex
+  #rb_include default_vertex
+  #rb_include logdepthbuf_vertex
+
+  #rb_include worldpos_vertex
+  #rb_include envmap_vertex
+  #rb_include shadowmap_vertex
+
+}

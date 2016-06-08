@@ -1,6 +1,7 @@
 require 'mittsu/renderers/shaders/uniforms_utils'
 require 'mittsu/renderers/shaders/uniforms_lib'
 require 'mittsu/renderers/shaders/shader_chunk'
+require 'mittsu/renderers/shaders/rbsl_loader'
 
 module Mittsu
   class ShaderLib_Instance
