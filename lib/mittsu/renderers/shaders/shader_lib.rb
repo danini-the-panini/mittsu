@@ -48,7 +48,7 @@ module Mittsu
         "  #endif",
 
           ShaderChunk[:morphtarget_vertex],
-          ShaderChunk[:skin_vertex],
+          ShaderChunk[:skinning_vertex],
           ShaderChunk[:default_vertex],
           ShaderChunk[:logdepthbuf_vertex],
 
