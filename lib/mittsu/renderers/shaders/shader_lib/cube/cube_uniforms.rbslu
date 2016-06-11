@@ -1,0 +1,2 @@
+uniform texture tCube;
+uniform float tFlip = -1.0;

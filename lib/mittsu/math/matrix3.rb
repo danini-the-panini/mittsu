@@ -3,8 +3,8 @@ require 'mittsu/math'
 module Mittsu
   class Matrix3
     attr_accessor :elements
-    def initialize(elements = nil)
-      @elements = elements || [
+    def initialize()
+      @elements = [
         1.0, 0.0, 0.0,
         0.0, 1.0, 0.0,
         0.0, 0.0, 1.0
@@ -139,6 +139,10 @@ module Mittsu
       r[7] = m[5]
       r[8] = m[8]
       self
+    end
+
+    def ==(other)
+      other.elements == @elements
     end
 
     def from_array(array)

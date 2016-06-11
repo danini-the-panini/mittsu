@@ -563,6 +563,10 @@ module Mittsu
       self
     end
 
+    def ==(other)
+      other.elements == @elements
+    end
+
     def to_a
       te = self.elements
       [

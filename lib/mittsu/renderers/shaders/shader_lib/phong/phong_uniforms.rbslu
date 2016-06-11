@@ -1,0 +1,11 @@
+#rb_include common
+#rb_include bump
+#rb_include normal_map
+#rb_include fog
+#rb_include lights
+#rb_include shadow_map
+
+uniform color emissive = color(0.0, 0.0, 0.0);
+uniform color specular = color(0.667, 0.667, 0.667);
+uniform float shininess = 30.0;
+uniform vec3 wrapRGB = vec3(1.0, 1.0, 1.0);
