@@ -215,10 +215,7 @@ module Mittsu
         a[offset + 1] = @y;
       }
     end
-
-    def to_a
-      self.to_array
-    end
+    alias :to_a :to_array
 
     def from_attribute(attribute, index, offset = 0)
       index = index * attribute.item_size + offset

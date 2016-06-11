@@ -112,8 +112,8 @@ module Mittsu
         UniformsLib[:lights],
         UniformsLib[:shadow_map],
         {
-          'emissive' => Uniform.new(:c, Color.new(0x000000)),
-          'wrapRGB' => Uniform.new(:v3, Vector3.new(1.0, 1.0, 1.0))
+          'emissive' => Uniform.new(:color, Color.new(0x000000)),
+          'wrapRGB' => Uniform.new(:vec3, Vector3.new(1.0, 1.0, 1.0))
         }
       ]),
       vertex_shader: [
@@ -228,10 +228,10 @@ module Mittsu
         UniformsLib[:lights],
         UniformsLib[:shadow_map],
         {
-          'emissive'  => Uniform.new(:c, Color.new(0x000000)),
-          'specular'  => Uniform.new(:c, Color.new(0x111111)),
-          'shininess' => Uniform.new(:f, 30.0),
-          'wrapRGB'   => Uniform.new(:v3, Vector3.new(1.0, 1.0, 1.0))
+          'emissive'  => Uniform.new(:color, Color.new(0x000000)),
+          'specular'  => Uniform.new(:color, Color.new(0x111111)),
+          'shininess' => Uniform.new(:float, 30.0),
+          'wrapRGB'   => Uniform.new(:vec3, Vector3.new(1.0, 1.0, 1.0))
         }
       ]),
       vertex_shader: [
@@ -337,8 +337,8 @@ module Mittsu
     # normal
     cube: ShaderLib_Instance.new(
       uniforms: {
-        'tCube' => Uniform.new(:t, nil),
-        'tFlip' => Uniform.new(:f, -1.0)
+        'tCube' => Uniform.new(:texture, nil),
+        'tFlip' => Uniform.new(:float, -1.0)
       },
       vertex_shader: [
         'out vec3 vWorldPosition;',

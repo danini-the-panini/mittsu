@@ -647,130 +647,82 @@ module Mittsu
 
         # AAAAAHHHHH!!!!! \o/ *flips table*
         case type
-        when :'1i'
+        when :int
           glUniform1i(location, value)
-        when :'1f'
+        when :ivec2
+          glUniform2i(location, value[0], value[1])
+        when :ivec3
+          glUniform3i(location, value[0], value[1], value[2])
+        when :ivec4
+          glUniform4i(location, value[0], value[1], value[2], value[3])
+        when :float
           glUniform1f(location, value)
-        when :'2f'
+        when :vec2
           glUniform2f(location, value[0], value[1])
-        when :'3f'
-          glUniform2f(location, value[0], value[1], value[2])
-        when :'4f'
+        when :vec3, :color
+          glUniform3f(location, value[0], value[1], value[2])
+        when :vec4
           glUniform4f(location, value[0], value[1], value[2], value[3])
-        when :'1iv'
+        when :'int[]'
           glUniform1iv(location, value.length, array_to_ptr_easy(value))
-        when :'2iv'
+        when :'ivec2[]'
           glUniform2iv(location, value.length / 2, array_to_ptr_easy(value))
-        when :'3iv'
+        when :'ivec3[]'
           glUniform3iv(location, value.length / 3, array_to_ptr_easy(value))
-        when :'4iv'
-          glUniform3iv(location, value.length / 4, array_to_ptr_easy(value))
-        when :'1fv'
+        when :'ivec4[]'
+          glUniform4iv(location, value.length / 4, array_to_ptr_easy(value))
+        when :'float[]'
           glUniform1fv(location, value.length, array_to_ptr_easy(value))
-        when :'2fv'
-          glUniform2fv(location, value.length / 2, array_to_ptr_easy(value))
-        when :'3fv'
-          glUniform3fv(location, value.length / 3, array_to_ptr_easy(value))
-        when :'4fv'
-          glUniform3fv(location, value.length / 4, array_to_ptr_easy(value))
-        when :Matrix3fv
-          glUniformMatrix3fv(location, value / 9, GL_FALSE, array_to_ptr_easy(value))
-        when :Matrix4fv
-          glUniformMatrix4fv(location, value / 16, GL_FALSE, array_to_ptr_easy(value))
-
-        #
-
-        when :i
-          # single integer
-          glUniform1i(location, value)
-        when :f
-          # single float
-          glUniform1f(location, value)
-        when :v2
-          # single Mittsu::Vector2
-          glUniform2f(location, value.x, value.y)
-        when :v3
-          # single Mittsu::Vector3
-          glUniform3f(location, value.x, value.y, value.z)
-        when :v4
-          # single Mittsu::Vector4
-          glUniform4f(location, value.x, value.y, value.z, value.w)
-        when :c
-          # single Mittsu::Color
-          glUniform3f(location, value.r, value.g, value.b)
-        when :iv1
-          # flat array of integers
-          glUniform1iv(location, value.length, array_to_ptr_easy(value))
-        when :iv
-          # flat array of integers with 3 x N size
-          glUniform3iv(location, value.length / 3, array_to_ptr_easy(value))
-        when :fv1
-          # flat array of floats
-          glUniform1fv(location, value.length, array_to_ptr_easy(value))
-        when :fv
-          # flat array of float with 3 x N size
-          glUniform3fv(location, value.length / 3, array_to_ptr_easy(value))
-        when :v2v
-          # array of Mittsu::Vector2
-          uniform.array ||= Array.new(2 * value.length) # Float32Array
-
-          value.each_with_index do |v, i|
-            offset = i * 2
-            uniform.array[offset] = v.x
-            uniform.array[offset + 1] = v.y
+        when :'vec2[]'
+          if value[0].is_a? Vector2
+            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
+            glUniform2fv(location, value.length, array_to_ptr_easy(uniform.array))
+          else
+            glUniform2fv(location, value.length / 2, array_to_ptr_easy(value))
           end
-
-          glUniform2fv(location, value.length * 2, array_to_ptr_easy(uniform.array))
-        when :v3v
-          # array of Mittsu::Vector3
-          uniform.array ||= Array.new(3 * value.length) # Float32Array
-
-          value.each_with_index do |v, i|
-            offset = i * 3
-            uniform.array[offset] = v.x
-            uniform.array[offset + 1] = v.y
-            uniform.array[offset + 2] = v.z
+        when :'vec3[]', :'color[]'
+          if value.first.is_a?(Vector3) || value.first.is_a?(Color)
+            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
+            glUniform3fv(location, value.length, array_to_ptr_easy(uniform.array))
+          else
+            glUniform3fv(location, value.length / 3, array_to_ptr_easy(value))
           end
-
-          glUniform3fv(location, value.length * 3, array_to_ptr_easy(uniform.array))
-        when :v4v
-          # array of Mittsu::Vector4
-          uniform.array ||= Array.new(4 * value.length) # Float32Array
-
-          value.each_with_index do |v, i|
-            offset = i * 4
-            uniform.array[offset] = v.x
-            uniform.array[offset + 1] = v.y
-            uniform.array[offset + 2] = v.z
-            uniform.array[offset + 3] = v.w
+        when :'vec4[]'
+          if value.first.is_a? Vector4
+            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
+            glUniform4fv(location, value.length, array_to_ptr_easy(uniform.array))
+          else
+            glUniform4fv(location, value.length / 4, array_to_ptr_easy(value))
           end
+        when :mat3
+          glUniformMatrix3fv(location, 1, GL_FALSE, array_to_ptr_easy(value.to_a))
+        when :mat4
+          glUniformMatrix4fv(location, 1, GL_FALSE, array_to_ptr_easy(value.to_a))
+        when :'mat3[]'
+          if value.first.is_a? Matrix3
+            uniform.array ||= Array.new(9 * value.length) # Float32Array
 
-          glUniform4fv(location, value.length * 4, array_to_ptr_easy(uniform.array))
-        when :m3
-          # single Mittsu::Matrix3
-          glUniformMatrix3fv(location, 1, GL_FALSE, array_to_ptr_easy(value.elements))
-        when :m3v
-          # array of Mittsu::Matrix3
-          uniform.array ||= Array.new(9 * value.length) # Float32Array
+            value.each_with_index do |v, i|
+              value[i].flatten_to_array_offset(uniform.array, i * 9)
+            end
 
-          value.each_with_index do |v, i|
-            value[i].flatten_to_array_offset(uniform.array, i * 9)
+            glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
+          else
+            glUniformMatrix3fv(location, value / 9, GL_FALSE, array_to_ptr_easy(value))
           end
+        when :'mat4[]'
+          if value.first.is_a? Matrix4
+            uniform.array ||= Array.new(16 * value.length) # Float32Array
 
-          glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
-        when :m4
-          # single Mittsu::Matrix4
-          glUniformMatrix4vf(location, 1, GL_FALSE, array_to_ptr_easy(value.elements))
-        when :m4v
-          # array of Mittsu::Matrix4
-          uniform.array ||= Array.new(16 * value.length) # Float32Array
+            value.each_with_index do |v, i|
+              value[i].flatten_to_array_offset(uniform.array, i * 16)
+            end
 
-          value.each_with_index do |v, i|
-            value[i].flatten_to_array_offset(uniform.array, i * 16)
+            glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
+          else
+            glUniformMatrix4fv(location, value / 16, GL_FALSE, array_to_ptr_easy(value))
           end
-
-          glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
-        when :t
+        when :texture
           # single Mittsu::Texture (2d or cube)
           texture = value
           texture_unit = get_texture_unit
@@ -784,7 +736,7 @@ module Mittsu
           # TODO: when OpenGLRenderTargetCube is defined
           # elsif texture.is_a?(OpenGLRenderTargetCube)
             # set_cube_texture_dynamic(texture, texture_unit)
-        when :tv
+        when :'texture[]'
           # array of Mittsu::Texture (2d)
           uniform.array ||= []
 

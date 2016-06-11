@@ -378,6 +378,22 @@ module Mittsu
       ((v.x == @x) && (v.y == @y) && (v.z == @z) && (v.w == @w))
     end
 
+    def []=(index, value)
+      return @x = value.to_f if index == 0 || index == :x
+      return @y = value.to_f if index == 1 || index == :y
+      return @z = value.to_f if index == 2 || index == :z
+      return @w = value.to_f if index == 3 || index == :w
+      raise IndexError
+    end
+
+    def [](index)
+      return @x if index == 0 || index == :x
+      return @y if index == 1 || index == :y
+      return @z if index == 2 || index == :z
+      return @w if index == 3 || index == :w
+      raise IndexError
+    end
+
     def from_array(array, offset = 0)
       @x = array[offset]
       @y = array[offset + 1]
@@ -393,6 +409,7 @@ module Mittsu
       array[offset + 3] = @w
       array
     end
+    alias :to_a :to_array
 
     def from_attribute(attribute, index, offset = 0)
       index = index * attribute.itemSize + offset

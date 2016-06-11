@@ -3,8 +3,8 @@ require 'mittsu/math'
 module Mittsu
   class Matrix3
     attr_accessor :elements
-    def initialize
-      @elements = [
+    def initialize(elements = nil)
+      @elements = elements || [
         1.0, 0.0, 0.0,
         0.0, 1.0, 0.0,
         0.0, 0.0, 1.0

@@ -25,82 +25,82 @@ module Mittsu
 
   UniformsLib = {
     common: {
-      'diffuse' => Uniform.new(:c, Color.new(0xeeeeee)),
-      'opacity' => Uniform.new(:f, 1.0),
+      'diffuse' => Uniform.new(:color, Color.new(0xeeeeee)),
+      'opacity' => Uniform.new(:float, 1.0),
 
-      'map' => Uniform.new(:t, nil),
-      'offsetRepeat' => Uniform.new(:v4, Vector4.new(0.0, 0.0, 1.0, 1.0)),
+      'map' => Uniform.new(:texture, nil),
+      'offsetRepeat' => Uniform.new(:vec4, Vector4.new(0.0, 0.0, 1.0, 1.0)),
 
-      'lightMap' => Uniform.new(:t, nil),
-      'specularMap' => Uniform.new(:t, nil),
-      'alphaMap' => Uniform.new(:t, nil),
+      'lightMap' => Uniform.new(:texture, nil),
+      'specularMap' => Uniform.new(:texture, nil),
+      'alphaMap' => Uniform.new(:texture, nil),
 
-      'envMap' => Uniform.new(:t, nil),
-      'flipEnvMap' => Uniform.new(:f, -1.0),
-      'reflectivity' => Uniform.new(:f, 1.0),
-      'refractionRatio' => Uniform.new(:f, 0.98),
+      'envMap' => Uniform.new(:texture, nil),
+      'flipEnvMap' => Uniform.new(:float, -1.0),
+      'reflectivity' => Uniform.new(:float, 1.0),
+      'refractionRatio' => Uniform.new(:float, 0.98),
 
-      'morphTargetInfluences' => Uniform.new(:f, 0.0)
+      'morphTargetInfluences' => Uniform.new(:float, 0.0)
     },
 
     bump: {
-      'bumpMap' => Uniform.new(:t, nil),
-      'bumpScale' => Uniform.new(:f, 1.0)
+      'bumpMap' => Uniform.new(:texture, nil),
+      'bumpScale' => Uniform.new(:float, 1.0)
     },
 
   	normal_map: {
-  		'normalMap' => Uniform.new(:t, nil),
-  		'normalScale' => Uniform.new(:v2, Vector2.new(1.0, 1.0))
+  		'normalMap' => Uniform.new(:texture, nil),
+  		'normalScale' => Uniform.new(:vec2, Vector2.new(1.0, 1.0))
   	},
 
     fog: {
-      'fogDensity' => Uniform.new(:f, 0.00025),
-      'fogNear' => Uniform.new(:f, 1.0),
-      'fogFar' => Uniform.new(:f, 2000.0),
-      'fogColor' => Uniform.new(:c, Color.new(0xffffff))
+      'fogDensity' => Uniform.new(:float, 0.00025),
+      'fogNear' => Uniform.new(:float, 1.0),
+      'fogFar' => Uniform.new(:float, 2000.0),
+      'fogColor' => Uniform.new(:color, Color.new(0xffffff))
     },
 
     lights: {
-      'ambientLightColor' => Uniform.new(:fv, []),
+      'ambientLightColor' => Uniform.new(:color, Color.new(0xffffff)),
 
-      'directionalLightDirection' => Uniform.new(:fv, []),
-      'directionalLightColor' => Uniform.new(:fv, []),
+      'directionalLightDirection' => Uniform.new(:'vec3[]', []),
+      'directionalLightColor' => Uniform.new(:'color[]', []),
 
-      'hemisphereLightDirection' => Uniform.new(:fv, []),
-      'hemisphereLightSkyColor' => Uniform.new(:fv, []),
-      'hemisphereLightGroundColor' => Uniform.new(:fv, []),
+      'hemisphereLightDirection' => Uniform.new(:'vec3[]', []),
+      'hemisphereLightSkyColor' => Uniform.new(:'color[]', []),
+      'hemisphereLightGroundColor' => Uniform.new(:'color[]', []),
 
-      'pointLightColor' => Uniform.new(:fv, []),
-      'pointLightPosition' => Uniform.new(:fv, []),
-      'pointLightDistance' => Uniform.new(:fv1, []),
-      'pointLightDecay' => Uniform.new(:fv1, []),
+      'pointLightColor' => Uniform.new(:'color[]', []),
+      'pointLightPosition' => Uniform.new(:'vec3[]', []),
+      'pointLightDistance' => Uniform.new(:'float[]', []),
+      'pointLightDecay' => Uniform.new(:'float[]', []),
 
-      'spotLightColor' => Uniform.new(:fv, []),
-      'spotLightPosition' => Uniform.new(:fv, []),
-      'spotLightDirection' => Uniform.new(:fv, []),
-      'spotLightDistance' => Uniform.new(:fv, []),
-      'spotLightAngleCos' => Uniform.new(:fv, []),
-      'spotLightExponent' => Uniform.new(:fv, []),
-      'spotLightDecay' => Uniform.new(:fv, [])
+      'spotLightColor' => Uniform.new(:'color[]', []),
+      'spotLightPosition' => Uniform.new(:'vec3[]', []),
+      'spotLightDirection' => Uniform.new(:'vec3[]', []),
+      'spotLightDistance' => Uniform.new(:'float[]', []),
+      'spotLightAngleCos' => Uniform.new(:'float[]', []),
+      'spotLightExponent' => Uniform.new(:'float[]', []),
+      'spotLightDecay' => Uniform.new(:'float[]', [])
     },
 
     particle: {
-      'psColor' => Uniform.new(:c, Color.new(0xeeeeee)),
-      'opacity' => Uniform.new(:f, 1.0),
-      'size' => Uniform.new(:f, 1.0),
-      'scale' => Uniform.new(:f, 1.0),
-      'map' => Uniform.new(:t, nil),
-      'offsetRepeat' => Uniform.new(:v4, Vector4.new(0.0, 0.0, 1.0, 1.0))
+      'psColor' => Uniform.new(:color, Color.new(0xeeeeee)),
+      'opacity' => Uniform.new(:float, 1.0),
+      'size' => Uniform.new(:float, 1.0),
+      'scale' => Uniform.new(:float, 1.0),
+      'map' => Uniform.new(:texture, nil),
+      'offsetRepeat' => Uniform.new(:vec4, Vector4.new(0.0, 0.0, 1.0, 1.0))
     },
 
     shadow_map: {
-      'shadowMap' => Uniform.new(:tv, []),
-      'shadowMapSize' => Uniform.new(:v2v, []),
+      'shadowMap' => Uniform.new(:'texture[]', []),
+      'shadowMapSize' => Uniform.new(:'vec2[]', []),
 
-      'shadowBias' => Uniform.new(:fv1, []),
-      'shadowDarkness' => Uniform.new(:fv1, []),
+      'shadowBias' => Uniform.new(:'float[]', []),
+      'shadowDarkness' => Uniform.new(:'float[]', []),
 
-      'shadowMatrix' => Uniform.new(:m4v, [])
+      'shadowMatrix' => Uniform.new(:'mat4[]', [])
     }
   }
 end

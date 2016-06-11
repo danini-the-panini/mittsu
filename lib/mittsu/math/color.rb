@@ -219,6 +219,20 @@ module Mittsu
       (c.r == @r) && (c.g == @g) && (c.b == @b)
     end
 
+    def []=(index, value)
+      return @r = value.to_f if index == 0 || index == :r
+      return @g = value.to_f if index == 1 || index == :g
+      return @b = value.to_f if index == 2 || index == :b
+      raise IndexError
+    end
+
+    def [](index)
+      return @r if index == 0 || index == :r
+      return @g if index == 1 || index == :g
+      return @b if index == 2 || index == :b
+      raise IndexError
+    end
+
     def from_array(array)
       @r = array[0]
       @g = array[1]
@@ -232,6 +246,7 @@ module Mittsu
       array[offset + 2] = @b
       array
     end
+    alias :to_a :to_array
 
     def clone
       Mittsu::Color.new(@r, @g, @b)

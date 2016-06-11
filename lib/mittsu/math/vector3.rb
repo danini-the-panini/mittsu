@@ -465,10 +465,7 @@ module Mittsu
 
       array
     end
-
-    def to_a
-      self.to_array
-    end
+    alias :to_a :to_array
 
     def from_attribute(attribute, index, offse = 0)
       index = index * attribute.itemSize + offset
