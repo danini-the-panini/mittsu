@@ -21,8 +21,8 @@ TEST_UNIFORM_LIB = {
 }
 
 TEST_UNIFORMS = <<RBSL
-#rb_include common
-#rb_include fog
+#include common
+#include fog
 RBSL
 
 EXPECTED_UNIFORMS = {
@@ -35,7 +35,7 @@ EXPECTED_UNIFORMS = {
 }
 
 TEST_CUSTOM_UNIFORMS = <<RBSL
-#rb_include common
+#include common
 uniform int someInt = 42;
 uniform float someFloat = 123.45;
 uniform vec3 someVector = vec3(1.2, 3.4, 5.6);
@@ -101,13 +101,13 @@ EXPECTED_CUSTOM_UNIFORMS = {
 TEST_VERTEX = <<RBSL
 uniform vec4 someUniform;
 
-#rb_include common
-#rb_include something_else
+#include common
+#include something_else
 
 void main() {
   vec4 someVariable = vec4(1, 0, 0.5, 1.0);
 
-  #rb_include some_vertex_library
+  #include some_vertex_library
 }
 RBSL
 
@@ -130,13 +130,13 @@ RBSL
 TEST_FRAGMENT = <<RBSL
 uniform vec4 someUniform;
 
-#rb_include common
-#rb_include something_else
+#include common
+#include something_else
 
 void main() {
   vec4 someVariable = vec4(1, 0, 0.5, 1.0);
 
-  #rb_include some_fragment_library
+  #include some_fragment_library
 
   fragColor = vec4(outgoingLight, diffuseColor.a);
 }

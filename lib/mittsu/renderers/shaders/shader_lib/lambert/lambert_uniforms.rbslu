@@ -1,7 +1,7 @@
-#rb_include common
-#rb_include fog
-#rb_include lights
-#rb_include shadow_map
+#include common
+#include fog
+#include lights
+#include shadow_map
 
 uniform color emissive = color(0.0, 0.0, 0.0);
 uniform vec3 wrapRGB = vec3(1.0, 1.0, 1.0);

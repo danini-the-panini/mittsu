@@ -1,12 +1,12 @@
 out vec3 vWorldPosition;
 
-#rb_include common
+#include common
 
-#rb_include logdepthbuf_pars_vertex
+#include logdepthbuf_pars_vertex
 
 void main() {
   vWorldPosition = transformDirection( position, modelMatrix );
   gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-  #rb_include logdepthbuf_vertex
+  #include logdepthbuf_vertex
 }

@@ -4,7 +4,7 @@ module Mittsu
 
     def self.load_shader(shader, chunks)
       shader.lines.flat_map(&:chomp).map{ |line|
-        if line =~ /(\s*)#rb_include\s+(\w+)/
+        if line =~ /(\s*)#include\s+(\w+)/
           indentation = $1
           chunk_name = $2.to_sym
 
@@ -193,7 +193,7 @@ module Mittsu
             name, value = self.parse_uniform(uniform_strings.join(' '))
             hash[name] = value
           end
-        elsif line =~ /#rb_include\s+(\w+)/
+        elsif line =~ /#include\s+(\w+)/
           uniforms_lib[$1.to_sym].map { |(k, v)| hash[k] = v.clone }
         elsif line.start_with?('uniform')
           if line.end_with?(';')

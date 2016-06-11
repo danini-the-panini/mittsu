@@ -3,10 +3,10 @@ uniform float tFlip;
 
 in vec3 vWorldPosition;
 
-#rb_include common
-#rb_include logdepthbuf_pars_fragment
+#include common
+#include logdepthbuf_pars_fragment
 
 void main() {
   fragColor = texture( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );
-  #rb_include logdepthbuf_fragment
+  #include logdepthbuf_fragment
 }

@@ -1,12 +1,12 @@
-#rb_include common
-#rb_include morphtarget_pars_vertex
-#rb_include skinning_pars_vertex
-#rb_include logdepthbuf_pars_vertex
+#include common
+#include morphtarget_pars_vertex
+#include skinning_pars_vertex
+#include logdepthbuf_pars_vertex
 
 void main() {
-  #rb_include skinbase_vertex
-  #rb_include morphtarget_vertex
-  #rb_include skinning_vertex
-  #rb_include default_vertex
-  #rb_include logdepthbuf_vertex
+  #include skinbase_vertex
+  #include morphtarget_vertex
+  #include skinning_vertex
+  #include default_vertex
+  #include logdepthbuf_vertex
 }

@@ -6,42 +6,40 @@ uniform vec3 specular;
 uniform float shininess;
 uniform float opacity;
 
-#rb_include common
-#rb_include color_pars_fragment
-#rb_include map_pars_fragment
-#rb_include alphamap_pars_fragment
-#rb_include lightmap_pars_fragment
-#rb_include envmap_pars_fragment
-#rb_include fog_pars_fragment
-#rb_include lights_phong_pars_fragment
-#rb_include shadowmap_pars_fragment
-#rb_include bumpmap_pars_fragment
-#rb_include normalmap_pars_fragment
-#rb_include specularmap_pars_fragment
-#rb_include logdepthbuf_pars_fragment
+#include common
+#include color_pars_fragment
+#include map_pars_fragment
+#include alphamap_pars_fragment
+#include lightmap_pars_fragment
+#include envmap_pars_fragment
+#include fog_pars_fragment
+#include lights_phong_pars_fragment
+#include shadowmap_pars_fragment
+#include bumpmap_pars_fragment
+#include normalmap_pars_fragment
+#include specularmap_pars_fragment
+#include logdepthbuf_pars_fragment
 
 void main() {
-
   vec3 outgoingLight = vec3( 0.0 ); // outgoing light does not have an alpha, the surface does
   vec4 diffuseColor = vec4( diffuse, opacity );
 
-  #rb_include logdepthbuf_fragment
-  #rb_include map_fragment
-  #rb_include color_fragment
-  #rb_include alphamap_fragment
-  #rb_include alphatest_fragment
-  #rb_include specularmap_fragment
+  #include logdepthbuf_fragment
+  #include map_fragment
+  #include color_fragment
+  #include alphamap_fragment
+  #include alphatest_fragment
+  #include specularmap_fragment
 
-  #rb_include lights_phong_fragment
+  #include lights_phong_fragment
 
-  #rb_include lightmap_fragment
-  #rb_include envmap_fragment
-  #rb_include shadowmap_fragment
+  #include lightmap_fragment
+  #include envmap_fragment
+  #include shadowmap_fragment
 
-  #rb_include linear_to_gamma_fragment
+  #include linear_to_gamma_fragment
 
-  #rb_include fog_fragment
+  #include fog_fragment
 
   fragColor = vec4( outgoingLight, diffuseColor.a );  // TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
-
 }

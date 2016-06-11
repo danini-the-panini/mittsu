@@ -1,3 +1,3 @@
-#rb_include common
-#rb_include fog
-#rb_include shadow_map
+#include common
+#include fog
+#include shadow_map
