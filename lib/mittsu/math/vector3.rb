@@ -4,6 +4,8 @@ module Mittsu
   class Vector3
     attr_reader :x, :y, :z
 
+    DIMENSIONS = 3
+
     def initialize(x = 0, y = 0, z = 0)
       @x = x.to_f
       @y = y.to_f

@@ -3,6 +3,9 @@ require 'mittsu/math'
 module Mittsu
   class Vector4
     attr_accessor :x, :y, :z, :w
+
+    DIMENSIONS = 4
+
     def initialize(x = 0.0, y = 0.0, z = 0.0, w = 1.0)
       self.set(x, y, z, w)
     end

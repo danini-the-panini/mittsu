@@ -3,6 +3,9 @@ require 'mittsu/math'
 module Mittsu
   class Matrix3
     attr_accessor :elements
+
+    DIMENSIONS = 3
+
     def initialize()
       @elements = [
         1.0, 0.0, 0.0,

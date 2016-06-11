@@ -1,6 +1,7 @@
 module Mittsu
   module RBSLLoader
     UNIFORM_RGX = /uniform\s+(\S+)\s+(\w+)(|\s+\=\s+(.+));/
+    COLOR_RGX = /color\(([^\)]*)\)/
 
     def self.load_shader(shader, chunks)
       shader.lines.flat_map(&:chomp).map{ |line|
@@ -17,50 +18,54 @@ module Mittsu
       }.join("\n") + "\n"
     end
 
+    def self.extract_array_contents(str)
+      /\[([^\]]+)\]/.match(str)[1]
+    end
+
     def self.parse_int(str)
       str.to_i
     end
 
+    def self.parse_ivec(str, n)
+      str =~ /ivec#{n}\(([^\)]+)\)/
+      $1.split(',').map(&:strip).map(&:to_i).take(n)
+    end
+
     def self.parse_ivec2(str)
-      str =~ /ivec2\(([^\)]+)\)/
-      $1.split(',').map(&:strip).map(&:to_i)
+      self.parse_ivec(str, 2)
     end
 
     def self.parse_ivec3(str)
-      str =~ /ivec3\(([^\)]+)\)/
-      $1.split(',').map(&:strip).map(&:to_i)
+      self.parse_ivec(str, 3)
     end
 
     def self.parse_ivec4(str)
-      str =~ /ivec4\(([^\)]+)\)/
-      $1.split(',').map(&:strip).map(&:to_i)
+      self.parse_ivec(str, 4)
     end
 
     def self.parse_float(str)
       str.to_f
     end
 
+    def self.parse_vec(str, vectorClass)
+      str =~ /vec#{vectorClass::DIMENSIONS}\(([^\)]+)\)/
+      values = $1.split(',').map(&:strip).map(&:to_f).take(vectorClass::DIMENSIONS)
+      vectorClass.new(*values)
+    end
+
     def self.parse_vec2(str)
-      str =~ /vec2\(([^\)]+)\)/
-      values = $1.split(',').map(&:strip).map(&:to_f)
-      Vector2.new(*values)
+      self.parse_vec(str, Vector2)
     end
 
     def self.parse_vec3(str)
-      str =~ /vec3\(([^\)]+)\)/
-      values = $1.split(',').map(&:strip).map(&:to_f)
-      Vector3.new(*values)
+      self.parse_vec(str, Vector3)
     end
 
     def self.parse_vec4(str)
-      str =~ /vec4\(([^\)]+)\)/
-      values = $1.split(',').map(&:strip).map(&:to_f)
-      Vector4.new(*values)
+      self.parse_vec(str, Vector4)
     end
 
-    def self.parse_color(str)
-      str =~ /color\(([^\)]*)\)/
-      values = $1.split(',').map(&:strip)
+    def self.parse_single_color(values)
       if values.length == 1
         values = values.map(&:to_i)
       else
@@ -69,94 +74,95 @@ module Mittsu
       Color.new(*values)
     end
 
-    def self.parse_int_array(str)
-      str =~ /\[([^\]]+)\]/
-      $1.split(',').map(&:strip).map(&:to_i)
-    end
-
-    def self.parse_ivec2_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/ivec2\(([^\)]+)\)/).map{ |m| m.first.split(',').map(&:strip).map(&:to_i) }
-    end
-
-    def self.parse_ivec3_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/ivec3\(([^\)]+)\)/).map{ |m| m.first.split(',').map(&:strip).map(&:to_i) }
-    end
-
-    def self.parse_ivec4_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/ivec4\(([^\)]+)\)/).map{ |m| m.first.split(',').map(&:strip).map(&:to_i) }
-    end
-
-    def self.parse_float_array(str)
-      str =~ /\[([^\]]+)\]/
-      $1.split(',').map(&:strip).map(&:to_f)
-    end
-
-    def self.parse_vec2_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/vec2\(([^\)]+)\)/).map{ |m|
-        values = m.first.split(',').map(&:strip).map(&:to_f)
-        Vector2.new(*values)
-      }
-    end
-
-    def self.parse_vec3_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/vec3\(([^\)]+)\)/).map{ |m|
-        values = m.first.split(',').map(&:strip).map(&:to_f)
-        Vector3.new(*values)
-      }
-    end
-
-    def self.parse_vec4_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/vec4\(([^\)]+)\)/).map{ |m|
-        values = m.first.split(',').map(&:strip).map(&:to_f)
-        Vector4.new(*values)
-      }
+    def self.parse_color(str)
+      str =~ COLOR_RGX
+      values = $1.split(',').map(&:strip)
+      self.parse_single_color(values)
     end
 
     def self.parse_color_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/color\(([^\)]*)\)/).map{ |m|
+      str = self.extract_array_contents(str)
+      str.scan(COLOR_RGX).map{ |m|
         values = m.first.split(',').map(&:strip)
-        if values.length == 1
-          values = values.map(&:to_i)
-        else
-          values = values.map(&:to_f)
-        end
-        Color.new(*values)
+        self.parse_single_color(values)
       }
+    end
+
+    def self.parse_int_array(str)
+      str = self.extract_array_contents(str)
+      str.split(',').map(&:strip).map(&:to_i)
+    end
+
+    def self.parse_ivec_array(str, n)
+      str = self.extract_array_contents(str)
+      str.scan(/ivec#{n}\(([^\)]+)\)/).map{ |m| m.first.split(',').map(&:strip).map(&:to_i).take(n) }
+    end
+
+    def self.parse_ivec2_array(str)
+      self.parse_ivec_array(str, 2)
+    end
+
+    def self.parse_ivec3_array(str)
+      self.parse_ivec_array(str, 3)
+    end
+
+    def self.parse_ivec4_array(str)
+      self.parse_ivec_array(str, 4)
+    end
+
+    def self.parse_float_array(str)
+      str = self.extract_array_contents(str)
+      str.split(',').map(&:strip).map(&:to_f)
+    end
+
+    def self.parse_vec_array(str, vectorClass)
+      str = self.extract_array_contents(str)
+      str.scan(/vec#{vectorClass::DIMENSIONS}\(([^\)]+)\)/).map{ |m|
+        values = m.first.split(',').map(&:strip).map(&:to_f).take(vectorClass::DIMENSIONS)
+        vectorClass.new(*values)
+      }
+    end
+
+    def self.parse_vec2_array(str)
+      self.parse_vec_array(str, Vector2)
+    end
+
+    def self.parse_vec3_array(str)
+      self.parse_vec_array(str, Vector3)
+    end
+
+    def self.parse_vec4_array(str)
+      self.parse_vec_array(str, Vector4)
+    end
+
+    def self.parse_mat(str, matrixClass)
+      str =~ /mat#{matrixClass::DIMENSIONS}\(([^\)]+)\)/
+      values = $1.split(',').map(&:strip).map(&:to_f).take(matrixClass::DIMENSIONS * matrixClass::DIMENSIONS)
+      matrixClass.new().tap { |mat| mat.set(*values) }
     end
 
     def self.parse_mat3(str)
-      str =~ /mat3\(([^\)]+)\)/
-      values = $1.split(',').map(&:strip).map(&:to_f)
-      Matrix3.new().tap { |mat| mat.set(*values) }
+      self.parse_mat(str, Matrix3)
     end
 
     def self.parse_mat4(str)
-      str =~ /mat4\(([^\)]+)\)/
-      values = $1.split(',').map(&:strip).map(&:to_f)
-      Matrix4.new().tap { |mat| mat.set(*values) }
+      self.parse_mat(str, Matrix4)
+    end
+
+    def self.parse_mat_array(str, matrixClass)
+      str = self.extract_array_contents(str)
+      str.scan(/mat#{matrixClass::DIMENSIONS}\(([^\)]+)\)/).map{ |m|
+        values = m.first.split(',').map(&:strip).map(&:to_f).take(matrixClass::DIMENSIONS * matrixClass::DIMENSIONS)
+        matrixClass.new().tap { |mat| mat.set(*values) }
+      }
     end
 
     def self.parse_mat3_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/mat3\(([^\)]+)\)/).map{ |m|
-        values = m.first.split(',').map(&:strip).map(&:to_f)
-        Matrix3.new().tap { |mat| mat.set(*values) }
-      }
+      self.parse_mat_array(str, Matrix3)
     end
 
     def self.parse_mat4_array(str)
-      str = /\[([^\]]+)\]/.match(str)[1]
-      str.scan(/mat4\(([^\)]+)\)/).map{ |m|
-        values = m.first.split(',').map(&:strip).map(&:to_f)
-        Matrix4.new().tap { |mat| mat.set(*values) }
-      }
+      self.parse_mat_array(str, Matrix4)
     end
 
     def self.parse_texture(str)

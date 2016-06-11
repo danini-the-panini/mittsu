@@ -4,6 +4,8 @@ module Mittsu
   class Matrix4
     attr_accessor :elements
 
+    DIMENSIONS = 4
+
     def initialize()
       @elements = [
         1.0, 0.0, 0.0, 0.0,
