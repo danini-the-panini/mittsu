@@ -708,7 +708,7 @@ module Mittsu
 
             glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
           else
-            glUniformMatrix3fv(location, value / 9, GL_FALSE, array_to_ptr_easy(value))
+            glUniformMatrix3fv(location, value.length / 9, GL_FALSE, array_to_ptr_easy(value))
           end
         when :'mat4[]'
           if value.first.is_a? Matrix4
@@ -720,7 +720,7 @@ module Mittsu
 
             glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
           else
-            glUniformMatrix4fv(location, value / 16, GL_FALSE, array_to_ptr_easy(value))
+            glUniformMatrix4fv(location, value.length / 16, GL_FALSE, array_to_ptr_easy(value))
           end
         when :texture
           # single Mittsu::Texture (2d or cube)
