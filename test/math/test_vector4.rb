@@ -56,10 +56,10 @@ class TestVector4 < Minitest::Test
     assert_equal(0, a.z)
     assert_equal(1, a.w)
 
-    a.set_x(x)
-    a.set_y(y)
-    a.set_z(z)
-    a.set_w(w)
+    a.x = x
+    a.y = y
+    a.z = z
+    a.w = w
 
     assert_equal(x, a.x)
     assert_equal(y, a.y)
@@ -74,14 +74,14 @@ class TestVector4 < Minitest::Test
     assert_equal(0, a.z)
     assert_equal(1, a.w)
 
-    a.set_component(0, 1)
-    a.set_component(1, 2)
-    a.set_component(2, 3)
-    a.set_component(3, 4)
-    assert_equal(1, a.get_component(0))
-    assert_equal(2, a.get_component(1))
-    assert_equal(3, a.get_component(2))
-    assert_equal(4, a.get_component(3))
+    a[0] = 1
+    a[1] = 2
+    a[2] = 3
+    a[3] = 4
+    assert_equal(1, a[0])
+    assert_equal(2, a[1])
+    assert_equal(3, a[2])
+    assert_equal(4, a[3])
   end
 
   def test_add
