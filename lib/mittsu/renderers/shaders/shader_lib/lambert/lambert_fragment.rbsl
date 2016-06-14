@@ -1,0 +1,56 @@
+uniform vec3 diffuse;
+uniform vec3 emissive;
+uniform float opacity;
+
+in vec3 vLightFront;
+
+#ifdef DOUBLE_SIDED
+  in vec3 vLightBack;
+#endif
+
+#include common
+#include color_pars_fragment
+#include map_pars_fragment
+#include alphamap_pars_fragment
+#include lightmap_pars_fragment
+#include envmap_pars_fragment
+#include fog_pars_fragment
+#include shadowmap_pars_fragment
+#include specularmap_pars_fragment
+#include logdepthbuf_pars_fragment
+
+void main() {
+  vec3 outgoingLight = vec3( 0.0 );  // outgoing light does not have an alpha, the surface does
+  vec4 diffuseColor = vec4( diffuse, opacity );
+
+  #include logdepthbuf_fragment
+  #include map_fragment
+  #include color_fragment
+  #include alphamap_fragment
+  #include alphatest_fragment
+  #include specularmap_fragment
+
+  #ifdef DOUBLE_SIDED
+    float isFront = float( gl_FrontFacing );
+    fragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;
+
+    if ( gl_FrontFacing )
+      outgoingLight += diffuseColor.rgb * vLightFront + emissive;
+    else
+      outgoingLight += diffuseColor.rgb * vLightBack + emissive;
+  #else
+    outgoingLight += diffuseColor.rgb * vLightFront + emissive;
+  #endif
+
+  #include lightmap_fragment
+  #include envmap_fragment
+  #include shadowmap_fragment
+
+  #include linear_to_gamma_fragment
+
+  #include fog_fragment
+
+  // fragColor = vec4( outgoingLight, diffuseColor.a );  // TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
+  fragColor = vec4(outgoingLight, diffuseColor.a);
+}

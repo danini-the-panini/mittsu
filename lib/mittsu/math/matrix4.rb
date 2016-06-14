@@ -4,6 +4,8 @@ module Mittsu
   class Matrix4
     attr_accessor :elements
 
+    DIMENSIONS = 4
+
     def initialize()
       @elements = [
         1.0, 0.0, 0.0, 0.0,
@@ -561,6 +563,10 @@ module Mittsu
     def from_array(array)
       self.elements[0..array.length] = array
       self
+    end
+
+    def ==(other)
+      other.elements == @elements
     end
 
     def to_a

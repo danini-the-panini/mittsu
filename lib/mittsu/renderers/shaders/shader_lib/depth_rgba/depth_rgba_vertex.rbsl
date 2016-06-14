@@ -1,0 +1,12 @@
+#include common
+#include morphtarget_pars_vertex
+#include skinning_pars_vertex
+#include logdepthbuf_pars_vertex
+
+void main() {
+  #include skinbase_vertex
+  #include morphtarget_vertex
+  #include skinning_vertex
+  #include default_vertex
+  #include logdepthbuf_vertex
+}
