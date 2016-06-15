@@ -164,19 +164,19 @@ module Mittsu
         prefix_vertex = ''
         prefix_fragment = ''
       else
-        prefix_vertex = compile_shader_template('../../shaders/shader_templates/vertex.glsl.erb', binding)
-        prefix_fragment = compile_shader_template('../../shaders/shader_templates/fragment.glsl.erb', binding)
+        prefix_vertex = File.read(File.expand_path('../../shaders/shader_templates/vertex.glsl.erb', __FILE__))
+        prefix_fragment = File.read(File.expand_path('../../shaders/shader_templates/fragment.glsl.erb', __FILE__))
       end
 
-      @vertex_shader = OpenGLShader.new(GL_VERTEX_SHADER, prefix_vertex + material_impl.shader[:vertex_shader])
-      @fragment_shader = OpenGLShader.new(GL_FRAGMENT_SHADER, prefix_fragment + material_impl.shader[:fragment_shader])
+      @vertex_shader = OpenGLShader.new(GL_VERTEX_SHADER, compile_shader_template(prefix_vertex + material_impl.shader[:vertex_shader], binding))
+      @fragment_shader = OpenGLShader.new(GL_FRAGMENT_SHADER, compile_shader_template(prefix_fragment + material_impl.shader[:fragment_shader], binding))
 
       glAttachShader(@program, @vertex_shader.shader)
       glAttachShader(@program, @fragment_shader.shader)
     end
 
-    def compile_shader_template(path, b)
-      ERB.new(File.read(File.expand_path(path, __FILE__))).result(b)
+    def compile_shader_template(template, b)
+      ERB.new(template).result(b)
     end
 
     def post_link_clean_up
