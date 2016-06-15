@@ -18,9 +18,8 @@
 	float fDepth;
 	vec3 shadowColor = vec3( 1.0 );
 
-	for( int i = 0; i < MAX_SHADOWS; i ++ ) {
-
-		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;
+	<% parameters[:max_shadows].times do |i| %>
+		vec3 shadowCoord = vShadowCoord[ <%= i %> ].xyz / vShadowCoord[ <%= i %> ].w;
 
 				// if ( something && something ) breaks ATI OpenGL shader compiler
 				// if ( all( something, something ) ) using this instead
@@ -47,7 +46,7 @@
 
 		if ( frustumTest ) {
 
-			shadowCoord.z += shadowBias[ i ];
+			shadowCoord.z += shadowBias[ <%= i %> ];
 
 			#if defined( SHADOWMAP_TYPE_PCF )
 
@@ -64,10 +63,10 @@
 				for ( float y = -1.25; y <= 1.25; y += 1.25 )
 					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {
 
-						vec4 rgbaDepth = texture( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
+						vec4 rgbaDepth = texture( shadowMap[ <%= i %> ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );
 
 								// doesn't seem to produce any noticeable visual difference compared to simple texture lookup
-								//vec4 rgbaDepth = textureProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );
+								//vec4 rgbaDepth = textureProj( shadowMap[ <%= i %> ], vec4( vShadowCoord[ <%= i %> ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ <%= i %> ].w ) );
 
 						float fDepth = unpackDepth( rgbaDepth );
 
@@ -82,42 +81,42 @@
 
 				const float shadowDelta = 1.0 / 9.0;
 
-				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;
-				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;
+				float xPixelOffset = 1.0 / shadowMapSize[ <%= i %> ].x;
+				float yPixelOffset = 1.0 / shadowMapSize[ <%= i %> ].y;
 
 				float dx0 = -1.25 * xPixelOffset;
 				float dy0 = -1.25 * yPixelOffset;
 				float dx1 = 1.25 * xPixelOffset;
 				float dy1 = 1.25 * yPixelOffset;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				fDepth = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
+				fDepth = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
 				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;
 
-				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );
+				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ <%= i %> ] * shadow ) );
 
 			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
@@ -127,8 +126,8 @@
 
 				float shadow = 0.0;
 
-				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;
-				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;
+				float xPixelOffset = 1.0 / shadowMapSize[ <%= i %> ].x;
+				float yPixelOffset = 1.0 / shadowMapSize[ <%= i %> ].y;
 
 				float dx0 = -1.0 * xPixelOffset;
 				float dy0 = -1.0 * yPixelOffset;
@@ -138,15 +137,15 @@
 				mat3 shadowKernel;
 				mat3 depthKernel;
 
-				depthKernel[0][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
-				depthKernel[0][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
-				depthKernel[0][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
-				depthKernel[1][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
-				depthKernel[1][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy ) );
-				depthKernel[1][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
-				depthKernel[2][0] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
-				depthKernel[2][1] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
-				depthKernel[2][2] = unpackDepth( texture( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
+				depthKernel[0][0] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, dy0 ) ) );
+				depthKernel[0][1] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );
+				depthKernel[0][2] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx0, dy1 ) ) );
+				depthKernel[1][0] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );
+				depthKernel[1][1] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy ) );
+				depthKernel[1][2] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );
+				depthKernel[2][0] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, dy0 ) ) );
+				depthKernel[2][1] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );
+				depthKernel[2][2] = unpackDepth( texture( shadowMap[ <%= i %> ], shadowCoord.xy + vec2( dx1, dy1 ) ) );
 
 				vec3 shadowZ = vec3( shadowCoord.z );
 				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));
@@ -158,7 +157,7 @@
 				shadowKernel[2] = vec3(lessThan(depthKernel[2], shadowZ ));
 				shadowKernel[2] *= vec3(0.25);
 
-				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );
+				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[<%= i %>].xy );
 
 				shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );
 				shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );
@@ -171,22 +170,22 @@
 
 				shadow = dot( shadowValues, vec4( 1.0 ) );
 
-				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );
+				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ <%= i %> ] * shadow ) );
 
 			#else
 
-				vec4 rgbaDepth = texture( shadowMap[ i ], shadowCoord.xy );
+				vec4 rgbaDepth = texture( shadowMap[ <%= i %> ], shadowCoord.xy );
 				float fDepth = unpackDepth( rgbaDepth );
 
 				if ( fDepth < shadowCoord.z )
 
 		// spot with multiple shadows is darker
 
-					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );
+					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ <%= i %> ] );
 
 		// spot with multiple shadows has the same color as single shadow spot
 
-		// 					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );
+		// 					shadowColor = min( shadowColor, vec3( shadowDarkness[ <%= i %> ] ) );
 
 			#endif
 
@@ -197,17 +196,17 @@
 
 			#ifdef SHADOWMAP_CASCADE
 
-				if ( inFrustum && inFrustumCount == 1 ) outgoingLight *= frustumColors[ i ];
+				if ( inFrustum && inFrustumCount == 1 ) outgoingLight *= frustumColors[ <%= i %> ];
 
 			#else
 
-				if ( inFrustum ) outgoingLight *= frustumColors[ i ];
+				if ( inFrustum ) outgoingLight *= frustumColors[ <%= i %> ];
 
 			#endif
 
 		#endif
 
-	}
+	<% end %>
 
 	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014
 	shadowColor = inputToLinear( shadowColor );
