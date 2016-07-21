@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLDirectionalLight < OpenGLLight
+  class DirectionalLight
     TYPE = :directional
 
     class Cache < Struct.new(:length, :count, :colors, :positions)
@@ -15,8 +15,8 @@ module Mittsu
     def setup_specific(index)
       offset = index * 3
 
-      @_direction.set_from_matrix_position(@light.matrix_world)
-      @_vector3.set_from_matrix_position(@light.target.matrix_world)
+      @_direction.set_from_matrix_position(matrix_world)
+      @_vector3.set_from_matrix_position(target.matrix_world)
       @_direction.sub(@_vector3)
       @_direction.normalize
 
@@ -25,7 +25,7 @@ module Mittsu
       positions[offset + 1] = @_direction.y
       positions[offset + 2] = @_direction.z
 
-      OpenGLHelper.set_color_linear(@cache.colors, offset, @light.color, @light.intensity)
+      OpenGLHelper.set_color_linear(@cache.colors, offset, color, intensity)
     end
 
     def to_sym

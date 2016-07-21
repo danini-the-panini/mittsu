@@ -75,10 +75,10 @@ module Mittsu
       @matrix = camera.matrix_world
       @matrix_auto_update = false
 
-      update
+      update_points
     end
 
-    def update
+    def update_points
       w = 1.0
       h = 1.0
 

@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLSpotLight < OpenGLLight
+  class SpotLight
     TYPE = :spot
 
     class Cache < Struct.new(:length, :count, :colors, :directions, :distances, :positions, :exponents, :angles_cos, :decays)
@@ -15,18 +15,18 @@ module Mittsu
     def setup_specific(index)
       offset = index * 3
 
-      OpenGLHelper.set_color_linear(@cache.colors, offset, @light.color, @light.intensity)
+      OpenGLHelper.set_color_linear(@cache.colors, offset, color, intensity)
 
-      @_direction.set_from_matrix_position(@light.matrix_world)
+      @_direction.set_from_matrix_position(matrix_world)
 
       positions = @cache.positions
       positions[offset]     = @_direction.x
       positions[offset + 1] = @_direction.y
       positions[offset + 2] = @_direction.z
 
-      @cache.distances[index] = @light.distance
+      @cache.distances[index] = distance
 
-      @_vector3.set_from_matrix_position(@light.target.matrix_world)
+      @_vector3.set_from_matrix_position(target.matrix_world)
       @_direction.sub(@_vector3)
       @_direction.normalize
 
@@ -35,9 +35,9 @@ module Mittsu
       directions[offset + 1] = @_direction.y
       directions[offset + 2] = @_direction.z
 
-      @cache.angles_cos[index] = Math.cos(@light.angle)
-      @cache.exponents[index] = @light.exponent;
-      @cache.decays[index] = @light.distance.zero? ? 0.0 : @light.decay
+      @cache.angles_cos[index] = Math.cos(angle)
+      @cache.exponents[index] = exponent;
+      @cache.decays[index] = distance.zero? ? 0.0 : decay
     end
 
     def to_sym

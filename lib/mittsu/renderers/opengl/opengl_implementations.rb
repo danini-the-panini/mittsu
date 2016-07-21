@@ -12,6 +12,13 @@ require 'mittsu/renderers/opengl/objects/line'
 require 'mittsu/renderers/opengl/objects/group'
 require 'mittsu/renderers/opengl/scenes/scene'
 
+require 'mittsu/renderers/opengl/lights/light'
+require 'mittsu/renderers/opengl/lights/spot_light'
+require 'mittsu/renderers/opengl/lights/point_light'
+require 'mittsu/renderers/opengl/lights/hemisphere_light'
+require 'mittsu/renderers/opengl/lights/ambient_light'
+require 'mittsu/renderers/opengl/lights/directional_light'
+
 require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_basic_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_lambert_material'
@@ -22,25 +29,12 @@ require 'mittsu/renderers/opengl/textures/opengl_texture'
 require 'mittsu/renderers/opengl/textures/opengl_cube_texture'
 require 'mittsu/renderers/opengl/textures/opengl_data_texture'
 require 'mittsu/renderers/opengl/textures/opengl_compressed_texture'
-require 'mittsu/renderers/opengl/lights/opengl_light'
-require 'mittsu/renderers/opengl/lights/opengl_light'
-require 'mittsu/renderers/opengl/lights/opengl_spot_light'
-require 'mittsu/renderers/opengl/lights/opengl_point_light'
-require 'mittsu/renderers/opengl/lights/opengl_hemisphere_light'
-require 'mittsu/renderers/opengl/lights/opengl_ambient_light'
-require 'mittsu/renderers/opengl/lights/opengl_directional_light'
 
 module Mittsu
   OPENGL_IMPLEMENTATIONS = {
     Material => OpenGLMaterial,
     Texture => OpenGLTexture,
-    Light => OpenGLLight,
     CubeTexture => OpenGLCubeTexture,
-    SpotLight => OpenGLSpotLight,
-    PointLight => OpenGLPointLight,
-    HemisphereLight => OpenGLHemisphereLight,
-    AmbientLight => OpenGLAmbientLight,
-    DirectionalLight => OpenGLDirectionalLight,
     DataTexture => OpenGLDataTexture,
     CompressedTexture => OpenGLCompressedTexture,
     MeshBasicMaterial => OpenGLMeshBasicMaterial,

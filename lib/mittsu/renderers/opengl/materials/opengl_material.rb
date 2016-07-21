@@ -94,7 +94,7 @@ module Mittsu
       }.each_with_object({
         directional: 0, point: 0, spot: 0, hemi: 0, other: 0
       }) { |light, counts|
-        counts[light.implementation(@renderer).to_sym] += 1
+        counts[light.to_sym] += 1
       }
     end
 
