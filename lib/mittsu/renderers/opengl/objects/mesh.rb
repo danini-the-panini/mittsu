@@ -1,9 +1,6 @@
 module Mittsu
-  class OpenGLMesh < OpenGLObject3D
-    def initialize(mesh, renderer)
-      super
-      @mesh = mesh
-    end
+  class Mesh
+    attr_accessor :renderer
 
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
       type = GL_UNSIGNED_INT # geometry_group.type_array == Uint32Array ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT
@@ -28,8 +25,6 @@ module Mittsu
 
     def update
       # check all geometry groubs
-      geometry = @mesh.geometry
-
       material = nil
       material_impl = nil
       geometry.groups.each do |geometry_group|
@@ -41,7 +36,7 @@ module Mittsu
         custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
 
         if geometry.vertices_need_update || geometry.morph_targets_need_update || geometry.elements_need_update || geometry.uvs_need_update || geometry.normals_need_update || geometry.colors_need_update || geometry.tangents_need_update || custom_attributes_dirty
-          geometry_group.set_mesh_buffers(@mesh, GL_DYNAMIC_DRAW, !geometry.dynamic, material)
+          geometry_group.set_mesh_buffers(self, GL_DYNAMIC_DRAW, !geometry.dynamic, material)
         end
       end
 
@@ -57,18 +52,18 @@ module Mittsu
     end
 
     def init_geometry
-      @object.geometry.renderer = @renderer
-      @object.geometry.init_geometry_groups(@object)
+      geometry.renderer = @renderer
+      geometry.init_geometry_groups(self)
     end
 
     def add_opengl_object
-      geometry = @object.geometry
+      geometry = geometry
       case geometry
       when BufferGeometry
-        @renderer.add_opengl_object(geometry, @object)
+        @renderer.add_opengl_object(geometry, self)
       when Geometry
         geometry.groups.each do |group|
-          @renderer.add_opengl_object(group, @object)
+          @renderer.add_opengl_object(group, self)
         end
       end
     end

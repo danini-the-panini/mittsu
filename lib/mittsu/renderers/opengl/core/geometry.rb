@@ -7,7 +7,6 @@ module Mittsu
     attr_accessor :groups, :initted
 
     def init_geometry_groups(object)
-      object_impl = object.implementation(@renderer)
       material = object.material
       add_buffers = false
 
@@ -40,12 +39,12 @@ module Mittsu
           add_buffers = false
         end
 
-        if add_buffers || !object_impl.active?
+        if add_buffers || !object.active?
           @renderer.add_opengl_object(geometry_group, object)
         end
       end
 
-      object_impl.active = true
+      object.active = true
     end
 
     def init_line_buffers(object)

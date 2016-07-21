@@ -6,12 +6,12 @@ require 'mittsu/textures'
 require 'mittsu/scenes'
 
 require 'mittsu/renderers/opengl/core/geometry'
+require 'mittsu/renderers/opengl/core/object_3d'
+require 'mittsu/renderers/opengl/objects/mesh'
+require 'mittsu/renderers/opengl/objects/line'
+require 'mittsu/renderers/opengl/objects/group'
+require 'mittsu/renderers/opengl/scenes/scene'
 
-require 'mittsu/renderers/opengl/core/opengl_object_3d'
-require 'mittsu/renderers/opengl/objects/opengl_mesh'
-require 'mittsu/renderers/opengl/objects/opengl_line'
-require 'mittsu/renderers/opengl/objects/opengl_group'
-require 'mittsu/renderers/opengl/scenes/opengl_scene'
 require 'mittsu/renderers/opengl/materials/opengl_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_basic_material'
 require 'mittsu/renderers/opengl/materials/opengl_mesh_lambert_material'
@@ -32,13 +32,10 @@ require 'mittsu/renderers/opengl/lights/opengl_directional_light'
 
 module Mittsu
   OPENGL_IMPLEMENTATIONS = {
-    Object3D => OpenGLObject3D,
     Material => OpenGLMaterial,
     Texture => OpenGLTexture,
     Light => OpenGLLight,
     CubeTexture => OpenGLCubeTexture,
-    Mesh => OpenGLMesh,
-    Line => OpenGLLine,
     SpotLight => OpenGLSpotLight,
     PointLight => OpenGLPointLight,
     HemisphereLight => OpenGLHemisphereLight,
@@ -46,8 +43,6 @@ module Mittsu
     DirectionalLight => OpenGLDirectionalLight,
     DataTexture => OpenGLDataTexture,
     CompressedTexture => OpenGLCompressedTexture,
-    Scene => OpenGLScene,
-    Group => OpenGLGroup,
     MeshBasicMaterial => OpenGLMeshBasicMaterial,
     MeshLambertMaterial => OpenGLMeshLambertMaterial,
     MeshPhongMaterial => OpenGLMeshPhongMaterial,

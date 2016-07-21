@@ -57,7 +57,6 @@ module Mittsu
 
     def init_mesh_buffers(object)
       geometry = object.geometry
-      object_impl = object.implementation(@renderer)
 
       nvertices = @faces3.length * 3
       nvertices2 = nvertices * 2
@@ -66,7 +65,7 @@ module Mittsu
       ntris = @faces3.length * 1
       nlines = @faces3.length * 3
 
-      material = object_impl.buffer_material(self)
+      material = object.buffer_material(self)
 
       @vertex_array = Array.new(nvertices3) # Float32Array
       @normal_array = Array.new(nvertices3) # Float32Array

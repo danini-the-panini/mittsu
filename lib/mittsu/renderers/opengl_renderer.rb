@@ -207,7 +207,7 @@ module Mittsu
       update_skeleton_objects(scene)
 
       update_screen_projection(camera)
-      scene.implementation(self).project
+      scene.project(self)
       sort_objects_for_render if @sort_objects
 
       render_custom_plugins_pre_pass(scene, camera)
@@ -257,7 +257,7 @@ module Mittsu
 
       @state.disable_unused_attributes
 
-      object.implementation(self).render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
+      object.render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
 
       # TODO: render particles
       # when PointCloud
@@ -368,7 +368,7 @@ module Mittsu
         object = opengl_object.object
         buffer = opengl_object.buffer
 
-        object.implementation(self).setup_matrices(camera)
+        object.setup_matrices(camera)
 
         if override_material
           material = override_material
@@ -458,7 +458,6 @@ module Mittsu
     # FIXME: refactor
     def update_object(object)
       geometry = object.geometry
-      object_impl = object.implementation(self)
 
       if geometry.is_a? BufferGeometry
         # TODO: geometry vertex array ?????
@@ -489,12 +488,12 @@ module Mittsu
           end
         end
       else
-        object_impl.update
+        object.update
       end
       # TODO: when PointCloud exists
       # elsif object.is_A? PointCloud
       #   # TODO: glBindVertexArray ???
-      #   material = object_impl.buffer_material(geometry)
+      #   material = object.buffer_material(geometry)
       #   custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
       #
       #   if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
@@ -512,7 +511,6 @@ module Mittsu
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
       material_impl = material.implementation(self)
-      object_impl = object.implementation(self)
 
       if material.needs_update?
         deallocate_material(material) if material.program
@@ -522,8 +520,8 @@ module Mittsu
       end
 
       if material.morph_targets
-        if !object_impl.morph_target_influences
-          object_impl.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
+        if !object.morph_target_influences
+          object.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
         end
       end
 
@@ -627,7 +625,7 @@ module Mittsu
         load_uniforms_generic(material_impl.uniforms_list)
       end
 
-      object.implementation(self).load_uniforms_matrices(program_uniforms)
+      object.load_uniforms_matrices(program_uniforms)
 
       if !program_uniforms['modelMatrix'].nil?
         glUniformMatrix4fv(program_uniforms['modelMatrix'], 1, GL_FALSE, array_to_ptr_easy(object.matrix_world.elements))

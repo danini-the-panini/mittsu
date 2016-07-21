@@ -1,23 +1,17 @@
 module Mittsu
-  class OpenGLLine < OpenGLObject3D
-    def initialize(line, renderer)
-      super
-      @line = line
-    end
-
+  class Line
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      mode = @line.mode == LineStrip ? GL_LINE_STRIP : GL_LINES
+      opengl_mode = mode == LineStrip ? GL_LINE_STRIP : GL_LINES
 
       @renderer.state.set_line_width(material.line_width * @renderer.pixel_ratio)
 
-      glDrawArrays(mode, 0, geometry_group.line_count)
+      glDrawArrays(opengl_mode, 0, geometry_group.line_count)
 
       @renderer.info[:render][:calls] += 1
     end
 
     def update
       # TODO: glBindVertexArray ???
-      geometry = @line.geometry
       material = buffer_material(geometry)
       material_impl = material.implementation(@renderer)
       custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
@@ -34,11 +28,10 @@ module Mittsu
     end
 
     def init_geometry
-      geometry = @object.geometry
       geometry.renderer = @renderer
       if geometry.vertex_buffer.nil?
         geometry.create_line_buffers
-        geometry.init_line_buffers(@object)
+        geometry.init_line_buffers(self)
 
         geometry.vertices_need_update = true
         geometry.colors_need_update = true
@@ -47,7 +40,7 @@ module Mittsu
     end
 
     def add_opengl_object
-      @renderer.add_opengl_object(@object.geometry, @object)
+      @renderer.add_opengl_object(geometry, self)
     end
   end
 end

@@ -336,10 +336,6 @@ module Mittsu
       object
     end
 
-    def implementation(renderer)
-      @_implementation ||= renderer.create_implementation(self)
-    end
-
     protected
 
     def jsonify
