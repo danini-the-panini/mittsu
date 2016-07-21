@@ -5,7 +5,8 @@ require 'mittsu/materials'
 require 'mittsu/textures'
 require 'mittsu/scenes'
 
-require 'mittsu/renderers/opengl/core/opengl_geometry'
+require 'mittsu/renderers/opengl/core/geometry'
+
 require 'mittsu/renderers/opengl/core/opengl_object_3d'
 require 'mittsu/renderers/opengl/objects/opengl_mesh'
 require 'mittsu/renderers/opengl/objects/opengl_line'
@@ -32,7 +33,6 @@ require 'mittsu/renderers/opengl/lights/opengl_directional_light'
 module Mittsu
   OPENGL_IMPLEMENTATIONS = {
     Object3D => OpenGLObject3D,
-    Geometry => OpenGLGeometry,
     Material => OpenGLMaterial,
     Texture => OpenGLTexture,
     Light => OpenGLLight,

@@ -28,9 +28,8 @@ module Mittsu
       if geometry.nil?
         # ImmediateRenderObject
       else
-        geometry_impl = geometry.implementation(@renderer)
-        if !geometry_impl.initted
-          geometry_impl.initted = true
+        if !geometry.initted
+          geometry.initted = true
           geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
           if geometry.is_a?(BufferGeometry)
             @renderer.info[:memory][:geometries] += 1

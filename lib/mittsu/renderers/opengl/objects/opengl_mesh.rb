@@ -29,11 +29,10 @@ module Mittsu
     def update
       # check all geometry groubs
       geometry = @mesh.geometry
-      geometry_impl = geometry.implementation(self)
 
       material = nil
       material_impl = nil
-      geometry_impl.groups.each do |geometry_group|
+      geometry.groups.each do |geometry_group|
         # TODO: place to put this???
         # glBindVertexArray(geometry_group.vertex_array_object)
         material = buffer_material(geometry_group)
@@ -58,7 +57,8 @@ module Mittsu
     end
 
     def init_geometry
-      @object.geometry.implementation(@renderer).init_geometry_groups(@object)
+      @object.geometry.renderer = @renderer
+      @object.geometry.init_geometry_groups(@object)
     end
 
     def add_opengl_object
@@ -67,8 +67,7 @@ module Mittsu
       when BufferGeometry
         @renderer.add_opengl_object(geometry, @object)
       when Geometry
-        geometry_impl = geometry.implementation(self)
-        geometry_impl.groups.each do |group|
+        geometry.groups.each do |group|
           @renderer.add_opengl_object(group, @object)
         end
       end

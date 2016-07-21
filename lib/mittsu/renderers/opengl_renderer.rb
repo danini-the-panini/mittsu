@@ -233,6 +233,7 @@ module Mittsu
     def render_buffer(camera, lights, fog, material, geometry_group, object)
       return unless material.visible
 
+      geometry_group.renderer = self
       geometry_group.bind_vertex_array_object
 
       update_object(object)
@@ -384,7 +385,7 @@ module Mittsu
           # TODO
           # render_buffer_direct(camera, lights, fog, material, buffer, object)
         else
-          render_buffer(camera, lights, fog, material, buffer.implementation(self), object)
+          render_buffer(camera, lights, fog, material, buffer, object)
         end
       end
     end

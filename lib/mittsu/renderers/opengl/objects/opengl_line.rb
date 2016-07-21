@@ -23,8 +23,7 @@ module Mittsu
       custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
 
       if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
-        geometry_impl = geometry.implementation(self)
-        geometry_impl.set_line_buffers(GL_DYNAMIC_DRAW)
+        geometry.set_line_buffers(GL_DYNAMIC_DRAW)
       end
 
       geometry.vertices_need_update = false
@@ -36,10 +35,10 @@ module Mittsu
 
     def init_geometry
       geometry = @object.geometry
-      geometry_impl = geometry.implementation(@renderer)
-      if geometry_impl.vertex_buffer.nil?
-        geometry_impl.create_line_buffers
-        geometry_impl.init_line_buffers(@object)
+      geometry.renderer = @renderer
+      if geometry.vertex_buffer.nil?
+        geometry.create_line_buffers
+        geometry.init_line_buffers(@object)
 
         geometry.vertices_need_update = true
         geometry.colors_need_update = true

@@ -562,10 +562,6 @@ module Mittsu
       self.dispatch_event type: :dispose
     end
 
-    def implementation(renderer)
-      @_implementation ||= renderer.create_implementation(self)
-    end
-
     private
 
     def set_bit(value, position, enabled)
