@@ -31,8 +31,8 @@ module OpenGLDebug
     extend OpenGL
   end
 
-  def self.load_lib
-    OpenGL.load_lib
+  def self.load_lib(*args)
+    OpenGL.load_lib(*args)
   end
 
   OpenGL.constants.each do |c|
