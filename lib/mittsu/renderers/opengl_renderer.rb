@@ -2,7 +2,10 @@ require 'opengl'
 require 'glfw'
 require 'fiddle'
 
-OpenGL.load_lib
+
+require 'mittsu/renderers/opengl/opengl_lib'
+opengl_lib = OpenGLLib.discover
+OpenGL.load_lib(opengl_lib.file, opengl_lib.path)
 
 require 'mittsu'
 require 'mittsu/renderers/glfw_window'

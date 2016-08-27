@@ -1,7 +1,14 @@
 require 'opengl'
+require 'mittsu/renderers/opengl/opengl_lib'
+
+module OpenGLLib
+  def self.discover
+    Struct.new(:path, :file).new(nil, nil)
+  end
+end
 
 module OpenGLStub
-  def self.load_lib
+  def self.load_lib(*args)
   end
 
   OpenGL.constants.each do |c|
