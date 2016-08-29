@@ -49,13 +49,13 @@ module OpenGLLib
   end
 
   # TODO
-  def Windows
+  class Windows
     def path; nil; end
     def file; nil; end
   end
 
   # TODO
-  def MacOS
+  class MacOS
     def path; nil; end
     def file; nil; end
   end
