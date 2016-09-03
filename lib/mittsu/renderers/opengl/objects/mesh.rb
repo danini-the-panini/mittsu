@@ -57,7 +57,6 @@ module Mittsu
     end
 
     def add_opengl_object
-      geometry = geometry
       case geometry
       when BufferGeometry
         @renderer.add_opengl_object(geometry, self)
@@ -65,6 +64,8 @@ module Mittsu
         geometry.groups.each do |group|
           @renderer.add_opengl_object(group, self)
         end
+      else
+        raise "GEOMETRY IS NULL"
       end
     end
   end
