@@ -14,6 +14,13 @@ material = Mittsu::MeshLambertMaterial.new(color: 0x00ff00)
 cube = Mittsu::Mesh.new(geometry, material)
 scene.add(cube)
 
+box_geometry = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
+room_material = Mittsu::MeshPhongMaterial.new(color: 0xffffff)
+room_material.side = Mittsu::BackSide
+room = Mittsu::Mesh.new(box_geometry, room_material)
+room.scale.set(10.0, 10.0, 10.0)
+scene.add(room)
+
 light = Mittsu::AmbientLight.new(0x404040) # soft white light
 scene.add(light)
 
