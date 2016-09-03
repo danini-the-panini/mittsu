@@ -10,6 +10,8 @@ module Mittsu
 
     def init
       if !@initted
+        puts " --- INIT #{self.name}" if DEBUG
+
         @initted = true
         @model_view_matrix = Matrix4.new
         @normal_matrix = Matrix3.new
@@ -52,6 +54,7 @@ module Mittsu
     end
 
     def project(renderer)
+      puts " --- PROJECT #{self.name}" if DEBUG
       @renderer = renderer
       return unless visible
       init

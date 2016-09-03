@@ -234,6 +234,7 @@ module Mittsu
     end
 
     def render_buffer(camera, lights, fog, material, geometry_group, object)
+      puts "--- RENDER #{object.name}" if DEBUG
       return unless material.visible
 
       geometry_group.renderer = self
@@ -368,6 +369,7 @@ module Mittsu
     def render_objects(render_list, camera, lights, fog, override_material)
       material = nil
       render_list.each do |opengl_object|
+        puts "-- RENDER_OBJECT #{opengl_object.name}" if DEBUG
         object = opengl_object.object
         buffer = opengl_object.buffer
 
@@ -443,6 +445,7 @@ module Mittsu
       material = object.material
 
       if material
+        puts "--- UNROLL #{opengl_object.name}" if DEBUG
         if material.is_a? MeshFaceMaterial
           material_index = geometry.is_a?(BufferGeometry) ? 0 : buffer.material_index
           material = material.materials[material_index]

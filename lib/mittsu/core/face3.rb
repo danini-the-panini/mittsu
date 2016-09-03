@@ -17,7 +17,7 @@ module Mittsu
     end
 
     def clone
-      face = THREE.face3.new(@a, @b, @c)
+      face = Mittsu::Face3.new(@a, @b, @c)
       face.normal.copy(@normal)
       face.color.copy(@color)
       face.material_index = @material_index
