@@ -30,7 +30,7 @@ room = Mittsu::Mesh.new(box_geometry, room_material)
 room.scale.set(10.0, 10.0, 10.0)
 scene.add(room)
 
-light = Mittsu::PointLight.new(0xffffff, 0.5, 10.0, 1.5) # white, half intensity
+light = Mittsu::PointLight.new(0xffffff, 1.0, 10.0, 1.0)
 dot = Mittsu::Mesh.new(box_geometry, Mittsu::MeshBasicMaterial.new(color: 0xffffff))
 dot.scale.set(0.1, 0.1, 0.1)
 light.add(dot)
