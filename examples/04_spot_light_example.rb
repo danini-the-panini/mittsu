@@ -20,7 +20,13 @@ floor.position.set(0.0, -2.0, 0.0)
 scene.add(sphere)
 scene.add(floor)
 
-light = Mittsu::SpotLight.new(0xffffff, 0.5, 10.0) # white, half intensity
+room_material = Mittsu::MeshPhongMaterial.new(color: 0xffffff)
+room_material.side = Mittsu::BackSide
+room = Mittsu::Mesh.new(box_geometry, room_material)
+room.scale.set(10.0, 10.0, 10.0)
+scene.add(room)
+
+light = Mittsu::SpotLight.new(0xffffff, 1.0, 10.0)
 light.position.set(3.0, 1.0, 0.0)
 dot = Mittsu::Mesh.new(box_geometry, Mittsu::MeshBasicMaterial.new(color: 0xffffff))
 dot.scale.set(0.1, 0.1, 0.1)
