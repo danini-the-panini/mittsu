@@ -13,8 +13,7 @@ module Mittsu
     def update
       # TODO: glBindVertexArray ???
       material = buffer_material(geometry)
-      material_impl = material.implementation(@renderer)
-      custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
+      custom_attributes_dirty = material.attributes && material.custom_attributes_dirty?
 
       if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
         geometry.set_line_buffers(GL_DYNAMIC_DRAW)
@@ -24,7 +23,7 @@ module Mittsu
       geometry.colors_need_update = false
       geometry.line_distances_need_update = false
 
-      material.attributes && material_impl.clear_custom_attributes
+      material.attributes && material.clear_custom_attributes
     end
 
     def init_geometry

@@ -13,8 +13,7 @@ module Mittsu
 
       compile_and_link_program(material, parameters)
 
-      material_impl = material.implementation(@renderer)
-      cache_uniform_locations(material_impl.shader[:uniforms] || {}, parameters)
+      cache_uniform_locations(material.shader[:uniforms] || {}, parameters)
       cache_attribute_locations(material.attributes || {}, parameters)
 
       @code = code
@@ -149,7 +148,6 @@ module Mittsu
     end
 
     def compile_shaders(material, parameters)
-      material_impl = material.implementation(@renderer)
       shadow_map_type_define = get_shadow_map_define(parameters[:shadow_map_type])
 
       env_map_type_define = get_env_map_type_define(parameters[:env_map], material)
@@ -168,8 +166,8 @@ module Mittsu
         prefix_fragment = File.read(File.expand_path('../../shaders/shader_templates/fragment.glsl.erb', __FILE__))
       end
 
-      @vertex_shader = OpenGLShader.new(GL_VERTEX_SHADER, compile_shader_template(prefix_vertex + material_impl.shader[:vertex_shader], binding))
-      @fragment_shader = OpenGLShader.new(GL_FRAGMENT_SHADER, compile_shader_template(prefix_fragment + material_impl.shader[:fragment_shader], binding))
+      @vertex_shader = OpenGLShader.new(GL_VERTEX_SHADER, compile_shader_template(prefix_vertex + material.shader[:vertex_shader], binding))
+      @fragment_shader = OpenGLShader.new(GL_FRAGMENT_SHADER, compile_shader_template(prefix_fragment + material.shader[:fragment_shader], binding))
 
       glAttachShader(@program, @vertex_shader.shader)
       glAttachShader(@program, @fragment_shader.shader)

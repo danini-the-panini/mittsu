@@ -25,18 +25,16 @@ module Mittsu
 
     def update
       # check all geometry groubs
-      material = nil
-      material_impl = nil
+      mat = nil
       geometry.groups.each do |geometry_group|
         # TODO: place to put this???
         # glBindVertexArray(geometry_group.vertex_array_object)
-        material = buffer_material(geometry_group)
-        material_impl = material.implementation(@renderer)
+        mat = buffer_material(geometry_group)
 
-        custom_attributes_dirty = material.attributes && material_impl.custom_attributes_dirty?
+        custom_attributes_dirty = mat.attributes && mat.custom_attributes_dirty?
 
         if geometry.vertices_need_update || geometry.morph_targets_need_update || geometry.elements_need_update || geometry.uvs_need_update || geometry.normals_need_update || geometry.colors_need_update || geometry.tangents_need_update || custom_attributes_dirty
-          geometry_group.set_mesh_buffers(self, GL_DYNAMIC_DRAW, !geometry.dynamic, material)
+          geometry_group.set_mesh_buffers(self, GL_DYNAMIC_DRAW, !geometry.dynamic, mat)
         end
       end
 
@@ -48,7 +46,7 @@ module Mittsu
       geometry.colors_need_update = false
       geometry.tangents_need_update = false
 
-      material.attributes && material_impl.clear_custom_attributes(material)
+      mat.attributes && mat.clear_custom_attributes
     end
 
     def init_geometry

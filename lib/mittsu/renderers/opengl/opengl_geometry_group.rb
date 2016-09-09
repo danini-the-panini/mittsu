@@ -158,9 +158,8 @@ module Mittsu
       return unless @initted_arrays
 
       geometry = object.geometry
-      material_impl = material.implementation(@renderer)
 
-      needs_face_normals = material_impl.needs_face_normals?
+      needs_face_normals = material.needs_face_normals?
 
       vertex_index = 0
 

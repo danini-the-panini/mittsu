@@ -377,12 +377,10 @@ module Mittsu
 
         if override_material
           material = override_material
-          material_impl = material.implementation(self)
         else
           material = opengl_object.material
           next unless material
-          material_impl = material.implementation(self)
-          material_impl.set
+          material.set(self)
         end
 
         set_material_faces(material)
@@ -390,6 +388,7 @@ module Mittsu
           # TODO
           # render_buffer_direct(camera, lights, fog, material, buffer, object)
         else
+          puts "-- RENDER COLOR #{material.color}" if DEBUG
           render_buffer(camera, lights, fog, material, buffer, object)
         end
       end
@@ -409,8 +408,7 @@ module Mittsu
             else nil
             end
             next unless material
-            material_impl = material.implementation(self)
-            material_impl.set
+            material.set(self)
           end
           render_immediate_object(camera, lights, fog, material, object)
         end
@@ -516,12 +514,10 @@ module Mittsu
     # FIXME: refactor
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
-      material_impl = material.implementation(self)
-
       if material.needs_update?
         deallocate_material(material) if material.program
 
-        material_impl.init(lights, fog, object)
+        material.init(lights, fog, object, self)
         material.needs_update = false
       end
 
@@ -537,7 +533,7 @@ module Mittsu
 
       program = material.program
       program_uniforms = program.uniforms
-      material_uniforms = material_impl.shader[:uniforms]
+      material_uniforms = material.shader[:uniforms]
 
       if program.id != @_current_program
         glUseProgram(program.program)
@@ -596,7 +592,7 @@ module Mittsu
         # TODO: when fog is implemented
         # refresh_uniforms_fog(material_uniforms, fog) if fog && material.fog
 
-        if material_impl.needs_lights?
+        if material.needs_lights?
           if @light_renderer.lights_need_update
             refresh_lights = true
             @light_renderer.setup(lights)
@@ -609,7 +605,7 @@ module Mittsu
           OpenGLHelper.mark_uniforms_lights_needs_update(material_uniforms, refresh_lights)
         end
 
-        material_impl.refresh_uniforms(material_uniforms)
+        material.refresh_uniforms(material_uniforms)
 
         # TODO: when all of these things exist
         # when LineDashedMaterial
@@ -624,11 +620,11 @@ module Mittsu
         # when MeshNormalMaterial
         #   material_uniforms.opactity.value = material.opacity
 
-        if object.receive_shadow && !material_impl.shadow_pass
+        if object.receive_shadow && !material.shadow_pass
           OpenGLHelper.refresh_uniforms_shadow(material_uniforms, lights)
         end
 
-        load_uniforms_generic(material_impl.uniforms_list)
+        load_uniforms_generic(material.uniforms_list)
       end
 
       object.load_uniforms_matrices(program_uniforms)
@@ -842,9 +838,8 @@ module Mittsu
 
     def render_with_override_material(scene, camera)
       override_material = scene.override_material
-      material_impl = override_material.implementation(self)
 
-      material_impl.set
+      override_material.set(self)
 
       render_objects(@opaque_objects, camera, @lights, scene.fog, override_material)
       render_objects(@transparent_objects, camera, @lights, scene.fog, override_material)
@@ -1035,20 +1030,18 @@ module Mittsu
     end
 
     def update_camera_uniforms(uniforms, camera, material)
-      material_impl = material.implementation(self)
-
       glUniformMatrix4fv(uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
 
       if @logarithmic_depth_buffer
         glUniform1f(uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
       end
 
-      if material_impl.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?
+      if material.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?
         @_vector3.set_from_matrix_position(camera.matrix_world)
         glUniform3f(uniforms['cameraPosition'], @_vector3.x, @_vector3.y, @_vector3.z)
       end
 
-      if material_impl.needs_view_matrix_uniform? && !uniforms['viewMatrix'].nil?
+      if material.needs_view_matrix_uniform? && !uniforms['viewMatrix'].nil?
         glUniformMatrix4fv(uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
       end
     end

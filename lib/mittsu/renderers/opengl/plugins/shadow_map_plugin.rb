@@ -49,10 +49,10 @@ module Mittsu
         skinning: true
       )
 
-      @depth_material.implementation(renderer).shadow_pass = true
-      @depth_material_morph.implementation(renderer).shadow_pass = true
-      @depth_material_skin.implementation(renderer).shadow_pass = true
-      @depth_material_morph_skin.implementation(renderer).shadow_pass = true
+      @depth_material.shadow_pass = true
+      @depth_material_morph.shadow_pass = true
+      @depth_material_skin.shadow_pass = true
+      @depth_material_morph_skin.shadow_pass = true
     end
 
     def render(scene, camera)

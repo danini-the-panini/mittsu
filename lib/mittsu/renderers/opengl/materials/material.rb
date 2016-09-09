@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLMaterial
+  class Material
     # TODO: init_shader for these material-types
     # MeshDepthMaterial => :depth, # TODO...
     # MeshNormalMaterial => :normal, # TODO...
@@ -9,48 +9,47 @@ module Mittsu
     attr_accessor :shadow_pass
     attr_reader :shader, :uniforms_list
 
-    def initialize(material, renderer)
-      @material = material
+    def init(lights, fog, object, renderer)
       @renderer = renderer
-    end
 
-    def init(lights, fog, object)
-      @material.add_event_listener(:dispose, @renderer.method(:on_material_dispose))
+      add_event_listener(:dispose, @renderer.method(:on_material_dispose))
 
       init_shader
 
-      @material.program = find_or_create_program(lights, fog, object)
+      self.program = find_or_create_program(lights, fog, object)
 
-      count_supported_morph_attributes(@material.program.attributes)
+      count_supported_morph_attributes(program.attributes)
 
       @uniforms_list = get_uniforms_list
     end
 
-    def set
-      if @material.transparent
-        @renderer.state.set_blending(@material.blending, @material.blend_equation, @material.blend_src, @material.blend_dst, @material.blend_equation_alpha, @material.blend_src_alpha, @material.blend_dst_alpha)
+    def set(renderer)
+      @renderer = renderer
+
+      if transparent
+        @renderer.state.set_blending(blending, blend_equation, blend_src, blend_dst, blend_equation_alpha, blend_src_alpha, blend_dst_alpha)
       else
         @renderer.state.set_blending(NoBlending)
       end
 
-      @renderer.state.set_depth_test(@material.depth_test)
-      @renderer.state.set_depth_write(@material.depth_write)
-      @renderer.state.set_color_write(@material.color_write)
-      @renderer.state.set_polygon_offset(@material.polygon_offset, @material.polygon_offset_factor, @material.polygon_offset_units)
+      @renderer.state.set_depth_test(depth_test)
+      @renderer.state.set_depth_write(depth_write)
+      @renderer.state.set_color_write(color_write)
+      @renderer.state.set_polygon_offset(polygon_offset, polygon_offset_factor, polygon_offset_units)
     end
 
     def needs_face_normals?
-      @material.shading == FlatShading
+      shading == FlatShading
     end
 
     def clear_custom_attributes
-      @material.attributes.each do |attribute|
+      attributes.each do |attribute|
         attribute.needs_update = false
       end
     end
 
     def custom_attributes_dirty?
-      @material.attributes.each do |attribute|
+      attributes.each do |attribute|
         return true if attribute.needs_update
       end
       false
@@ -61,24 +60,24 @@ module Mittsu
     end
 
     def needs_camera_position_uniform?
-      @material.env_map
+      env_map
     end
 
     def needs_view_matrix_uniform?
-      @material.skinning
+      skinning
     end
 
     def needs_lights?
-      @material.lights
+      lights
     end
 
     protected
 
     def init_shader
       @shader = {
-        uniforms: @material.uniforms,
-        vertex_shader: @material.vertex_shader,
-        fragment_shader: @material.fragment_shader
+        uniforms: uniforms,
+        vertex_shader: vertex_shader,
+        fragment_shader: fragment_shader
       }
     end
 
@@ -142,11 +141,11 @@ module Mittsu
     end
 
     def count_supported_morph_attributes(attributes)
-      if @material.morph_targets
-        @material.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphTarget', @renderer.max_morph_normals)
+      if morph_targets
+        self.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphTarget', @renderer.max_morph_normals)
       end
-      if @material.morph_normals
-        @material.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphNormal', @renderer.max_morph_normals)
+      if morph_normals
+        self.num_supported_morph_normals = count_supported_morph_attribute(attributes, 'morphNormal', @renderer.max_morph_normals)
       end
     end
 
@@ -159,7 +158,7 @@ module Mittsu
 
     def get_uniforms_list
       @shader[:uniforms].map { |(key, uniform)|
-        location = @material.program.uniforms[key]
+        location = program.uniforms[key]
         if location
           [uniform, location]
         end
@@ -177,34 +176,34 @@ module Mittsu
       {
         supports_vertex_textures: @renderer.supports_vertex_textures?,
 
-        map: !!@material.map,
-        env_map: !!@material.env_map,
-        env_map_mode: @material.env_map && @material.env_map.mapping,
-        light_map: !!@material.light_map,
-        bump_map: !!@material.light_map,
-        normal_map: !!@material.normal_map,
-        specular_map: !!@material.specular_map,
-        alpha_map: !!@material.alpha_map,
+        map: !!map,
+        env_map: !!env_map,
+        env_map_mode: env_map && env_map.mapping,
+        light_map: !!light_map,
+        bump_map: !!light_map,
+        normal_map: !!normal_map,
+        specular_map: !!specular_map,
+        alpha_map: !!alpha_map,
 
-        combine: @material.combine,
+        combine: combine,
 
-        vertex_colors: @material.vertex_colors,
+        vertex_colors: vertex_colors,
 
         fog: fog,
-        use_fog: @material.fog,
+        use_fog: fog,
         # fog_exp: fog.is_a?(FogExp2), # TODO: when FogExp2 exists
 
-        flat_shading: @material.shading == FlatShading,
+        flat_shading: shading == FlatShading,
 
-        size_attenuation: @material.size_attenuation,
+        size_attenuation: size_attenuation,
         logarithmic_depth_buffer: @renderer.logarithmic_depth_buffer,
 
-        skinning: @material.skinning,
+        skinning: skinning,
         max_bones: max_bones,
         use_vertex_texture: @renderer.supports_bone_textures?,
 
-        morph_targets: @material.morph_targets,
-        morph_normals: @material.morph_normals,
+        morph_targets: morph_targets,
+        morph_normals: morph_normals,
         max_morph_targets: @renderer.max_morph_targets,
         max_morph_normals: @renderer.max_morph_normals,
 
@@ -219,11 +218,11 @@ module Mittsu
         shadow_map_debug: @renderer.shadow_map_debug,
         shadow_map_cascade: @renderer.shadow_map_cascade,
 
-        alpha_test: @material.alpha_test,
-        metal: @material.metal,
-        wrap_around: @material.wrap_around,
-        double_sided: @material.side == DoubleSide,
-        flip_sided: @material.side == BackSide
+        alpha_test: alpha_test,
+        metal: metal,
+        wrap_around: wrap_around,
+        double_sided: side == DoubleSide,
+        flip_sided: side == BackSide
       }
     end
 
@@ -233,12 +232,12 @@ module Mittsu
       if shader_id
         chunks << shader_id
       else
-        chunks << @material.fragment_shader
-        chunks << @material.vertex_shader
+        chunks << fragment_shader
+        chunks << vertex_shader
       end
 
-      if !@material.defines.nil?
-        @material.defines.each do |(name, define)|
+      if !defines.nil?
+        defines.each do |(name, define)|
           chunks << name
           chunks << define
         end
@@ -261,7 +260,7 @@ module Mittsu
       end
 
       if program.nil?
-        program = OpenGLProgram.new(@renderer, code, @material, parameters)
+        program = OpenGLProgram.new(@renderer, code, self, parameters)
         @renderer.programs.push(program)
 
         @renderer.info[:memory][:programs] = @renderer.programs.length
