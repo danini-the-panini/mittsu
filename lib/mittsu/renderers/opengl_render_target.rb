@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLRenderTarget < OpenGLTexture
+  class OpenGLRenderTarget < Texture
     include EventDispatcher
 
     attr_accessor :width,
@@ -19,6 +19,8 @@ module Mittsu
                   :share_depth_from
 
     attr_reader :framebuffer
+
+    attr_writer :renderer
 
     def initialize(width, height, options = {})
       super(self, nil)
@@ -59,6 +61,8 @@ module Mittsu
 
     def clone
       OpenGLRenderTarget.new(@width, @height).tap do |tmp|
+        tmp.renderer = @renderer
+
     		tmp.wrap_s = @wrap_s
     		tmp.wrap_t = @wrap_t
 
@@ -153,11 +157,6 @@ module Mittsu
 
     def dispose
       dispatch_event(type: :dispose)
-    end
-
-    def implementation(renderer)
-      @renderer = renderer
-      self
     end
 
     def update_mipmap

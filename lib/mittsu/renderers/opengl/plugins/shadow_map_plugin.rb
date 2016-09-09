@@ -122,6 +122,7 @@ module Mittsu
           pars = { min_filter: shadow_filter, mag_filter: shadow_filter, format: RGBAFormat }
 
           light.shadow_map = OpenGLRenderTarget.new(light.shadow_map_width, light.shadow_map_height, pars)
+          light.shadow_map.renderer = @renderer
           light.shadow_map_size = Vector2.new(light.shadow_map_width, light.shadow_map_height)
 
           light.shadow_matrix = Matrix4.new

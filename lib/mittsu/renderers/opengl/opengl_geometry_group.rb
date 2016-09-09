@@ -753,9 +753,5 @@ module Mittsu
       @skin_index_array = nil
       @skin_weight_array = nil
     end
-
-    def implementation(_)
-      self
-    end
   end
 end

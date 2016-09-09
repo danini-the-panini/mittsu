@@ -1,36 +1,38 @@
 module Mittsu
-  class OpenGLCubeTexture < OpenGLTexture
-    def set(slot)
-      if @texture.image.length == 6
-        if @texture.needs_update?
-          if !@texture.image[:_opengl_texture_cube]
-            @texture.add_event_listener(:dispose, @renderer.method(:on_texture_dispose))
-            @texture.image[:_opengl_texture_cube] = glCreateTexture
+  class CubeTexture
+    def set(slot, renderer)
+      @renderer = renderer
+
+      if image.length == 6
+        if needs_update?
+          if !image[:_opengl_texture_cube]
+            add_event_listener(:dispose, @renderer.method(:on_texture_dispose))
+            image[:_opengl_texture_cube] = glCreateTexture
             @renderer.info[:memory][:textures] += 1
           end
 
           glActiveTexture(GL_TEXTURE0 + slot)
-          glBindTexture(GL_TEXTURE_CUBE_MAP, @texture.image[:_opengl_texture_cube])
+          glBindTexture(GL_TEXTURE_CUBE_MAP, image[:_opengl_texture_cube])
 
           # glPixelStorei(GL_UNPACK_FLIP_Y_WEBGL, texture.flip_y)
 
-          is_compressed = @texture.is_a?(CompressedTexture)
-          is_data_texture = @texture.image[0].is_a?(DataTexture)
+          is_compressed = is_a?(CompressedTexture)
+          is_data_texture = image[0].is_a?(DataTexture)
 
           cube_image = [];
 
           6.times do |i|
             if @auto_scale_cubemaps && !is_compressed && !is_data_texture
-              cube_image[i] = clamp_to_max_size(@texture.image[i], @_max_cubemap_size)
+              cube_image[i] = clamp_to_max_size(image[i], @_max_cubemap_size)
             else
-              cube_image[i] = is_data_texture ? @texture.image[i].image : @texture.image[i];
+              cube_image[i] = is_data_texture ? image[i].image : image[i];
             end
           end
 
-          image = cube_image[0]
-          is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
-          gl_format = GL_MITTSU_PARAMS[@texture.format]
-          gl_type = GL_MITTSU_PARAMS[@texture.type]
+          img = cube_image[0]
+          is_image_power_of_two = Math.power_of_two?(img.width) && Math.power_of_two?(img.height)
+          gl_format = GL_MITTSU_PARAMS[format]
+          gl_type = GL_MITTSU_PARAMS[type]
 
           set_parameters(GL_TEXTURE_CUBE_MAP, is_image_power_of_two)
 
@@ -45,7 +47,7 @@ module Mittsu
               mipmaps = cube_image[i].mipmaps
 
               mipmaps.each_with_index do |mipmap, j|
-                if @texture.format != RGBAFormat && @texture.format != RGBFormat
+                if format != RGBAFormat && format != RGBFormat
                   if @renderer.compressed_texture_formats.include?(gl_format)
                     glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, gl_format, mipmap.width, mipmap.height, 0, mipmap.data)
                   else
@@ -58,16 +60,16 @@ module Mittsu
             end
           end
 
-          if @texture.generate_mipmaps && is_image_power_of_two
+          if generate_mipmaps && is_image_power_of_two
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
           end
 
-          @texture.needs_update = false
+          self.needs_update = false
 
-          @texture.on_update.call if @texture.on_update
+          on_update.call if on_update
         else
           glActiveTexture(GL_TEXTURE0 + slot)
-          glBindTexture(GL_TEXTURE_CUBE_MAP, @texture.image[:_opengl_texture_cube])
+          glBindTexture(GL_TEXTURE_CUBE_MAP, image[:_opengl_texture_cube])
         end
       end
     end

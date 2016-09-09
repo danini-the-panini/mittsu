@@ -188,10 +188,8 @@ module Mittsu
       # TODO: when OpenGLRenderTargetCube exists
       # is_cube = render_target.is_a? OpenGLRenderTargetCube
 
-      render_target_impl = render_target.implementation(self)
-
       # TODO framebuffer logic for render target cube
-      render_target_impl.setup_buffers
+      render_target.setup_buffers
 
       if render_target != @_current_render_target
         render_target.use
@@ -223,7 +221,7 @@ module Mittsu
 
       render_custom_plugins_post_pass(scene, camera)
 
-      render_target.implementation(self).update_mipmap
+      render_target.update_mipmap
 
       ensure_depth_buffer_writing
     end
@@ -311,10 +309,6 @@ module Mittsu
       material = event.target
       material.remove_event_listener(:dispose, method(:on_material_dispose))
       deallocate_material(material)
-    end
-
-    def create_implementation(thing)
-      OPENGL_IMPLEMENTATIONS[thing.class].new(thing, self)
     end
 
     def clamp_to_max_size(image, max_size = @_max_texture_size)
@@ -571,7 +565,7 @@ module Mittsu
         #     texture_unit = get_texture_unit
         #
         #     glUniform1i(program_uniforms['boneTexture'], texture_unit)
-        #     object.skeleton.bone_texture.implementation(self).set(texture_unit)
+        #     object.skeleton.bone_texture.set(texture_unit, self)
         #   end
         #
         #   if !program_uniforms['boneTextureWidth'].nil?
@@ -732,8 +726,7 @@ module Mittsu
 
           next unless texture
 
-          texture_impl = texture.implementation(self)
-          texture_impl.set(texture_unit)
+          texture.set(texture_unit, self)
           # TODO: when OpenGLRenderTargetCube is defined
           # elsif texture.is_a?(OpenGLRenderTargetCube)
             # set_cube_texture_dynamic(texture, texture_unit)
@@ -752,7 +745,7 @@ module Mittsu
 
             next unless tex
 
-            tex.implementation(self).set(tex_unit)
+            tex.set(tex_unit, self)
           end
         else
           puts "WARNING: Mittsu::OpenGLRenderer: Unknown uniform type: #{type}"
@@ -822,7 +815,7 @@ module Mittsu
         object = opengl_object.object
 
         if object.visible
-          object.implementation(self).setup_matrices(camera)
+          object.setup_matrices(camera)
           unroll_immediate_buffer_material(opengl_object)
         end
       end

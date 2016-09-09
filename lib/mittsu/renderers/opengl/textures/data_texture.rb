@@ -1,10 +1,8 @@
 module Mittsu
-  class OpenGLDataTexture < OpenGLTexture
+  class DataTexture
     def update_specific
-      gl_format = GL_MITTSU_PARAMS[@texture.format]
-      gl_type = GL_MITTSU_PARAMS[@texture.type]
-      mipmaps = @texture.mipmaps
-      image = @texture.image
+      gl_format = GL_MITTSU_PARAMS[format]
+      gl_type = GL_MITTSU_PARAMS[type]
       is_image_power_of_two = Math.power_of_two?(image.width) && Math.power_of_two?(image.height)
 
       # use manually created mipmaps if available
