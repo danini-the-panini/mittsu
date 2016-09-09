@@ -3,11 +3,11 @@ module Mittsu
     attr_accessor :lights_need_update, :cache
 
     LIGHT_CLASSES = [
-      OpenGLAmbientLight,
-      OpenGLDirectionalLight,
-      OpenGLPointLight,
-      OpenGLSpotLight,
-      OpenGLHemisphereLight
+      AmbientLight,
+      DirectionalLight,
+      PointLight,
+      SpotLight,
+      HemisphereLight
     ]
     LIGHT_TYPES = LIGHT_CLASSES.map { |klass| klass::TYPE }
 
@@ -25,7 +25,7 @@ module Mittsu
 
       lights.each do |light|
         next if light.only_shadow
-        light.implementation(self).setup
+        light.setup(self)
       end
 
       LIGHT_CLASSES.each do |klass|

@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLShaderMaterial < OpenGLMaterial
+  class ShaderMaterial
     def needs_camera_position_uniform?
       true
     end

@@ -1,30 +1,21 @@
 require 'mittsu/renderers/opengl/opengl_geometry_like'
 
 module Mittsu
-  class OpenGLGeometry
+  class Geometry
     include OpenGLGeometryLike
 
     attr_accessor :groups, :initted
-    attr_reader :id
-
-    def initialize(geometry, renderer)
-      @id = (@@id ||= 1).tap { @@id += 1 }
-
-      @geometry = geometry
-      @renderer = renderer
-    end
 
     def init_geometry_groups(object)
-      object_impl = object.implementation(@renderer)
       material = object.material
       add_buffers = false
 
-      if @groups.nil? || @geometry.groups_need_update
+      if @groups.nil? || @groups_need_update
         @renderer.remove_opengl_object(object)
 
         @groups = make_groups(material.is_a?(MeshFaceMaterial))
 
-        @geometry.groups_need_update = false
+        @groups_need_update = false
       end
 
       # create separate VBOs per geometry chunk
@@ -35,29 +26,29 @@ module Mittsu
           geometry_group.create_mesh_buffers
           geometry_group.init_mesh_buffers(object)
 
-          @geometry.vertices_need_update = true
-          @geometry.morph_targets_need_update = true
-          @geometry.elements_need_update = true
-          @geometry.uvs_need_update = true
-          @geometry.normals_need_update = true
-          @geometry.tangents_need_update = true
-          @geometry.colors_need_update = true
+          @vertices_need_update = true
+          @morph_targets_need_update = true
+          @elements_need_update = true
+          @uvs_need_update = true
+          @normals_need_update = true
+          @tangents_need_update = true
+          @colors_need_update = true
 
   				add_buffers = true
         else
           add_buffers = false
         end
 
-        if add_buffers || !object_impl.active?
+        if add_buffers || !object.active?
           @renderer.add_opengl_object(geometry_group, object)
         end
       end
 
-      object_impl.active = true
+      object.active = true
     end
 
     def init_line_buffers(object)
-      nvertices = @geometry.vertices.length
+      nvertices = @vertices.length
 
       @vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
       @color_array = Array.new(nvertices * 3, 0.0) # Float32Array
@@ -79,8 +70,8 @@ module Mittsu
     end
 
     def set_line_buffers(hint)
-      if @geometry.vertices_need_update
-        @geometry.vertices.each_with_index do |vertex, v|
+      if @vertices_need_update
+        @vertices.each_with_index do |vertex, v|
           offset = v * 3
 
           @vertex_array[offset]     = vertex.x
@@ -92,8 +83,8 @@ module Mittsu
         glBufferData_easy(GL_ARRAY_BUFFER, @vertex_array, hint)
       end
 
-      if @geometry.colors_need_update
-        @geometry.colors.each_with_index do |color, c|
+      if @colors_need_update
+        @colors.each_with_index do |color, c|
           offset = c * 3
 
           @color_array[offset]     = color.r
@@ -105,8 +96,8 @@ module Mittsu
         glBufferData_easy(GL_ARRAY_BUFFER, @color_array, hint)
       end
 
-      if @geometry.line_distances_need_update
-        @geometry.line_distances.each_with_index do |l, d|
+      if @line_distances_need_update
+        @line_distances.each_with_index do |l, d|
           @line_distance_array[d] = l
         end
 
@@ -176,13 +167,13 @@ module Mittsu
 
       hash_map = {}
 
-      num_morph_targets = @geometry.morph_targets.length
-      num_morph_normals = @geometry.morph_normals.length
+      num_morph_targets = @morph_targets.length
+      num_morph_normals = @morph_normals.length
 
       groups = {}
       groups_list = []
 
-      @geometry.faces.each_with_index do |face, f|
+      @faces.each_with_index do |face, f|
         material_index = uses_face_material ? face.material_index : 0
 
         if !hash_map.include? material_index
@@ -218,7 +209,7 @@ module Mittsu
     def init_custom_attributes(object)
       material = object.material
 
-      nvertices = @geometry.vertices.length
+      nvertices = @vertices.length
 
       if material.attributes
         @custom_attributes_list ||= []

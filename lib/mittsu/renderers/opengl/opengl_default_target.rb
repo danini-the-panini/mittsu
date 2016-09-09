@@ -46,9 +46,5 @@ module Mittsu
     def set_viewport_size(width, height)
       @viewport_width, @viewport_height = width, height
     end
-
-    def implementation(_)
-      self
-    end
   end
 end

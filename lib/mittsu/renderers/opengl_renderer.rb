@@ -188,10 +188,8 @@ module Mittsu
       # TODO: when OpenGLRenderTargetCube exists
       # is_cube = render_target.is_a? OpenGLRenderTargetCube
 
-      render_target_impl = render_target.implementation(self)
-
       # TODO framebuffer logic for render target cube
-      render_target_impl.setup_buffers
+      render_target.setup_buffers
 
       if render_target != @_current_render_target
         render_target.use
@@ -210,7 +208,7 @@ module Mittsu
       update_skeleton_objects(scene)
 
       update_screen_projection(camera)
-      scene.implementation(self).project
+      scene.project(self)
       sort_objects_for_render if @sort_objects
 
       render_custom_plugins_pre_pass(scene, camera)
@@ -223,7 +221,7 @@ module Mittsu
 
       render_custom_plugins_post_pass(scene, camera)
 
-      render_target.implementation(self).update_mipmap
+      render_target.update_mipmap
 
       ensure_depth_buffer_writing
     end
@@ -234,8 +232,10 @@ module Mittsu
     end
 
     def render_buffer(camera, lights, fog, material, geometry_group, object)
+      puts "--- RENDER #{object.name}" if DEBUG
       return unless material.visible
 
+      geometry_group.renderer = self
       geometry_group.bind_vertex_array_object
 
       update_object(object)
@@ -259,7 +259,7 @@ module Mittsu
 
       @state.disable_unused_attributes
 
-      object.implementation(self).render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
+      object.render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
 
       # TODO: render particles
       # when PointCloud
@@ -309,10 +309,6 @@ module Mittsu
       material = event.target
       material.remove_event_listener(:dispose, method(:on_material_dispose))
       deallocate_material(material)
-    end
-
-    def create_implementation(thing)
-      OPENGL_IMPLEMENTATIONS[thing.class].new(thing, self)
     end
 
     def clamp_to_max_size(image, max_size = @_max_texture_size)
@@ -367,19 +363,18 @@ module Mittsu
     def render_objects(render_list, camera, lights, fog, override_material)
       material = nil
       render_list.each do |opengl_object|
+        puts "-- RENDER_OBJECT #{opengl_object.name}" if DEBUG
         object = opengl_object.object
         buffer = opengl_object.buffer
 
-        object.implementation(self).setup_matrices(camera)
+        object.setup_matrices(camera)
 
         if override_material
           material = override_material
-          material_impl = material.implementation(self)
         else
           material = opengl_object.material
           next unless material
-          material_impl = material.implementation(self)
-          material_impl.set
+          material.set(self)
         end
 
         set_material_faces(material)
@@ -387,7 +382,8 @@ module Mittsu
           # TODO
           # render_buffer_direct(camera, lights, fog, material, buffer, object)
         else
-          render_buffer(camera, lights, fog, material, buffer.implementation(self), object)
+          puts "-- RENDER COLOR #{material.color}" if DEBUG
+          render_buffer(camera, lights, fog, material, buffer, object)
         end
       end
     end
@@ -406,8 +402,7 @@ module Mittsu
             else nil
             end
             next unless material
-            material_impl = material.implementation(self)
-            material_impl.set
+            material.set(self)
           end
           render_immediate_object(camera, lights, fog, material, object)
         end
@@ -442,6 +437,7 @@ module Mittsu
       material = object.material
 
       if material
+        puts "--- UNROLL #{opengl_object.name}" if DEBUG
         if material.is_a? MeshFaceMaterial
           material_index = geometry.is_a?(BufferGeometry) ? 0 : buffer.material_index
           material = material.materials[material_index]
@@ -460,7 +456,6 @@ module Mittsu
     # FIXME: refactor
     def update_object(object)
       geometry = object.geometry
-      object_impl = object.implementation(self)
 
       if geometry.is_a? BufferGeometry
         # TODO: geometry vertex array ?????
@@ -491,12 +486,12 @@ module Mittsu
           end
         end
       else
-        object_impl.update
+        object.update
       end
       # TODO: when PointCloud exists
       # elsif object.is_A? PointCloud
       #   # TODO: glBindVertexArray ???
-      #   material = object_impl.buffer_material(geometry)
+      #   material = object.buffer_material(geometry)
       #   custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
       #
       #   if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
@@ -513,19 +508,16 @@ module Mittsu
     # FIXME: refactor
     def set_program(camera, lights, fog, material, object)
       @_used_texture_units = 0
-      material_impl = material.implementation(self)
-      object_impl = object.implementation(self)
-
       if material.needs_update?
         deallocate_material(material) if material.program
 
-        material_impl.init(lights, fog, object)
+        material.init(lights, fog, object, self)
         material.needs_update = false
       end
 
       if material.morph_targets
-        if !object_impl.morph_target_influences
-          object_impl.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
+        if !object.morph_target_influences
+          object.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
         end
       end
 
@@ -535,7 +527,7 @@ module Mittsu
 
       program = material.program
       program_uniforms = program.uniforms
-      material_uniforms = material_impl.shader[:uniforms]
+      material_uniforms = material.shader[:uniforms]
 
       if program.id != @_current_program
         glUseProgram(program.program)
@@ -573,7 +565,7 @@ module Mittsu
         #     texture_unit = get_texture_unit
         #
         #     glUniform1i(program_uniforms['boneTexture'], texture_unit)
-        #     object.skeleton.bone_texture.implementation(self).set(texture_unit)
+        #     object.skeleton.bone_texture.set(texture_unit, self)
         #   end
         #
         #   if !program_uniforms['boneTextureWidth'].nil?
@@ -594,7 +586,7 @@ module Mittsu
         # TODO: when fog is implemented
         # refresh_uniforms_fog(material_uniforms, fog) if fog && material.fog
 
-        if material_impl.needs_lights?
+        if material.needs_lights?
           if @light_renderer.lights_need_update
             refresh_lights = true
             @light_renderer.setup(lights)
@@ -607,7 +599,7 @@ module Mittsu
           OpenGLHelper.mark_uniforms_lights_needs_update(material_uniforms, refresh_lights)
         end
 
-        material_impl.refresh_uniforms(material_uniforms)
+        material.refresh_uniforms(material_uniforms)
 
         # TODO: when all of these things exist
         # when LineDashedMaterial
@@ -622,14 +614,14 @@ module Mittsu
         # when MeshNormalMaterial
         #   material_uniforms.opactity.value = material.opacity
 
-        if object.receive_shadow && !material_impl.shadow_pass
+        if object.receive_shadow && !material.shadow_pass
           OpenGLHelper.refresh_uniforms_shadow(material_uniforms, lights)
         end
 
-        load_uniforms_generic(material_impl.uniforms_list)
+        load_uniforms_generic(material.uniforms_list)
       end
 
-      object.implementation(self).load_uniforms_matrices(program_uniforms)
+      object.load_uniforms_matrices(program_uniforms)
 
       if !program_uniforms['modelMatrix'].nil?
         glUniformMatrix4fv(program_uniforms['modelMatrix'], 1, GL_FALSE, array_to_ptr_easy(object.matrix_world.elements))
@@ -734,8 +726,7 @@ module Mittsu
 
           next unless texture
 
-          texture_impl = texture.implementation(self)
-          texture_impl.set(texture_unit)
+          texture.set(texture_unit, self)
           # TODO: when OpenGLRenderTargetCube is defined
           # elsif texture.is_a?(OpenGLRenderTargetCube)
             # set_cube_texture_dynamic(texture, texture_unit)
@@ -754,7 +745,7 @@ module Mittsu
 
             next unless tex
 
-            tex.implementation(self).set(tex_unit)
+            tex.set(tex_unit, self)
           end
         else
           puts "WARNING: Mittsu::OpenGLRenderer: Unknown uniform type: #{type}"
@@ -824,7 +815,7 @@ module Mittsu
         object = opengl_object.object
 
         if object.visible
-          object.implementation(self).setup_matrices(camera)
+          object.setup_matrices(camera)
           unroll_immediate_buffer_material(opengl_object)
         end
       end
@@ -840,9 +831,8 @@ module Mittsu
 
     def render_with_override_material(scene, camera)
       override_material = scene.override_material
-      material_impl = override_material.implementation(self)
 
-      material_impl.set
+      override_material.set(self)
 
       render_objects(@opaque_objects, camera, @lights, scene.fog, override_material)
       render_objects(@transparent_objects, camera, @lights, scene.fog, override_material)
@@ -1033,20 +1023,18 @@ module Mittsu
     end
 
     def update_camera_uniforms(uniforms, camera, material)
-      material_impl = material.implementation(self)
-
       glUniformMatrix4fv(uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
 
       if @logarithmic_depth_buffer
         glUniform1f(uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
       end
 
-      if material_impl.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?
+      if material.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?
         @_vector3.set_from_matrix_position(camera.matrix_world)
         glUniform3f(uniforms['cameraPosition'], @_vector3.x, @_vector3.y, @_vector3.z)
       end
 
-      if material_impl.needs_view_matrix_uniform? && !uniforms['viewMatrix'].nil?
+      if material.needs_view_matrix_uniform? && !uniforms['viewMatrix'].nil?
         glUniformMatrix4fv(uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
       end
     end

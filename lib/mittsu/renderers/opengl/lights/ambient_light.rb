@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLAmbientLight < OpenGLLight
+  class AmbientLight
     TYPE = :ambient
 
     class Cache < Struct.new(:length, :count, :value)
@@ -16,9 +16,9 @@ module Mittsu
     end
 
     def setup_specific(_)
-      @cache.value[0] += @light.color.r
-      @cache.value[1] += @light.color.g
-      @cache.value[2] += @light.color.b
+      @cache.value[0] += color.r
+      @cache.value[1] += color.g
+      @cache.value[2] += color.b
     end
 
     def self.null_remaining_lights(_); end

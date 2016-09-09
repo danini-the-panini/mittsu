@@ -57,7 +57,6 @@ module Mittsu
 
     def init_mesh_buffers(object)
       geometry = object.geometry
-      object_impl = object.implementation(@renderer)
 
       nvertices = @faces3.length * 3
       nvertices2 = nvertices * 2
@@ -66,7 +65,7 @@ module Mittsu
       ntris = @faces3.length * 1
       nlines = @faces3.length * 3
 
-      material = object_impl.buffer_material(self)
+      material = object.buffer_material(self)
 
       @vertex_array = Array.new(nvertices3) # Float32Array
       @normal_array = Array.new(nvertices3) # Float32Array
@@ -159,9 +158,8 @@ module Mittsu
       return unless @initted_arrays
 
       geometry = object.geometry
-      material_impl = material.implementation(@renderer)
 
-      needs_face_normals = material_impl.needs_face_normals?
+      needs_face_normals = material.needs_face_normals?
 
       vertex_index = 0
 
@@ -754,10 +752,6 @@ module Mittsu
       @line_array = nil
       @skin_index_array = nil
       @skin_weight_array = nil
-    end
-
-    def implementation(_)
-      self
     end
   end
 end

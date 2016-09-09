@@ -40,15 +40,16 @@ module OpenGLDebug
   end
 
   def call_debug_method m, *args
-    r = OpenGLProxy.send(m, *args)
     if m.to_s.start_with?('glUniform')
       uniform_name = @@current_shader.get_uniform_name(args.first)
       call = "#{m}('#{uniform_name}',#{args[1..-1].map { |s| s.to_s[0..20] }.join(', ')})"
     else
       call = "#{m}(#{args.map { |s| s.to_s[0..20] }.join(', ')})"
     end
+    print call
+    r = OpenGLProxy.send(m, *args)
     ret = r.nil? ? '' : " => #{r}"
-    puts "#{call}#{ret} (#{caller[0]})"
+    puts "#{ret} (#{caller[0]})"
     e = OpenGLProxy.glGetError
     raise "ERROR: #{m} => #{ERROR_STRINGS[e]}" unless e == OpenGL::GL_NO_ERROR
     r

@@ -1,5 +1,5 @@
 module Mittsu
-  class OpenGLHemisphereLight < OpenGLLight
+  class HemisphereLight
     TYPE = :hemi
 
     class Cache < Struct.new(:length, :count, :sky_colors, :ground_colors, :positions)
@@ -15,7 +15,7 @@ module Mittsu
     def setup_specific(index)
       offset = index * 3
 
-      @_direction.set_from_matrix_position(@light.matrix_world)
+      @_direction.set_from_matrix_position(matrix_world)
       @_direction.normalize
 
       positions = @cache.positions
@@ -23,11 +23,8 @@ module Mittsu
       positions[offset + 1] = @_direction.y
       positions[offset + 2] = @_direction.z
 
-      sky_color = @light.color
-      ground_color = @light.ground_color
-
-      OpenGLHelper.set_color_linear(@cache.sky_colors, offset, sky_color, @light.intensity )
-      OpenGLHelper.set_color_linear(@cache.ground_colors, offset, ground_color, @light.intensity)
+      OpenGLHelper.set_color_linear(@cache.sky_colors, offset, color, intensity)
+      OpenGLHelper.set_color_linear(@cache.ground_colors, offset, ground_color, intensity)
     end
 
     def self.null_remaining_lights(cache)

@@ -1,12 +1,16 @@
+require 'mittsu/renderers/opengl/materials/opengl_material_basics'
+
 module Mittsu
-  class OpenGLMeshLambertMaterial < OpenGLMeshBasicMaterial
+  class MeshLambertMaterial
+    include OpenGLMaterialBasics
+
     def refresh_uniforms(uniforms)
-      super
+      refresh_uniforms_basic(uniforms)
 
-      uniforms['emissive'].value = @material.emissive
+      uniforms['emissive'].value = emissive
 
-      if @material.wrap_around
-        uniforms['wrapRGB'].value.copy(@material.wrap_rgb)
+      if wrap_around
+        uniforms['wrapRGB'].value.copy(wrap_rgb)
       end
     end
 

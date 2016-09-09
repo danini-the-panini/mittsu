@@ -29,7 +29,8 @@ module Mittsu
                   :line_count,
                   :initted_arrays,
                   :custom_attributes_list,
-                  :num_vertices
+                  :num_vertices,
+                  :renderer
 
     def bind_vertex_array_object
       glBindVertexArray(@vertex_array_object) if @vertex_array_object

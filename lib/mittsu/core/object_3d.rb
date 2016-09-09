@@ -5,7 +5,9 @@ module Mittsu
   class Object3D
     include EventDispatcher
 
-    attr_accessor  :name, :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_update, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry
+    attr_accessor :children, :up, :position, :rotation, :quaternion, :scale, :rotation_auto_update, :matrix, :matrix_world, :matrix_auto_update, :matrix_world_needs_update, :visible, :cast_shadow, :receive_shadow, :frustum_culled, :render_order, :user_data, :parent, :geometry
+
+    attr_writer :name
 
     attr_reader :id, :uuid, :type
 
@@ -17,7 +19,6 @@ module Mittsu
 
       @uuid = SecureRandom.uuid
 
-      @name = ''
       @type = 'Object3D'
 
       @children = []
@@ -54,6 +55,10 @@ module Mittsu
       @render_order = 0
 
       @user_data = {}
+    end
+
+    def name
+      @name || "<#{@type} ##{@id}>"
     end
 
     def apply_matrix(matrix)
@@ -334,10 +339,6 @@ module Mittsu
         end
       end
       object
-    end
-
-    def implementation(renderer)
-      @_implementation ||= renderer.create_implementation(self)
     end
 
     protected

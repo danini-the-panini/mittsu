@@ -1,9 +1,14 @@
+require 'mittsu/renderers/opengl/materials/opengl_material_basics'
+
 module Mittsu
-  class OpenGLLineBasicMaterial < OpenGLMaterial
+  class MeshBasicMaterial
+    include OpenGLMaterialBasics
+
     def refresh_uniforms(uniforms)
-      uniforms['diffuse'].value = @material.color
-      uniforms['opacity'].value = @material.opacity
+      refresh_uniforms_basic(uniforms)
     end
+
+    protected
 
     def init_shader
       @shader = ShaderLib.create_shader(shader_id)

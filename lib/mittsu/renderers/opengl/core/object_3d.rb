@@ -1,14 +1,8 @@
 module Mittsu
-  class OpenGLObject3D
-    attr_accessor :morph_target_influences
+  class Object3D
+    attr_accessor :morph_target_influences, :renderer
     attr_reader :model_view_matrix
     attr_writer :active
-
-    def initialize(object, renderer)
-      @object = object
-      @renderer = renderer
-      @_vector3 = Vector3.new
-    end
 
     def active?
       @active
@@ -16,21 +10,20 @@ module Mittsu
 
     def init
       if !@initted
+        puts " --- INIT #{self.name}" if DEBUG
+
         @initted = true
         @model_view_matrix = Matrix4.new
         @normal_matrix = Matrix3.new
 
-        @object.add_event_listener(:removed, @renderer.method(:on_object_removed))
+        add_event_listener(:removed, @renderer.method(:on_object_removed))
       end
-
-      geometry = @object.geometry
 
       if geometry.nil?
         # ImmediateRenderObject
       else
-        geometry_impl = geometry.implementation(@renderer)
-        if !geometry_impl.initted
-          geometry_impl.initted = true
+        if !geometry.initted
+          geometry.initted = true
           geometry.add_event_listener(:dispose, @renderer.method(:on_geometry_dispose))
           if geometry.is_a?(BufferGeometry)
             @renderer.info[:memory][:geometries] += 1
@@ -55,26 +48,30 @@ module Mittsu
         add_opengl_object
         # TODO: when ImmediateRenderObject exists
         # if object.is_a? ImmediateRenderObject || object.immediate_render_callback
-        #   add_buffer_immediate(@renderer.instance_variable_get(:@_opengl_objects_immediate), @object)
+        #   add_buffer_immediate(@renderer.instance_variable_get(:@_opengl_objects_immediate), self)
         # end
       end
     end
 
-    def project
-      return unless @object.visible
+    def project(renderer)
+      puts " --- PROJECT #{self.name}" if DEBUG
+      @renderer = renderer
+      return unless visible
       init
 
       # TODO!!! FIXME!!!
-      opengl_objects = @renderer.instance_variable_get(:@_opengl_objects)[@object.id]
+      opengl_objects = @renderer.instance_variable_get(:@_opengl_objects)[id]
 
-      if opengl_objects && (!@object.frustum_culled || @renderer.object_in_frustum?(@object))
+      if opengl_objects && (!frustum_culled || @renderer.object_in_frustum?(self))
         opengl_objects.each do |opengl_object|
           # TODO!!! FIXME!!!
           @renderer.send(:unroll_buffer_material, opengl_object)
 
           opengl_object.render = true
           if @renderer.sort_objects?
-            @_vector3.set_from_matrix_position(@object.matrix_world)
+            @_vector3 ||= Vector3.new
+
+            @_vector3.set_from_matrix_position(matrix_world)
             @_vector3.apply_projection(@renderer.proj_screen_matrix)
 
             opengl_object[:z] = @_vector3.z
@@ -86,7 +83,7 @@ module Mittsu
     end
 
     def setup_matrices(camera)
-      @model_view_matrix.multiply_matrices(camera.matrix_world_inverse, @object.matrix_world)
+      @model_view_matrix.multiply_matrices(camera.matrix_world_inverse, matrix_world)
       @normal_matrix.normal_matrix(@model_view_matrix)
       @model_view_matrix
     end
@@ -104,7 +101,6 @@ module Mittsu
     end
 
     def buffer_material(geometry_group)
-      material = @object.material
       if material.is_a?(MeshFaceMaterial)
         material.materials[geometry_group.material_index]
       else
@@ -123,8 +119,8 @@ module Mittsu
     protected
 
     def project_children
-      @object.children.each do |child|
-        child.implementation(@renderer).project
+      children.each do |child|
+        child.project(@renderer)
       end
     end
   end
