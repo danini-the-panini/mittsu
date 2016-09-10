@@ -6,6 +6,12 @@
 
 Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of [THREE.js](http://threejs.org). No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!
 
+## GIFs!
+
+![Normal-mapped Earth](https://cloud.githubusercontent.com/assets/1171825/18411863/45328540-7781-11e6-986b-6e3f2551c719.gif)
+![Point Light](https://cloud.githubusercontent.com/assets/1171825/18411861/4531bb4c-7781-11e6-92b4-b6ebda60e2c9.gif)
+![Tank Demo](https://cloud.githubusercontent.com/assets/1171825/18411862/4531fe9a-7781-11e6-9665-b172df1a3645.gif)
+
 ## Installation
 
 Install the prerequisites:
