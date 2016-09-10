@@ -14,7 +14,7 @@ Mittsu depends on Ruby 2.x, OpenGL 3.3+, GLFW 3.1.x and ImageMagick 6.4.9+
 
 ```bash
 # OSX
-$ brew intall glfw3 imagemagick
+$ brew install glfw3 imagemagick
 
 # Ubuntu
 $ sudo apt-get install libglfw3-dev libmagickwand-dev
