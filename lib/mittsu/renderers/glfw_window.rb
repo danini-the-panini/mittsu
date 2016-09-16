@@ -3,12 +3,12 @@ require 'glfw'
 
 GLFW_LIB_EXT = OpenGL.get_platform == :OPENGL_PLATFORM_MACOSX ? 'dylib' : 'so'
 if OpenGL.get_platform != :OPENGL_PLATFORM_TEST
-  GLFW_LIB = begin
+  GLFW_LIB = ENV["MITTSU_LIBGLFW_FILE"] || begin
     "lib#{`pkg-config --libs-only-l glfw3`.gsub(/^-l/, '').chomp.strip}.#{GLFW_LIB_EXT}"
   rescue
     "libglfw.#{GLFW_LIB_EXT}"
   end
-  GLFW_LIB_PATH = begin
+  GLFW_LIB_PATH = ENV["MITTSU_LIBGLFW_PATH"] || begin
     s = `pkg-config glfw3 --libs-only-L`.gsub(/^-L/, '').chomp.strip
     s.empty? ? nil : s
   rescue
