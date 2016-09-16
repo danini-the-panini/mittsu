@@ -13,6 +13,10 @@ module OpenGLLib
   end
 
   class Linux
+    def initialize(loader = Linux)
+      @loader = loader
+    end
+
     def path
       return nil if file_path.nil?
       File.dirname file_path
@@ -23,29 +27,43 @@ module OpenGLLib
       File.basename file_path
     end
 
+    class << self
+      def kernel_module_in_use
+        lspci_line = `lspci -nnk | grep -i vga -A3 | grep 'in use'`
+        /in use:\s*(\S+)/ =~ lspci_line && $1
+      end
+
+      def libgl_paths
+        Dir.glob('/usr/lib*/**/libGL.so*')
+      end
+
+      def sixtyfour_bits?
+        1.size == 8
+      end
+    end
+
     private
       def file_path
         @_file_path ||= begin
-          libs = Dir.glob("/usr/lib*/**/libGL.so*")
-          if libs.size == 0
-            puts "no libGL.so"
-            exit 1
-          end
-          case kernel_module_in_use
-          when /nvidia/
-            return libs.grep(/nvidia/)[0]
-          end
-          if 1.size == 8 # 64 bits
-            libs.grep(/64/)[0]
-          else # 32 bits
-            libs[0]
-          end
-        end.tap { |x| puts x }
+          return nil if libs.size == 0
+          driver_specific_lib || sixtyfour_bit_lib || libs.first
+        end
       end
 
-      def kernel_module_in_use
-        lspci_line = `lspci -nnk | grep -i vga -A3 | grep 'in use'`
-        return /in use:\s*(\S+)/ =~ lspci_line && $1
+      def driver_specific_lib
+        libs.grep(/nvidia/).first if kernel_module =~ /nvidia/
+      end
+
+      def sixtyfour_bit_lib
+        libs.grep(/64/).first if @loader.sixtyfour_bits?
+      end
+
+      def kernel_module
+        @_kernel_module ||= @loader.kernel_module_in_use
+      end
+
+      def libs
+        @_libs ||= @loader.libgl_paths.sort_by(&:length)
       end
   end
 
