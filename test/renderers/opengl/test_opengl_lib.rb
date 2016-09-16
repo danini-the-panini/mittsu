@@ -20,9 +20,10 @@ class TestOpenGLLib < Minitest::Test
   def test_linux_64_nvidia_2
     fake_loader = Struct.new(:libgl_paths, :kernel_module_in_use, :sixtyfour_bits?).new(
       [
-        '/usr/lib/x86_64-linux-gnu/mesa/libGL.so',
         '/usr/lib/x86_64-linux-gnu/libGL.so',
-        '/usr/lib/some-dir-with-nvidia-in-it/libGL.so'
+        '/usr/lib/x86_64-linux-gnu/mesa/libGL.so',
+        '/usr/lib/nvidia-367/libGL.so',
+        '/usr/lib32/nvidia-367/libGL.so'
       ],
       'nvidia',
       true
@@ -30,7 +31,7 @@ class TestOpenGLLib < Minitest::Test
 
     linux_lib = OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so', linux_lib.file
-    assert_equal '/usr/lib/some-dir-with-nvidia-in-it', linux_lib.path
+    assert_equal '/usr/lib/nvidia-367', linux_lib.path
   end
 
   def test_linux_64_vboxvideo

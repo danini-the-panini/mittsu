@@ -34,7 +34,7 @@ module OpenGLLib
       end
 
       def libgl_paths
-        Dir.glob('/usr/lib*/**/libGL.so*')
+        Dir.glob('/usr/lib*/**/libGL.so')
       end
 
       def sixtyfour_bits?
