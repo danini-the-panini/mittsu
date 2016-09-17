@@ -31,30 +31,46 @@ module OpenGLLib
       def kernel_module_in_use
         lspci_line = `lspci -nnk | grep -i vga -A3 | grep 'in use'`
         /in use:\s*(\S+)/ =~ lspci_line && $1
+      rescue
+        ''
       end
 
       def libgl_paths
         Dir.glob('/usr/lib*/**/libGL.so')
+      rescue
+        []
       end
 
       def sixtyfour_bits?
         1.size == 8
+      end
+
+      def ldconfig
+        `ldconfig -p | grep 'libGL\\.so'`.lines
+      rescue
+        []
       end
     end
 
     private
       def file_path
         @_file_path ||= begin
-          return nil if libs.size == 0
-          driver_specific_lib || sixtyfour_bit_lib || libs.first
+          ldconfig_lib || driver_specific_lib || sixtyfour_bit_lib || libs.first
         end
       end
 
+      def ldconfig_lib
+        return nil if ldconfig.empty?
+        ldconfig.first.match(/=> (\/.*)$/)[1]
+      end
+
       def driver_specific_lib
+        return nil if libs.empty?
         libs.grep(/nvidia/).first if kernel_module =~ /nvidia/
       end
 
       def sixtyfour_bit_lib
+        return nil if libs.empty?
         libs.grep(/64/).first if @loader.sixtyfour_bits?
       end
 
@@ -64,6 +80,10 @@ module OpenGLLib
 
       def libs
         @_libs ||= @loader.libgl_paths.sort_by(&:length)
+      end
+
+      def ldconfig
+        @_ldconfig ||= @loader.ldconfig
       end
   end
 
