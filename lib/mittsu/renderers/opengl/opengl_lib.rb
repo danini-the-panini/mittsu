@@ -55,12 +55,15 @@ module OpenGLLib
     private
       def file_path
         @_file_path ||= begin
-          ldconfig_lib || driver_specific_lib || sixtyfour_bit_lib || libs.first
+          ldconfig_lib || driver_specific_lib || sixtyfour_bit_lib || fallback_lib || give_up
+        end.tap do |result|
+          print_debug_info(result) if Mittsu::DEBUG
         end
       end
 
       def ldconfig_lib
         return nil if ldconfig.empty?
+        @_debug = { source: 'ldconfig', info: ldconfig.inspect } if Mittsu::DEBUG
         ldconfig_for_arch = ldconfig.reject { |lib| @loader.sixtyfour_bits? ^ ldconfig_64?(lib) }
         ldconfig_for_arch.first.match(/=> (\/.*)$/)[1]
       end
@@ -71,12 +74,26 @@ module OpenGLLib
 
       def driver_specific_lib
         return nil if libs.empty?
-        libs.grep(/nvidia/).first if kernel_module =~ /nvidia/
+        @_debug = { source: 'driver', info: kernel_module } if Mittsu::DEBUG
+        libs.select { |lib| lib =~ /nvidia/ }.first if kernel_module =~ /nvidia/
       end
 
       def sixtyfour_bit_lib
         return nil if libs.empty?
-        libs.grep(/64/).first if @loader.sixtyfour_bits?
+        sixtyfour_bit_libs = libs.select { |lib| lib =~ /64/ }
+        @_debug = { source: '64', info: sixtyfour_bit_libs.inspect } if Mittsu::DEBUG
+        sixtyfour_bit_libs.first if @loader.sixtyfour_bits?
+      end
+
+      def fallback_lib
+        return nil if libs.empty?
+        @_debug = { source: 'fallback', info: libs.inspect } if Mittsu::DEBUG
+        libs.first
+      end
+
+      def give_up
+        @_debug = { source: 'none', info: nil } if Mittsu::DEBUG
+        nil
       end
 
       def kernel_module
@@ -89,6 +106,13 @@ module OpenGLLib
 
       def ldconfig
         @_ldconfig ||= @loader.ldconfig
+      end
+
+      def print_debug_info(result)
+        puts "Loading lib path: #{result.inspect}"
+        puts "Source: #{@_debug[:source]}"
+        puts "Info: #{@_debug[:info]}"
+        puts "64-bit? #{@loader.sixtyfour_bits?}"
       end
   end
 
