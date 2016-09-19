@@ -36,7 +36,7 @@ module OpenGLLib
       end
 
       def libgl_paths
-        Dir.glob('/usr/lib*/**/libGL.so')
+        Dir.glob('/usr/lib*/**/libGL.so*')
       rescue
         []
       end
@@ -61,7 +61,12 @@ module OpenGLLib
 
       def ldconfig_lib
         return nil if ldconfig.empty?
-        ldconfig.first.match(/=> (\/.*)$/)[1]
+        ldconfig_for_arch = ldconfig.reject { |lib| @loader.sixtyfour_bits? ^ ldconfig_64?(lib) }
+        ldconfig_for_arch.first.match(/=> (\/.*)$/)[1]
+      end
+
+      def ldconfig_64?(lib)
+        lib =~ /\([^\)]*64[^\)]*\) =>/
       end
 
       def driver_specific_lib
