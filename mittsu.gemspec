@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "bug_tracker" => "https://github.com/jellymann/mittsu/issues"
   }
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|examples)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples)/|\.sh$)}) }
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = '>= 2.0.0'
