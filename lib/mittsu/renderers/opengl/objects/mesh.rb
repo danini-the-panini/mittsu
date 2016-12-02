@@ -7,7 +7,7 @@ module Mittsu
 
       # wireframe
       if material.wireframe
-        @renderer.state.set_line_width(material.wireframe_linewidth * @pixel_ratio)
+        @renderer.state.set_line_width(material.wireframe_linewidth * @renderer.pixel_ratio)
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.line_buffer) if update_buffers
         glDrawElements(GL_LINES, geometry_group.line_count, type, 0)
