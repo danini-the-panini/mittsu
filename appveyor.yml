@@ -3,7 +3,7 @@ version: '{build}'
 clone_folder: c:\projects\mittsu
 
 environment:
-  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN64\lib-vc2015\glfw3.dll
+  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN64\lib-mingw-w64\glfw3.dll
 
 install:
   - ps: c:\projects\mittsu\install_glfw.ps1
