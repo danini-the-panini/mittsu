@@ -6,6 +6,9 @@ install:
 
 build: off
 
+install:
+  ps: install_glfw.ps
+
 before_test:
   - ruby -v
   - gem -v
