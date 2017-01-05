@@ -14,7 +14,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.copy_at 1, b, 2
 
     assert_equal [0, 0, 7, 8, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set
@@ -23,7 +23,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set([1, 2, 3], 2)
 
     assert_equal [0, 0, 1, 2, 3, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_x
@@ -32,7 +32,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_x 1, 42
 
     assert_equal [0, 0, 0, 42, 0, 0, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_y
@@ -41,7 +41,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_y 1, 42
 
     assert_equal [0, 0, 0, 0, 42, 0, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_z
@@ -50,7 +50,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_z 1, 42
 
     assert_equal [0, 0, 0, 0, 0, 42, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_xy
@@ -59,7 +59,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_xy 1, 42, 24
 
     assert_equal [0, 0, 0, 42, 24, 0, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_xyz
@@ -68,7 +68,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_xyz 1, 42, 24, 12
 
     assert_equal [0, 0, 0, 42, 24, 12, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_xyzw
@@ -77,7 +77,7 @@ class TestBufferAttribute < Minitest::Test
     result = a.set_xyzw 1, 42, 24, 12, 6
 
     assert_equal [0, 0, 0, 0, 42, 24, 12, 6, 0, 0, 0, 0], a.array
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_clone

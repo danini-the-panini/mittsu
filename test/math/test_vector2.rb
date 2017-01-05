@@ -23,7 +23,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5, a.x
     assert_equal 2.3, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_set_x
@@ -75,7 +75,7 @@ class TestVector2 < Minitest::Test
     assert_equal 3.4, a.x
     assert_equal 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_add
@@ -86,7 +86,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 + 3.4, a.x
     assert_equal 2.3 + 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_add_scalar
@@ -97,7 +97,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 + 4.1, a.x
     assert_equal 2.3 + 4.1, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_add_vectors
@@ -108,7 +108,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 + 3.4, a.x
     assert_equal 2.3 + 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_sub
@@ -119,7 +119,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 - 3.4, a.x
     assert_equal 2.3 - 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_sub_scalar
@@ -130,7 +130,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 - 4.1, a.x
     assert_equal 2.3 - 4.1, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_sub_vectors
@@ -141,7 +141,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 - 3.4, a.x
     assert_equal 2.3 - 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_multiply
@@ -152,7 +152,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 * 3.4, a.x
     assert_equal 2.3 * 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_multiply_scalar
@@ -163,7 +163,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 * 4.1, a.x
     assert_equal 2.3 * 4.1, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_divide
@@ -174,7 +174,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 / 3.4, a.x
     assert_equal 2.3 / 1.2, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_divide_scalar
@@ -185,7 +185,7 @@ class TestVector2 < Minitest::Test
     assert_equal 1.5 / 4.1, a.x
     assert_equal 2.3 / 4.1, a.y
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_min
@@ -193,7 +193,7 @@ class TestVector2 < Minitest::Test
     result = a.min(Mittsu::Vector2.new(0.3, 0.5))
     assert_equal 0.3, a.x
     assert_equal 0.5, a.y
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, 2.3)
     a.min(Mittsu::Vector2.new(0.3, 3.5))
@@ -216,7 +216,7 @@ class TestVector2 < Minitest::Test
     result = a.max(Mittsu::Vector2.new(0.3, 0.5))
     assert_equal 1.5, a.x
     assert_equal 2.3, a.y
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, 2.3)
     a.max(Mittsu::Vector2.new(0.3, 3.5))
@@ -239,7 +239,7 @@ class TestVector2 < Minitest::Test
     result = a.clamp(Mittsu::Vector2.new(0.0, -1.0), Mittsu::Vector2.new(1.0, 1.0))
     assert_equal(1.0, a.x)
     assert_equal(-1.0, a.y)
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(0.5, -0.3)
     a.clamp(Mittsu::Vector2.new(0.0, -1.0), Mittsu::Vector2.new(1.0, 1.0))
@@ -257,7 +257,7 @@ class TestVector2 < Minitest::Test
     result = a.clamp_scalar(0.0, 1.0)
     assert_equal 1.0, a.x
     assert_equal 0.0, a.y
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(0.5, 0.3)
     a.clamp_scalar(0.0, 1.0)
@@ -270,7 +270,7 @@ class TestVector2 < Minitest::Test
     result = a.floor
     assert_equal(1, a.x)
     assert_equal(-4, a.y)
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, -3.5)
     a.floor
@@ -283,7 +283,7 @@ class TestVector2 < Minitest::Test
     result = a.ceil
     assert_equal(2, a.x)
     assert_equal(-3, a.y)
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, -3.5)
     a.ceil
@@ -296,7 +296,7 @@ class TestVector2 < Minitest::Test
     result = a.round
     assert_equal(1, a.x)
     assert_equal(-3, a.y)
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, -3.5)
     a.round
@@ -309,7 +309,7 @@ class TestVector2 < Minitest::Test
     result = a.round_to_zero
     assert_equal(1, a.x)
     assert_equal(-3, a.y)
-    assert_same a, result
+    assert_equal a, result
 
     a = Mittsu::Vector2.new(1.5, -3.5)
     a.round_to_zero
@@ -325,7 +325,7 @@ class TestVector2 < Minitest::Test
     assert_equal(-1.4, a.x)
     assert_equal(3.4, a.y)
 
-    assert_same a, result
+    assert_equal a, result
   end
 
   def test_dot
@@ -356,7 +356,7 @@ class TestVector2 < Minitest::Test
     assert_in_delta(0.38074980525429, a.x, DELTA)
     assert_in_delta(-0.92467809847472, a.y, DELTA)
 
-    assert_same(a, result)
+    assert_equal(a, result)
   end
 
   def test_distance_to
@@ -380,7 +380,7 @@ class TestVector2 < Minitest::Test
 
     assert_in_delta(0.87572455208487, a.x, DELTA)
     assert_in_delta(-2.12675962649186, a.y, DELTA)
-    assert_same(result, a)
+    assert_equal(result, a)
   end
 
   def test_lerp
@@ -395,7 +395,7 @@ class TestVector2 < Minitest::Test
 
       assert_in_delta(exx, a.x, DELTA)
       assert_in_delta(exy, a.y, DELTA)
-      assert_same a, result
+      assert_equal a, result
     end
   end
 
@@ -412,7 +412,7 @@ class TestVector2 < Minitest::Test
 
       assert_in_delta(exx, c.x, DELTA)
       assert_in_delta(exy, c.y, DELTA)
-      assert_same c, result
+      assert_equal c, result
     end
   end
 
@@ -432,7 +432,7 @@ class TestVector2 < Minitest::Test
 
     assert_equal 1.2, a.x
     assert_equal 2.4, a.y
-    assert_same a, result
+    assert_equal a, result
 
     a.from_array([1.2, 2.4, 4.8, 8.16, 16.32], 2)
 
@@ -462,7 +462,7 @@ class TestVector2 < Minitest::Test
     result = a.from_attribute(att, 0)
     assert_equal 1.0, a.x
     assert_equal 2.0, a.y
-    assert_same a, result
+    assert_equal a, result
 
     a.from_attribute(att, 1)
     assert_equal 4.0, a.x

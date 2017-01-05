@@ -1,0 +1,23 @@
+version: '{build}'
+
+clone_folder: c:\projects\mittsu
+
+environment:
+  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
+
+install:
+  - ps: c:\projects\mittsu\install_glfw.ps1
+  - set PATH=C:\Ruby22\bin;%PATH%
+  - bundle install
+
+build: off
+
+
+before_test:
+  - dir c:\projects\mittsu\glfw-3.2.1.bin.WIN32
+  - ruby -v
+  - gem -v
+  - bundle -v
+
+test_script:
+  - bundle exec rake test
