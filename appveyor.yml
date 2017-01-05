@@ -3,7 +3,7 @@ version: '{build}'
 clone_folder: c:\projects\mittsu
 
 environment:
-  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw3\lib-vc2015\glfw3.dll
+  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN64\lib-vc2015\glfw3.dll
 
 install:
   - ps: c:\projects\mittsu\install_glfw.ps1
@@ -14,7 +14,7 @@ build: off
 
 
 before_test:
-  - dir c:\projects\mittsu\glfw3
+  - dir c:\projects\mittsu\glfw-3.2.1.bin.WIN64
   - ruby -v
   - gem -v
   - bundle -v
