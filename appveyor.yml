@@ -1,19 +1,20 @@
 version: '{build}'
 
+clone_folder: c:\projects\mittsu
+
 environment:
-  MITTSU_LIBGLFW_FILE: c:\mittsu\glfw3\lib-vc2015\glfw3.dll
+  MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw3\lib-vc2015\glfw3.dll
 
 install:
-  - ps: c:\mittsu\install_glfw.ps
+  - ps: c:\projects\mittsu\install_glfw.ps1
   - set PATH=C:\Ruby22\bin;%PATH%
   - bundle install
 
 build: off
 
-clone_folder: c:\mittsu
 
 before_test:
-  - dir c:\mittsu\glfw3
+  - dir c:\projects\mittsu\glfw3
   - ruby -v
   - gem -v
   - bundle -v
