@@ -1,4 +1,4 @@
-require 'rmagick'
+require 'chunky_png'
 require 'mittsu/extras/image'
 
 module Mittsu
@@ -11,18 +11,15 @@ module Mittsu
 
     def load(url, flip: false, flop: false)
       chache_url = "#{url}?flip=#{flip}&flop=#{flop}"
-      cached = Cache.get(url)
+      cached = Cache.get(chache_url )
       return cached unless cached.nil?
 
-      rm_image = Magick::Image.read(url).first
-      rm_image = rm_image.flip if flip
-      rm_image = rm_image.flop if flop
-      rgba_data = rm_image.to_blob { |i|
-        i.format = "RGBA"
-        i.depth = 8
-      }
+      png_image = ChunkyPNG::Image.from_file(url)
+      png_image = png_image.flip_vertically if flip
+      png_image = png_image.flip_horizontally if flop
+      rgba_data = png_image.to_rgba_stream
 
-      image = Image.new(rm_image.columns, rm_image.rows, rgba_data)
+      image = Image.new(png_image.width, png_image.height, rgba_data)
 
       Cache.add(url, image)
       @manager.item_start(url)
