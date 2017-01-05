@@ -14,7 +14,7 @@ build: off
 
 
 before_test:
-  - dir c:\projects\mittsu\glfw-3.2.1.bin.WIN64
+  - dir c:\projects\mittsu\glfw-3.2.1.bin.WIN32
   - ruby -v
   - gem -v
   - bundle -v
