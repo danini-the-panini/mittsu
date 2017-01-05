@@ -1,4 +1,4 @@
-Invoke-WebRequest https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.bin.WIN64.zip -OutFile glfw3.zip
+Invoke-WebRequest https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.bin.WIN64.zip -OutFile "$pwd\glfw3.zip"
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Unzip
@@ -8,4 +8,4 @@ function Unzip
     [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
 }
 
-Unzip "glfw3.zip" "glfw3"
+Unzip "$pwd\glfw3.zip" "$pwd\glfw3"
