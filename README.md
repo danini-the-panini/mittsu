@@ -1,6 +1,6 @@
 # Mittsu
 
-[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Build status](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
 
 3D Graphics Library for Ruby
 
