@@ -1,4 +1,4 @@
-version: {build}
+version: '{build}'
 
 install:
   - set PATH=C:\Ruby22\bin;%PATH%
