@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'opengl-bindings', "~> 1.5"
   spec.add_runtime_dependency 'ffi', "~> 1.9"
-  spec.add_runtime_dependency 'rmagick', "~> 2.15"
+  spec.add_runtime_dependency 'chunky_png', "~> 1.3"
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"
