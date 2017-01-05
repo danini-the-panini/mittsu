@@ -26,43 +26,43 @@ class TestMath < Minitest::Test
     x = -0.0
     sign = Mittsu::Math.sign(x)
 
-    assert_same(x, sign)
+    assert_equal(x, sign)
   end
 
   def test_sign_positive_zero
     sign = Mittsu::Math.sign(0.0)
 
-    assert_same(0.0, sign)
+    assert_equal(0.0, sign)
   end
 
   def test_sign_negative_infinity
     sign = Mittsu::Math.sign(-Float::INFINITY)
 
-    assert_same(-1.0, sign)
+    assert_equal(-1.0, sign)
   end
 
   def test_sign_negative_number
     sign = Mittsu::Math.sign(-3)
 
-    assert_same(-1.0, sign)
+    assert_equal(-1.0, sign)
   end
 
   def test_sign_negative_small_number
     sign = Mittsu::Math.sign(-1e-10)
 
-    assert_same(-1.0, sign)
+    assert_equal(-1.0, sign)
   end
 
   def test_sign_positive_infinity
     sign = Mittsu::Math.sign(Float::INFINITY)
 
-    assert_same(1.0, sign)
+    assert_equal(1.0, sign)
   end
 
   def test_sign_positive_number
     sign = Mittsu::Math.sign(3)
 
-    assert_same(1.0, sign)
+    assert_equal(1.0, sign)
   end
 
   def test_clamp_less_than_range
