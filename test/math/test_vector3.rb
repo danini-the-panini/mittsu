@@ -299,8 +299,8 @@ class TestVector3 < Minitest::Test
     a = Mittsu::Vector3.new(0, -0.18851655680720186, 0.9820700116639124)
     b = Mittsu::Vector3.new(0, 0.18851655680720186, -0.9820700116639124)
 
-    assert_equal(a.angle_to(a), 0)
-    assert_equal(a.angle_to(b), Math::PI)
+    assert_in_delta(a.angle_to(a), 0)
+    assert_in_delta(a.angle_to(b), Math::PI)
 
     x = Mittsu::Vector3.new(1, 0, 0)
     y = Mittsu::Vector3.new(0, 1, 0)
