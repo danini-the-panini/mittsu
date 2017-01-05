@@ -4,7 +4,7 @@ environment:
   MITTSU_LIBGLFW_FILE: c:\mittsu\glfw3\lib-vc2015\glfw3.dll
 
 install:
-  - ps: install_glfw.ps
+  - ps: c:\mittsu\install_glfw.ps
   - set PATH=C:\Ruby22\bin;%PATH%
   - bundle install
 
