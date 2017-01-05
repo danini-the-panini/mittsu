@@ -13,6 +13,7 @@ build: off
 clone_folder: c:\mittsu
 
 before_test:
+  - dir c:\mittsu\glfw3
   - ruby -v
   - gem -v
   - bundle -v
