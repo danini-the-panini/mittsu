@@ -1,6 +1,6 @@
 # Mittsu
 
-[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Build status](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
 
 3D Graphics Library for Ruby
 
@@ -16,17 +16,22 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 
 Install the prerequisites:
 
-Mittsu depends on Ruby 2.x, OpenGL 3.3+, GLFW 3.1.x and ImageMagick 6.4.9+
+Mittsu depends on Ruby 2.x, OpenGL 3.3+, and GLFW 3.1.x
 
 ```bash
 # OSX
-$ brew install glfw3 imagemagick
+$ brew install glfw3
 
 # Ubuntu
-$ sudo apt-get install libglfw3-dev libmagickwand-dev
+$ sudo apt-get install libglfw3-dev
 ```
 
-**NOTE**: On Ubuntu, you may need to install `libgl1-mesa-dev` for the OpenGL dependency.
+**NOTE:** On Windows, you will have to manually specify the glfw3.dll path in an environment variable
+(you can download it [here](http://www.glfw.org/download.html))
+```bash
+> set MITTSU_LIBGLFW_PATH=C:\path\to\glfw3.dll
+> ruby your_awesome_mittsu_app.rb
+```
 
 Add this line to your application's Gemfile:
 
