@@ -1,11 +1,11 @@
 module Mittsu
   module ImageUtils
     class << self
-      def load_texture(url, mapping = Texture::DEFAULT_MAPPING)
+      def load_texture(url, mapping = Texture::DEFAULT_MAPPING, flip: true, flop: false)
         loader = ImageLoader.new
 
         Texture.new(nil, mapping).tap do |texture|
-          image = loader.load(url, flip: true)
+          image = loader.load(url, flip: flip, flop: flop)
           texture.image = image
           texture.needs_update = true
 
