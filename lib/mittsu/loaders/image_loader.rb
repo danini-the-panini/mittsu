@@ -11,12 +11,12 @@ module Mittsu
 
     def load(url, flip: false, flop: false)
       chache_url = "#{url}?flip=#{flip}&flop=#{flop}"
-      cached = Cache.get(chache_url )
+      cached = Cache.get(chache_url)
       return cached unless cached.nil?
 
       png_image = ChunkyPNG::Image.from_file(url)
-      png_image = png_image.flip_vertically if flip
-      png_image = png_image.flip_horizontally if flop
+      png_image.flip_horizontally! if flip
+      png_image.flip_vertically! if flop
       rgba_data = png_image.to_rgba_stream
 
       image = Image.new(png_image.width, png_image.height, rgba_data)
