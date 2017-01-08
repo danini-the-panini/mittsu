@@ -29,7 +29,7 @@ module GLFWLib
 
     class << self
       def libgl_paths
-        Dir.glob('/usr/lib*/**/libglfw3.so*')
+        Dir.glob('/usr/lib*/**/libglfw*.so*')
       rescue
         []
       end
@@ -39,7 +39,7 @@ module GLFWLib
       end
 
       def ldconfig
-        `ldconfig -p | grep 'libGL\\.so'`.lines
+        `ldconfig -p | grep 'libglfw3\\?\\.so'`.lines
       rescue
         []
       end
