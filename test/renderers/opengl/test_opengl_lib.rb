@@ -12,7 +12,7 @@ class TestOpenGLLib < Minitest::Test
       []
     )
 
-    linux_lib = OpenGLLib::Linux.new(fake_loader)
+    linux_lib = Mittsu::OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so', linux_lib.file
     assert_equal '/usr/lib/x86_64-linux-gnu', linux_lib.path
   end
@@ -31,7 +31,7 @@ class TestOpenGLLib < Minitest::Test
       []
     )
 
-    linux_lib = OpenGLLib::Linux.new(fake_loader)
+    linux_lib = Mittsu::OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so', linux_lib.file
     assert_equal '/usr/lib/nvidia-367', linux_lib.path
   end
@@ -47,7 +47,7 @@ class TestOpenGLLib < Minitest::Test
       []
     )
 
-    linux_lib = OpenGLLib::Linux.new(fake_loader)
+    linux_lib = Mittsu::OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so', linux_lib.file
     assert_equal '/usr/lib/x86_64-linux-gnu', linux_lib.path
   end
@@ -66,7 +66,7 @@ class TestOpenGLLib < Minitest::Test
       ]
     )
 
-    linux_lib = OpenGLLib::Linux.new(fake_loader)
+    linux_lib = Mittsu::OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so.1', linux_lib.file
     assert_equal '/usr/lib/nvidia-367', linux_lib.path
   end
@@ -85,7 +85,7 @@ class TestOpenGLLib < Minitest::Test
       ]
     )
 
-    linux_lib = OpenGLLib::Linux.new(fake_loader)
+    linux_lib = Mittsu::OpenGLLib::Linux.new(fake_loader)
     assert_equal 'libGL.so.1', linux_lib.file
     assert_equal '/usr/lib32/nvidia-367', linux_lib.path
   end
