@@ -19,6 +19,7 @@ require 'mittsu/renderers/opengl/opengl_light_renderer'
 require 'mittsu/renderers/opengl/opengl_default_target'
 require 'mittsu/renderers/opengl/opengl_buffer'
 require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
+require 'mittsu/renderers/opengl/plugins/sprite_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
 
@@ -863,8 +864,9 @@ module Mittsu
     end
 
     def render_custom_plugins_post_pass(scene, camera)
+      @sprite_plugin.render(scene, camera)
+
       # TODO: when these custom plugins are implemented
-      # @sprite_plugin.render(scene, camera)
       # lens_flare_plugin.render(scene, camera, @_current_render_target.width, @_current_render_target.height)
     end
 
@@ -912,6 +914,7 @@ module Mittsu
 
     def init_collections
       @lights = []
+      @sprites = []
 
       @_opengl_objects = {}
       @_opengl_objects_immediate = []
@@ -984,8 +987,9 @@ module Mittsu
     def init_plugins
       @shadow_map_plugin = ShadowMapPlugin.new(self, @lights, @_opengl_objects, @_opengl_objects_immediate)
 
+      @sprite_plugin = SpritePlugin.new(self, @sprites)
+
       # TODO: when these custom plugins are implemented
-      # @sprite_plugin = SpritePlugin.new(self, @sprites)
       # @lens_flare_plugin = LensFlarePlugin.new(self, @lens_flares)
     end
 
