@@ -4,7 +4,7 @@ require 'fiddle'
 
 
 require 'mittsu/renderers/opengl/opengl_lib'
-opengl_lib = OpenGLLib.discover
+opengl_lib = Mittsu::OpenGLLib.discover
 OpenGL.load_lib(ENV["MITTSU_LIBGL_FILE"] || opengl_lib.file, ENV["MITTSU_LIBGL_PATH"] || opengl_lib.path)
 
 require 'mittsu'
