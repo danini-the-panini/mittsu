@@ -2,18 +2,7 @@ require 'mittsu/renderers/generic_lib'
 
 module Mittsu
   module GLFWLib
-    def self.discover
-      case OpenGL.get_platform
-      when :OPENGL_PLATFORM_WINDOWS
-        Windows.new
-      when :OPENGL_PLATFORM_MACOSX
-        MacOS.new
-      when :OPENGL_PLATFORM_LINUX
-        Linux.new
-      else
-        fail "Unsupported platform."
-      end
-    end
+    extend GenericLib
 
     class Linux < GenericLib::Linux
       def initialize(loader = Linux)

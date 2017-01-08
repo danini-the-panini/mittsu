@@ -1,5 +1,18 @@
 module Mittsu
   module GenericLib
+    def discover
+      case OpenGL.get_platform
+      when :OPENGL_PLATFORM_WINDOWS
+        self::Windows.new
+      when :OPENGL_PLATFORM_MACOSX
+        self::MacOS.new
+      when :OPENGL_PLATFORM_LINUX
+        self::Linux.new
+      else
+        fail "Unsupported platform."
+      end
+    end
+
     class Linux
       def path
         return nil if file_path.nil?
