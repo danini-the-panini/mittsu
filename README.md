@@ -23,7 +23,7 @@ Mittsu depends on Ruby 2.x, OpenGL 3.3+, and GLFW 3.1.x
 $ brew install glfw3
 
 # Ubuntu
-$ sudo apt-get install libglfw3-dev
+$ sudo apt-get install libglfw3
 ```
 
 **NOTE:** On Windows, you will have to manually specify the glfw3.dll path in an environment variable
