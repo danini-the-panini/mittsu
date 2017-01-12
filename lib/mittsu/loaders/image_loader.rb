@@ -1,4 +1,9 @@
-require 'chunky_png'
+begin
+  require 'oily_png'
+rescue LoadError
+  require 'chunky_png'
+end
+
 require 'mittsu/extras/image'
 
 module Mittsu

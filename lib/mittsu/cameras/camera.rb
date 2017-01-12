@@ -15,7 +15,7 @@ module Mittsu
     def get_world_direction(target = Vector3.new)
       @_quaternion ||= Quaternion.new
       self.get_world_quaternion(@_quaternion)
-      target.set(0.0, 0.0, -1.0).qpply_quaternion(@_quaternion)
+      target.set(0.0, 0.0, -1.0).apply_quaternion(@_quaternion)
     end
 
     def look_at(vector)
