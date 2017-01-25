@@ -179,11 +179,11 @@ module Mittsu
       end
 
       def set_mouselock(value)
-		if value
-			glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
-		else
-			glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
-		end
+        if value
+          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        else
+          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+        end
       end
 
       private
