@@ -37,6 +37,39 @@ module Mittsu
       end
     end
 
+    def check_intersection object, raycaster, ray, pA, pB, pC, point
+
+      intersect = nil;
+      material = object.material;
+
+      if material.side == BackSide
+
+        intersect = ray.intersect_triangle( pC, pB, pA, true, point );
+
+      else
+
+        intersect = ray.intersect_triangle( pA, pB, pC, material.side != DoubleSide, point );
+
+      end
+
+       return nil if intersect.nil?
+
+       @intersectionPointWorld ||= Vector3.new
+        @intersectionPointWorld.copy( point );
+        @intersectionPointWorld.apply_matrix4( @matrix_world );
+
+        distance = raycaster.ray.origin.distance_to( @intersectionPointWorld );
+
+        return nil if ( distance < raycaster.near || distance > raycaster.far )
+
+          return {
+            distance: distance,
+            point: @intersectionPointWorld.clone(),
+            object: object
+          };
+
+    end
+
     def raycast(raycaster, intersects)
       @_inverse_matrix ||= Matrix4.new
       @_ray ||= Ray.new
@@ -45,24 +78,29 @@ module Mittsu
       @_v_a ||= Vector3.new
       @_v_b ||= Vector3.new
       @_v_c ||= Vector3.new
+      v_a = @_v_a
+      v_b = @_v_b
+      v_c = @_v_c
 
       # Checking bounding_sphere distance to ray
 
       @geometry.compute_bounding_sphere if @geometry.bounding_sphere.nil?
 
-      sphere.copy(geometry.bounding_sphere)
-      sphere.apply_matrix4(@matrix_world)
+      @_sphere.copy(geometry.bounding_sphere)
+      @_sphere.apply_matrix4(@matrix_world)
 
-      return unless raycaster.intersection_sphere?(sphere)
+      return unless raycaster.ray.intersection_sphere?(@_sphere)
 
       # check bounding box before continuing
 
-      inverse_matrix.inverse(@matrix_world)
-      ray.copy(raycaster.ray).apply_matrix4(inverse_matrix)
+      @_inverse_matrix = Matrix4.new
+      @_inverse_matrix.inverse(@matrix_world)
+      @_ray.copy(raycaster.ray).apply_matrix4(@_inverse_matrix)
 
-      if !geometry.bounding_bounding_box.nil?
+      if !geometry.bounding_box.nil?
         return unless ray.intersection_box?(geometry.bounding_box)
       end
+
 
       if geometry.is_a?(BufferGeometry)
         return if @material.nil?
@@ -93,13 +131,13 @@ module Mittsu
               v_b.from_array(positions, b * 3)
               v_c.from_array(positions, c * 3)
 
-              if material.side = BackSide
+              if material.side == BackSide
                 intersection_point = ray.intersect_triangle(v_c, v_b, v_a, true)
               else
                 intersection_point = ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
               end
 
-              next if intersect_point.nil?
+              next if intersection_point.nil?
 
               intersection_point.apply_matrix4(@matrix_world)
 
@@ -138,7 +176,7 @@ module Mittsu
               intersection_point = ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
             end
 
-            next if intersect_point.nil?
+            next if intersection_point.nil?
 
             intersection_point.apply_matrix4(@matrix_world)
 
@@ -210,27 +248,15 @@ module Mittsu
             c = v_c
           end
 
-          if material.side = BackSide
-            intersection_point = ray.intersect_triangle(v_c, v_b, v_a, true)
-          else
-            intersection_point = ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
+
+          intersection_point = Vector3.new
+          intersection = check_intersection self, raycaster, @_ray, a, b, c, intersection_point
+
+          next if not intersection
+          if intersection
+            intersection[:face] = face
           end
-
-          next if intersect_point.nil?
-
-          intersection_point.apply_matrix4(@matrix_world)
-
-          distance = racaster.ray.origin.distance_to(intersection_point)
-
-          next if distance < precision || distance < raycaster.near || distance > raycaster.far
-
-          intersects << {
-            distance: distance,
-            point: intersection_point,
-            face: face,
-            face_index: f,
-            object: self
-          }
+          intersects << intersection
         end
       end
     end

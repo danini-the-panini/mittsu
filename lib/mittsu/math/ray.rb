@@ -245,7 +245,6 @@ module Mittsu
       #   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
       #   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
       d_dot_n = @direction.dot(normal)
-      sign
       if d_dot_n > 0
         return nil if backface_culling
         sign = 1.0

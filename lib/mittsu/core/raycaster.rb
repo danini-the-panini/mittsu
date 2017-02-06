@@ -2,7 +2,7 @@ require 'mittsu'
 
 module Mittsu
   class Raycaster
-    attr_accessor :near, :far, :ray, :params
+    attr_accessor :near, :far, :ray, :params, :precision
 
     def initialize(origin, direction, near = 0.0, far = Float::INFINITY)
       @ray = Mittsu::Ray.new(origin, direction)
@@ -61,7 +61,7 @@ module Mittsu
       end
 
       intersects.sort do |a, b|
-        a.distance <=> b.distance
+        a[:distance] <=> b[:distance]
       end
     end
 
