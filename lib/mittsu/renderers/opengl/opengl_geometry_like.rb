@@ -27,6 +27,7 @@ module Mittsu
                   :type_array,
                   :face_count,
                   :line_count,
+                  :particle_count,
                   :initted_arrays,
                   :custom_attributes_list,
                   :num_vertices,

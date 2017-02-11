@@ -34,7 +34,7 @@ module Mittsu
 
         geometry.vertices_need_update = true
         geometry.colors_need_update = true
-        geometry.line_distances_need_update
+        geometry.line_distances_need_update = true
       end
     end
 
