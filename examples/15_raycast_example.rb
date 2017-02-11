@@ -9,7 +9,7 @@ camera = Mittsu::PerspectiveCamera.new(75.0, ASPECT, 0.1, 1000.0)
 
 renderer = Mittsu::OpenGLRenderer.new width: screen_width, height: screen_height, title: '15 Raycast Example'
 
-cursor = Mittsu::Mesh.new(Mittsu::SphereGeometry.new(0.1), Mittsu::MeshBasicMaterial.new(color: 0xff0000))
+cursor = Mittsu::Mesh.new(Mittsu::SphereGeometry.new(0.1), Mittsu::MeshBasicMaterial.new(color: 0x00ffff, wireframe: true))
 scene.add(cursor)
 
 cubes = Mittsu::Group.new
@@ -17,7 +17,7 @@ cubes = Mittsu::Group.new
   geometry = Mittsu::BoxGeometry.new(0.5, 0.5, 0.5)
   material = Mittsu::MeshBasicMaterial.new(color: 0x00ff00)
   cube = Mittsu::Mesh.new(geometry, material)
-  cube.position.set(-3.0 + i*1.5, -3.0 + j*1.5, 0.0)
+  cube.position.set(-3.0 + i*1.5, -3.0 + j*1.5, rand)
   cube.rotation.set(rand, rand, rand)
   cubes.add(cube)
 } }
@@ -56,6 +56,7 @@ renderer.window.run do
   cubes.children.each do |cube|
     cube.material.color.set(0x00ff00)
   end
+  cursor.position.copy(intersects.first[:point]) unless intersects.empty?
   intersects.each do |intersect|
     intersect[:object].material.color.set(0xff00ff)
   end
