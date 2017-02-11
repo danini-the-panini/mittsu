@@ -261,13 +261,6 @@ module Mittsu
       @state.disable_unused_attributes
 
       object.render_buffer(camera, lights, fog, material, geometry_group, buffers_need_update)
-
-      # TODO: render particles
-      # when PointCloud
-      #   glDrawArrays(GL_POINTS, 0, geometry_group.particle_count)
-      #
-      #   @info[:render][:calls] += 1
-      #   @info[:render][:points] += geometry_group.particle_count
     end
 
     def compressed_texture_formats
@@ -489,21 +482,6 @@ module Mittsu
       else
         object.update
       end
-      # TODO: when PointCloud exists
-      # elsif object.is_A? PointCloud
-      #   # TODO: glBindVertexArray ???
-      #   material = object.buffer_material(geometry)
-      #   custom_attributes_dirty = material.attributes && are_custom_attributes_dirty(material)
-      #
-      #   if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
-      #     set_particle_buffers(geometry, GL_DYNAMIC_DRAW, object)
-      #   end
-      #
-      #   geometry.vertices_need_update = false
-      #   geometry.colors_need_update = false
-      #
-      #   material.attributes && clear_custom_attributes(material)
-      # end
     end
 
     # FIXME: refactor
@@ -606,8 +584,6 @@ module Mittsu
         # when LineDashedMaterial
         #   refresh_uniforms_line(material_uniforms, material)
         #   refresh_uniforms_dash(material_uniforms, material)
-        # when PointCloudMaterial
-        #   refresh_uniforms_particle(material_uniforms, material)
         # when MeshDepthMaterial
         #   material_uniforms.m_near.value = camera.near
         #   material_uniforms.m_far.value = camera.far
