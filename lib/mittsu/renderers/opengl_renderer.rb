@@ -807,8 +807,8 @@ module Mittsu
     end
 
     def sort_objects_for_render
-      @opaque_objects.sort { |a,b| OpenGLHelper.painter_sort_stable(a,b) }
-      @transparent_objects.sort { |a,b| OpenGLHelper.reverse_painter_sort_stable(a,b) }
+      @opaque_objects.sort! { |a,b| OpenGLHelper.painter_sort_stable(a,b) }
+      @transparent_objects.sort! { |a,b| OpenGLHelper.reverse_painter_sort_stable(a,b) }
     end
 
     def set_matrices_for_immediate_objects(camera)
