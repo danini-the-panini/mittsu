@@ -5,5 +5,9 @@ module Mittsu
     def name
       "BUFFER(#{object.name})"
     end
+
+    def id
+      object.id
+    end
   end
 end

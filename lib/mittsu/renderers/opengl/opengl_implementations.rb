@@ -1,5 +1,6 @@
 require 'mittsu/core/geometry'
 require 'mittsu/core/object_3d'
+require 'mittsu/core/buffer_geometry'
 require 'mittsu/objects'
 require 'mittsu/materials'
 require 'mittsu/textures'
@@ -7,9 +8,11 @@ require 'mittsu/scenes'
 
 require 'mittsu/renderers/opengl/core/geometry'
 require 'mittsu/renderers/opengl/core/object_3d'
+require 'mittsu/renderers/opengl/core/buffer_geometry'
 require 'mittsu/renderers/opengl/objects/mesh'
 require 'mittsu/renderers/opengl/objects/line'
 require 'mittsu/renderers/opengl/objects/group'
+require 'mittsu/renderers/opengl/objects/sprite'
 require 'mittsu/renderers/opengl/scenes/scene'
 
 require 'mittsu/renderers/opengl/lights/light'
