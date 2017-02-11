@@ -178,6 +178,14 @@ module Mittsu
         glfwGetJoystickName(joystick)
       end
 
+      def set_mouselock(value)
+        if value
+          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        else
+          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+        end
+      end
+
       private
 
       def poll_all_joysticks_buttons
