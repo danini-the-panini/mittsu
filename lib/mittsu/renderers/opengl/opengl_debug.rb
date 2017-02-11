@@ -39,7 +39,7 @@ module OpenGLDebug
     const_set c, OpenGL.const_get(c)
   end
 
-  def call_debug_method m, *args
+  def call_debug_method m, called_from = caller[0], *args
     if m.to_s.start_with?('glUniform')
       uniform_name = @@current_shader.get_uniform_name(args.first)
       call = "#{m}('#{uniform_name}',#{args[1..-1].map { |s| s.to_s[0..20] }.join(', ')})"
@@ -49,7 +49,7 @@ module OpenGLDebug
     print call
     r = OpenGLProxy.send(m, *args)
     ret = r.nil? ? '' : " => #{r}"
-    puts "#{ret} (#{caller[0]})"
+    puts "#{ret} (#{called_from})"
     e = OpenGLProxy.glGetError
     raise "ERROR: #{m} => #{ERROR_STRINGS[e]}" unless e == OpenGL::GL_NO_ERROR
     r
@@ -57,12 +57,12 @@ module OpenGLDebug
 
   OpenGL.instance_methods.each do |m|
     define_method m do |*args|
-      self.call_debug_method(m, *args)
+      self.call_debug_method(m, caller[0], *args)
     end
   end
 
   def glCreateProgram
-    call_debug_method(:glCreateProgram).tap do |handle|
+    call_debug_method(:glCreateProgram, caller[0]).tap do |handle|
       @@shaders ||= {}
       @@shaders[handle] = DebugShader.new(handle)
     end
@@ -70,11 +70,11 @@ module OpenGLDebug
 
   def glUseProgram(handle)
     @@current_shader = @@shaders[handle]
-    call_debug_method(:glUseProgram, handle)
+    call_debug_method(:glUseProgram, caller[0], handle)
   end
 
   def glGetUniformLocation(program, name)
-    call_debug_method(:glGetUniformLocation, program, name).tap do |handle|
+    call_debug_method(:glGetUniformLocation, caller[0], program, name).tap do |handle|
       @@shaders[program].set_uniform(handle, name)
     end
   end
