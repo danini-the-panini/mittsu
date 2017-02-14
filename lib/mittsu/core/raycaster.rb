@@ -16,7 +16,7 @@ module Mittsu
       @params = {
         sprite: {},
         mesh: {},
-        point_cloud: { threshold: 1 },
+        point_cloud: { threshold: 1.0 },
         lod:{},
         line: {}
       }

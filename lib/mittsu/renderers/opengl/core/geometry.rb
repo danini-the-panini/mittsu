@@ -34,7 +34,7 @@ module Mittsu
           @tangents_need_update = true
           @colors_need_update = true
 
-  				add_buffers = true
+          add_buffers = true
         else
           add_buffers = false
         end
@@ -59,12 +59,32 @@ module Mittsu
       init_custom_attributes(object)
     end
 
+    def init_particle_buffers(object)
+      nvertices = @vertices.length
+
+      @vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      @color_array = Array.new(nvertices * 3, 0.0) # Float32Array
+
+      @particle_count = nvertices
+
+      init_custom_attributes(object)
+    end
+
     def create_line_buffers
       @vertex_array_object = glCreateVertexArray
 
       @vertex_buffer = glCreateBuffer
       @color_buffer = glCreateBuffer
       @line_distance_buffer = glCreateBuffer
+
+      @renderer.info[:memory][:geometries] += 1
+    end
+
+    def create_particle_buffers
+      @vertex_array_object = glCreateVertexArray
+
+      @vertex_buffer = glCreateBuffer
+      @color_buffer = glCreateBuffer
 
       @renderer.info[:memory][:geometries] += 1
     end
@@ -117,36 +137,36 @@ module Mittsu
               custom_attribute.array[ca] = value
             end
           when 2
-            values.each_with_index do |value, ca|
-              custom_attribute[offset    ] = value.x
-              custom_attribute[offset + 1] = value.y
+            values.each do |value|
+              custom_attribute.array[offset    ] = value.x
+              custom_attribute.array[offset + 1] = value.y
 
               offset += 2
             end
           when 3
             if custom_attribute.type === :c
-              values.each_with_index do |value, ca|
-                custom_attribute[offset    ] = value.r
-                custom_attribute[offset + 1] = value.g
-                custom_attribute[offset + 2] = value.b
+              values.each do |value|
+                custom_attribute.array[offset    ] = value.r
+                custom_attribute.array[offset + 1] = value.g
+                custom_attribute.array[offset + 2] = value.b
 
                 offset += 3
               end
             else
-              values.each_with_index do |value, ca|
-                custom_attribute[offset    ] = value.x
-                custom_attribute[offset + 1] = value.y
-                custom_attribute[offset + 2] = value.z
+              values.each do |value|
+                custom_attribute.array[offset    ] = value.x
+                custom_attribute.array[offset + 1] = value.y
+                custom_attribute.array[offset + 2] = value.z
 
                 offset += 3
               end
             end
           when 4
-            values.each_with_index do |value, ca|
-              custom_attribute[offset    ] = value.x
-              custom_attribute[offset + 1] = value.y
-              custom_attribute[offset + 2] = value.z
-              custom_attribute[offset + 3] = value.w
+            values.each do |value|
+              custom_attribute.array[offset    ] = value.x
+              custom_attribute.array[offset + 1] = value.y
+              custom_attribute.array[offset + 2] = value.z
+              custom_attribute.array[offset + 3] = value.w
 
               offset += 4
             end
@@ -154,6 +174,88 @@ module Mittsu
 
           glBindBuffer(GL_ARRAY_BUFFER, custom_attribute.buffer)
           glBufferData_easy(GL_ARRAY_BUFFER, custom_attribute.array, hint)
+
+          custom_attribute.needs_update = false
+        end
+      end
+    end
+
+    def set_particle_buffers(hint)
+      if @vertices_need_update
+        @vertices.each_with_index do |vertex, v|
+          offset = v * 3
+
+          @vertex_array[offset]     = vertex.x
+          @vertex_array[offset + 1] = vertex.y
+          @vertex_array[offset + 2] = vertex.z
+        end
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
+        glBufferData_easy(GL_ARRAY_BUFFER, @vertex_array, hint)
+      end
+
+      if @colors_need_update
+        @colors.each_with_index do |color, c|
+          offset = c * 3;
+
+          @color_array[offset]     = color.r
+          @color_array[offset + 1] = color.g
+          @color_array[offset + 2] = color.b
+        end
+
+        glBindBuffer(GL_ARRAY_BUFFER, @color_buffer)
+        glBufferData_easy(GL_ARRAY_BUFFER, @color_array, hint)
+      end
+
+      if @custom_attribute
+        @custom_attributes.each do |custom_attribute|
+          if custom_attribute.needs_update? && (custom_attribute.bount_to.nil? || custom_attribute.bount_to == 'vertices')
+            offset = 0
+
+            if custom_attribute.size == 1
+              custom_attribute.value.each_with_index do |value, ca|
+                custom_attribute.array[ca] = value
+              end
+            elsif custom_attribute.size == 2
+              custom_attribute.value.each do |value|
+                custom_attribute.array[offset]     = value.x
+                custom_attribute.array[offset + 1] = value.y
+
+                offset += 2
+              end
+            elsif custom_attribute.size == 3
+              if custom_attribute.type == :c
+                custom_attribute.value.each do |value|
+                  custom_attribute.array[offset]     = value.r
+                  custom_attribute.array[offset + 1] = value.g
+                  custom_attribute.array[offset + 2] = value.b
+
+                  offset += 3
+                end
+              else
+                custom_attribute.value.each do |value|
+                  custom_attribute.array[offset]     = value.x
+                  custom_attribute.array[offset + 1] = value.y
+                  custom_attribute.array[offset + 2] = value.z
+
+                  offset += 3
+                end
+              end
+            elsif custom_attribute.size == 4
+              custom_attribute.value.each do |value|
+                custom_attribute.array[offset]     = value.x
+                custom_attribute.array[offset + 1] = value.y
+                custom_attribute.array[offset + 2] = value.z
+                custom_attribute.array[offset + 3] = value.w
+
+                offset += 3
+              end
+            end
+          end
+
+          glBindBuffer(GL_ARRAY_BUFFER, customAttribute.buffer)
+          glBufferData(GL_ARRAY_BUFFER, customAttribute.array, hint)
 
           custom_attribute.needs_update = false
         end
