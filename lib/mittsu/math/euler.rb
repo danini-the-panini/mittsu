@@ -11,7 +11,7 @@ module Mittsu
       @x, @y, @z, @order = x.to_f, y.to_f, z.to_f, order
     end
 
-    def set(x, y, z, order)
+    def set(x, y, z, order = nil)
       @x = x.to_f
       @y = y.to_f
       @z = z.to_f
