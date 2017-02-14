@@ -4,7 +4,7 @@ module Mittsu
   class Raycaster
     attr_accessor :near, :far, :ray, :params, :precision
 
-    def initialize(origin, direction, near = 0.0, far = Float::INFINITY)
+    def initialize(origin = Vector3.new, direction = Vector3.new, near = 0.0, far = Float::INFINITY)
       @ray = Mittsu::Ray.new(origin, direction)
       # direction is assumed to be normalized (for accurate distance calculations)
 
@@ -49,7 +49,7 @@ module Mittsu
       end
     end
 
-    def intersect_objects(objects, recursive)
+    def intersect_objects(objects, recursive = false)
       intersects = []
       if !objects.is_a? Array
         puts 'WARNING: Mittsu::Raycaster#intersect_objects: objects is not an array'
