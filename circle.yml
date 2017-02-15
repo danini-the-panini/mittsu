@@ -1,8 +1,11 @@
 ## Customize the test machine
 machine:
+  xcode:
+    version: 8.2
+
   environment:
     MITTSU_LIBGLFW_PATH: /usr/local/lib
-    MITTSU_LIBGLFW_FILE: libglfw.so
+    MITTSU_LIBGLFW_FILE: libglfw.dylib
     MINITEST_REPORTER: JUnit
 
   # Version of ruby to use
@@ -12,11 +15,8 @@ machine:
 
 ## Customize dependencies
 dependencies:
-  cache_directories:
-    - glfw-3.1.2
   pre:
-    - sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
-    - bash ./install-glfw-3.1.2.sh
+    - brew install glfw
 
 test:
   post:
