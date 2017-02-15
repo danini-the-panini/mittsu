@@ -1,5 +1,8 @@
 ## Customize the test machine
 machine:
+  xcode:
+    version: 8.2
+
   environment:
     MITTSU_LIBGLFW_PATH: /usr/local/lib
     MITTSU_LIBGLFW_FILE: libglfw.so
