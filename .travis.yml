@@ -13,3 +13,5 @@ addons:
 before_install:
   - sudo apt-get update; sudo apt-get install xorg-dev libgl1-mesa-dev
   - bash ./install-glfw-3.1.2.sh
+
+script: bundle exec rake test
