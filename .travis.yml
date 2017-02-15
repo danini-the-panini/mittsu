@@ -1,3 +1,7 @@
 language: ruby
 rvm:
   2.4.0
+
+before_install:
+  - sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
+  - bash ./install-glfw-3.1.2.sh
