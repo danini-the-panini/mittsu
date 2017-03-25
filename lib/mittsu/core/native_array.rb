@@ -76,4 +76,29 @@ module Mittsu
     SIZEOF_ELEMENT = Fiddle::SIZEOF_INT
     PACK_DIRECTIVE = 'l'
   end
+
+  class Int16Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_SHORT
+    PACK_DIRECTIVE = 's'
+  end
+
+  class Int8Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_CHAR
+    PACK_DIRECTIVE = 'c'
+  end
+
+  class UInt32Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_INT
+    PACK_DIRECTIVE = 'L'
+  end
+
+  class UInt16Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_SHORT
+    PACK_DIRECTIVE = 'S'
+  end
+
+  class UInt8Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_CHAR
+    PACK_DIRECTIVE = 'C'
+  end
 end
