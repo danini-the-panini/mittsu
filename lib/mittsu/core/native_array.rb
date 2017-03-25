@@ -1,7 +1,7 @@
 require 'fiddle'
 
 module Mittsu
-  class Int32Array
+  class NativeArray
     FREEFUNC = Fiddle::Function.new(Fiddle::RUBY_FREE, [Fiddle::TYPE_VOIDP], Fiddle::TYPE_VOID)
     include Enumerable
 
@@ -11,23 +11,23 @@ module Mittsu
 
     def initialize(size)
       @size = size
-      @ptr = Fiddle::Pointer.malloc(size * Fiddle::SIZEOF_INT, FREEFUNC)
+      @ptr = Fiddle::Pointer.malloc(size * self.class::SIZEOF_ELEMENT, FREEFUNC)
     end
 
     def [](index, length=nil)
       if length.nil?
-        @ptr[index * Fiddle::SIZEOF_INT, Fiddle::SIZEOF_INT].unpack('l')[0]
+        @ptr[index * self.class::SIZEOF_ELEMENT, self.class::SIZEOF_ELEMENT].unpack(self.class::PACK_DIRECTIVE)[0]
       else
-        @ptr[index * Fiddle::SIZEOF_INT, length * Fiddle::SIZEOF_INT].unpack("l#{length}")
+        @ptr[index * self.class::SIZEOF_ELEMENT, length * self.class::SIZEOF_ELEMENT].unpack("#{self.class::PACK_DIRECTIVE}#{length}")
       end
     end
 
     def []=(index, length=nil, value)
       if length.nil?
-        @ptr[index * Fiddle::SIZEOF_INT, Fiddle::SIZEOF_INT] = [value].pack('l')
+        @ptr[index * self.class::SIZEOF_ELEMENT, self.class::SIZEOF_ELEMENT] = [value].pack(self.class::PACK_DIRECTIVE)
       else
-        string = value.is_a?(Array) ? value.pack("l#{length}") : value
-        @ptr[index * Fiddle::SIZEOF_INT, length * Fiddle::SIZEOF_INT] = string
+        string = value.is_a?(Array) ? value.pack("#{self.class::PACK_DIRECTIVE}#{length}") : value
+        @ptr[index * self.class::SIZEOF_ELEMENT, length * self.class::SIZEOF_ELEMENT] = string
       end
     end
 
@@ -56,14 +56,24 @@ module Mittsu
 
     def self.from_array(array, length = nil)
       length ||= array.length
-      from_string(array.pack("l#{length}"), length)
+      from_string(array.pack("#{self::PACK_DIRECTIVE}#{length}"), length)
     end
 
     def self.from_string(string, length = nil)
-      length ||= string.bytesize / Fiddle::SIZEOF_INT
+      length ||= string.bytesize / self::SIZEOF_ELEMENT
       new(length).tap do |array|
         array[0, length] = string
       end
     end
+  end
+
+  class Float32Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_FLOAT
+    PACK_DIRECTIVE = 'F'
+  end
+
+  class Int32Array < NativeArray
+    SIZEOF_ELEMENT = Fiddle::SIZEOF_INT
+    PACK_DIRECTIVE = 'l'
   end
 end
