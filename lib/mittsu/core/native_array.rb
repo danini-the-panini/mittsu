@@ -5,13 +5,18 @@ module Mittsu
     FREEFUNC = Fiddle::Function.new(Fiddle::RUBY_FREE, [Fiddle::TYPE_VOIDP], Fiddle::TYPE_VOID)
     include Enumerable
 
-    attr_reader :size
+    attr_reader :size, :ptr, :bytesize
     alias count size
     alias length size
 
-    def initialize(size)
+    def initialize(size, initial_value=nil)
       @size = size
-      @ptr = Fiddle::Pointer.malloc(size * self.class::SIZEOF_ELEMENT, FREEFUNC)
+      @bytesize = size * self.class::SIZEOF_ELEMENT
+      @ptr = Fiddle::Pointer.malloc(@bytesize, FREEFUNC)
+
+      if !initial_value.nil?
+        self[0, length] = [initial_value].pack(self.class::PACK_DIRECTIVE)*length
+      end
     end
 
     def [](index, length=nil)
@@ -37,6 +42,14 @@ module Mittsu
       @size.times do |index|
         yield self[index]
       end
+    end
+
+    def ==(other)
+      return false if length != other.length
+      each_with_index do |element, index|
+        return false if element != other[index]
+      end
+      true
     end
 
     def to_a

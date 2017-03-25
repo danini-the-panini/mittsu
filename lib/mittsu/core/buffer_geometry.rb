@@ -440,7 +440,7 @@ module Mittsu
       # puts "Faces to process: #{(indices.length/3)}"
       # puts "Reordering #{verticesCount} vertices."
 
-      sorted_indices = Array.new(indices.length) # 16-bit (Uint16Array in THREE.js)
+      sorted_indices = UInt16Array.new(indices.length)
       index_ptr = 0
       vertex_ptr = 0
 
@@ -449,9 +449,9 @@ module Mittsu
 
       duplicated_vertices = 0
       new_vertice_maps = 0
-      face_vertices = Array.new(6) # (Int32Array)
-      vertex_map = Array.new(vertices.length) # (Int32Array)
-      rev_vertex_map = Array.new(vertices.length) # (Int32Array)
+      face_vertices = Int32Array.new(6)
+      vertex_map = Int32Array.new(vertices.length)
+      rev_vertex_map = Int32Array.new(vertices.length)
       vertices.each_index do |j|
         vertex_map[j] = -1
         rev_vertex_map[j] = -1
@@ -569,7 +569,7 @@ module Mittsu
 
     # reoderBuffers:
     # Reorder attributes based on a new indexBuffer and indexMap.
-    # indexBuffer - Uint16Array of the new ordered indices.
+    # indexBuffer - UInt16Array of the new ordered indices.
     # indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
     # vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
     def reorder_buffers(index_buffer, index_map, vertex_count)

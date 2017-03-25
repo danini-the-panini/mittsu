@@ -496,7 +496,7 @@ module Mittsu
 
       if material.morph_targets
         if !object.morph_target_influences
-          object.morph_target_influences = Array.new(@max_morph_targets) # Float32Array
+          object.morph_target_influences = Float32Array.new(@max_morph_targets)
         end
       end
 
@@ -647,22 +647,22 @@ module Mittsu
           glUniform1fv(location, value.length, array_to_ptr_easy(value))
         when :'vec2[]'
           if value[0].is_a? Vector2
-            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
-            glUniform2fv(location, value.length, array_to_ptr_easy(uniform.array))
+            uniform.array ||= Float32Array.from_array(value.flat_map(&:to_a))
+            glUniform2fv(location, value.length, uniform.array.ptr)
           else
             glUniform2fv(location, value.length / 2, array_to_ptr_easy(value))
           end
         when :'vec3[]', :'color[]'
           if value.first.is_a?(Vector3) || value.first.is_a?(Color)
-            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
-            glUniform3fv(location, value.length, array_to_ptr_easy(uniform.array))
+            uniform.array ||= Float32Array.from_array(value.flat_map(&:to_a))
+            glUniform3fv(location, value.length, uniform.array.ptr)
           else
             glUniform3fv(location, value.length / 3, array_to_ptr_easy(value))
           end
         when :'vec4[]'
           if value.first.is_a? Vector4
-            uniform.array ||= value.flat_map(&:to_a) # TODO: Float32Array
-            glUniform4fv(location, value.length, array_to_ptr_easy(uniform.array))
+            uniform.array ||= Float32Array.from_array(value.flat_map(&:to_a))
+            glUniform4fv(location, value.length, uniform.array.ptr)
           else
             glUniform4fv(location, value.length / 4, array_to_ptr_easy(value))
           end
@@ -672,25 +672,25 @@ module Mittsu
           glUniformMatrix4fv(location, 1, GL_FALSE, array_to_ptr_easy(value.to_a))
         when :'mat3[]'
           if value.first.is_a? Matrix3
-            uniform.array ||= Array.new(9 * value.length) # Float32Array
+            uniform.array ||= Float32Array.new(9 * value.length)
 
             value.each_with_index do |v, i|
               value[i].flatten_to_array_offset(uniform.array, i * 9)
             end
 
-            glUniformMatrix3fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
+            glUniformMatrix3fv(location, value.length, GL_FALSE, uniform.array.ptr)
           else
             glUniformMatrix3fv(location, value.length / 9, GL_FALSE, array_to_ptr_easy(value))
           end
         when :'mat4[]'
           if value.first.is_a? Matrix4
-            uniform.array ||= Array.new(16 * value.length) # Float32Array
+            uniform.array ||= Float32Array.new(16 * value.length)
 
             value.each_with_index do |v, i|
               value[i].flatten_to_array_offset(uniform.array, i * 16)
             end
 
-            glUniformMatrix4fv(location, value.length, GL_FALSE, array_to_ptr_easy(uniform.array))
+            glUniformMatrix4fv(location, value.length, GL_FALSE, uniform.array.ptr)
           else
             glUniformMatrix4fv(location, value.length / 16, GL_FALSE, array_to_ptr_easy(value))
           end

@@ -3,7 +3,7 @@ module Mittsu
     attr_accessor :renderer
 
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      type = GL_UNSIGNED_INT # geometry_group.type_array == Uint32Array ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT
+      type = GL_UNSIGNED_INT
 
       # wireframe
       if material.wireframe

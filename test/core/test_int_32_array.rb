@@ -6,6 +6,13 @@ class TestInt32Array < Minitest::Test
     assert_equal 10, array.count
     assert_equal 10, array.size
     assert_equal 10, array.length
+    assert_equal 40, array.bytesize
+
+    array = Mittsu::Int32Array.new(3, 42)
+
+    array[0] = 42
+    array[1] = 42
+    array[2] = 42
   end
 
   def test_index
@@ -111,6 +118,26 @@ class TestInt32Array < Minitest::Test
 
     assert_equal 2, array[1]
     assert_equal 42, array2[1]
+  end
+
+  def test_equality
+    array = Mittsu::Float32Array.new(3)
+
+    array[0] = 1
+    array[1] = 2
+    array[2] = 3
+
+    array2 = Mittsu::Float32Array.new(3)
+
+    array2[0] = 1
+    array2[1] = 2
+    array2[2] = 3
+
+    assert_equal array, array2
+
+    array2[0] = 99
+
+    refute_equal array, array2
   end
 
   def test_from_array

@@ -1,8 +1,8 @@
 module Mittsu
   class OpenGLState
     def initialize
-      @new_attributes = Array.new(16) # Uint8Array
-      @enabled_attributes = Array.new(16) # Uint8Array
+      @new_attributes = Array.new(16)
+      @enabled_attributes = Array.new(16)
 
       @current_blending = nil
       @current_blend_equation = nil
