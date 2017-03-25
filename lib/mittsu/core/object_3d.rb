@@ -239,7 +239,7 @@ module Mittsu
       target.set(0.0, 0.0, 1.0).apply_quaternion(@_quaternion)
     end
 
-    def raycast; end
+    def raycast(raycaster, intersects); end
 
     def traverse(&callback)
       callback.yield self

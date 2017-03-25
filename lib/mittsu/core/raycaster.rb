@@ -41,11 +41,11 @@ module Mittsu
       end
     end
 
-    def intersect_object(object, recursive)
+    def intersect_object(object, recursive = false)
       intersects = []
       intersect(object, intersects, recursive)
       intersects.sort do |a, b|
-        a.distance <=> b.distance
+        a[:distance] <=> b[:distance]
       end
     end
 
@@ -70,8 +70,10 @@ module Mittsu
     def intersect(object, intersects, recursive)
       object.raycast(self, intersects)
 
-      object.children.each do |child|
-        intersect(chil, intersects, true)
+      if recursive
+        object.children.each do |child|
+          intersect(child, intersects, true)
+        end
       end
     end
   end
