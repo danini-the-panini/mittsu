@@ -13,7 +13,7 @@ camera_ortho.position.z = 10.0
 scene = Mittsu::Scene.new
 scene_ortho = Mittsu::Scene.new
 
-amount = 20
+amount = 200
 radius = 500
 
 map_a = Mittsu::ImageUtils.load_texture(File.join File.dirname(__FILE__), 'sprite0.png')
@@ -106,7 +106,7 @@ renderer.window.run do
     image_width = material.map.image.width
     image_height = material.map.image.height
 
-    sprite.material.rotation += 0.1 * (i / 1.0)
+    sprite.material.rotation += 0.01 * i.to_f
     sprite.scale.set(scale * image_width, scale * image_height, 1.0)
 
     if material.map != material_c
@@ -116,10 +116,10 @@ renderer.window.run do
     group.rotation.x = time * 0.5
     group.rotation.y = time * 0.75
     group.rotation.z = time * 1.0
-
-    renderer.clear
-    renderer.render(scene, camera)
-    renderer.clear_depth
-    renderer.render(scene_ortho, camera_ortho)
   end
+
+  renderer.clear
+  renderer.render(scene, camera)
+  renderer.clear_depth
+  renderer.render(scene_ortho, camera_ortho)
 end
