@@ -1,7 +1,7 @@
 require 'fiddle'
 
 module Mittsu
-  class Float32Array
+  class Int32Array
     FREEFUNC = Fiddle::Function.new(Fiddle::RUBY_FREE, [Fiddle::TYPE_VOIDP], Fiddle::TYPE_VOID)
     include Enumerable
 
@@ -11,23 +11,23 @@ module Mittsu
 
     def initialize(size)
       @size = size
-      @ptr = Fiddle::Pointer.malloc(size * Fiddle::SIZEOF_FLOAT, FREEFUNC)
+      @ptr = Fiddle::Pointer.malloc(size * Fiddle::SIZEOF_INT, FREEFUNC)
     end
 
     def [](index, length=nil)
       if length.nil?
-        @ptr[index * Fiddle::SIZEOF_FLOAT, Fiddle::SIZEOF_FLOAT].unpack('F')[0]
+        @ptr[index * Fiddle::SIZEOF_INT, Fiddle::SIZEOF_INT].unpack('l')[0]
       else
-        @ptr[index * Fiddle::SIZEOF_FLOAT, length * Fiddle::SIZEOF_FLOAT].unpack("F#{length}")
+        @ptr[index * Fiddle::SIZEOF_INT, length * Fiddle::SIZEOF_INT].unpack("l#{length}")
       end
     end
 
     def []=(index, length=nil, value)
       if length.nil?
-        @ptr[index * Fiddle::SIZEOF_FLOAT, Fiddle::SIZEOF_FLOAT] = [value].pack('F')
+        @ptr[index * Fiddle::SIZEOF_INT, Fiddle::SIZEOF_INT] = [value].pack('l')
       else
-        string = value.is_a?(Array) ? value.pack("F#{length}") : value
-        @ptr[index * Fiddle::SIZEOF_FLOAT, length * Fiddle::SIZEOF_FLOAT] = string
+        string = value.is_a?(Array) ? value.pack("l#{length}") : value
+        @ptr[index * Fiddle::SIZEOF_INT, length * Fiddle::SIZEOF_INT] = string
       end
     end
 
@@ -56,11 +56,11 @@ module Mittsu
 
     def self.from_array(array, length = nil)
       length ||= array.length
-      from_string(array.pack("F#{length}"), length)
+      from_string(array.pack("l#{length}"), length)
     end
 
     def self.from_string(string, length = nil)
-      length ||= string.bytesize / Fiddle::SIZEOF_FLOAT
+      length ||= string.bytesize / Fiddle::SIZEOF_INT
       new(length).tap do |array|
         array[0, length] = string
       end
