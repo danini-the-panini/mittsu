@@ -7,7 +7,7 @@ ASPECT = SCREEN_WIDTH.to_f / SCREEN_HEIGHT.to_f
 scene = Mittsu::Scene.new
 camera = Mittsu::PerspectiveCamera.new(75.0, ASPECT, 0.1, 1000.0)
 
-renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT, title: '02 Box Mesh Example'
+renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT, title: '18 Remove Object Example'
 
 cubes = Mittsu::Group.new
 GEOMETRY = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
