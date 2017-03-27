@@ -1018,5 +1018,16 @@ module Mittsu
         glUniformMatrix4fv(uniforms['viewMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.matrix_world_inverse.elements))
       end
     end
+
+    def remove_child(object)
+      if object.is_a?(Mesh) || object.is_a?(PointCloud) || object.is_a?(Line)
+        @_opengl_objects.delete(object.id)
+
+      # elsif object.is_a?(ImmediateRenderObject) || object.immediate_render_callback
+      #   removeInstances( _webglObjectsImmediate, object );
+      end
+
+      object.deinit
+    end
   end
 end

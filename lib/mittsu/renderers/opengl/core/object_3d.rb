@@ -116,6 +116,13 @@ module Mittsu
       # NOOP
     end
 
+    def deinit
+      @initted = nil
+      @model_view_matrix = nil
+      @normal_matrix = nil
+      @active = nil
+    end
+
     protected
 
     def project_children
