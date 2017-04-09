@@ -12,6 +12,8 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 ![Point Light](https://cloud.githubusercontent.com/assets/1171825/18411861/4531bb4c-7781-11e6-92b4-b6ebda60e2c9.gif)
 ![Tank Demo](https://cloud.githubusercontent.com/assets/1171825/18411862/4531fe9a-7781-11e6-9665-b172df1a3645.gif)
 
+(You can find the source for the Tank Demo [here](https://github.com/jellymann/mittsu-tank-demo))
+
 ## Installation
 
 Install the prerequisites:
