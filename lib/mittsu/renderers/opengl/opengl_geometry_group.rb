@@ -4,7 +4,7 @@ module Mittsu
   class OpenGLGeometryGroup
     include OpenGLGeometryLike
 
-    attr_reader :id
+    attr_reader :id, :material_index
 
     alias :initted_arrays? :initted_arrays
 
