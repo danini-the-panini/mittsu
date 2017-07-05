@@ -24,12 +24,10 @@ module Mittsu
       end
     end
 
-    class Windows
-      def path; nil; end
-      def file; nil; end
+    class Windows < GenericLib::Base
     end
 
-    class MacOS
+    class MacOS < GenericLib::Base
       def path
         '/usr/local/lib'
       end

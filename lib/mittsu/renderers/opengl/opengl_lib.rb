@@ -10,14 +10,10 @@ module Mittsu
       end
     end
 
-    class Windows
-      def path; nil; end
-      def file; nil; end
+    class Windows < GenericLib::Base
     end
 
-    class MacOS
-      def path; nil; end
-      def file; nil; end
+    class MacOS < GenericLib::Base
     end
   end
 end
