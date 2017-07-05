@@ -9,11 +9,17 @@ module Mittsu
       when :OPENGL_PLATFORM_LINUX
         self::Linux.new
       else
-        fail "Unsupported platform."
+        warn "WARNING: Unsupported platform: #{OpenGL.get_platform}"
+        self::Base.new
       end
     end
 
-    class Linux
+    class Base
+      def path; nil; end
+      def file; nil; end
+    end
+
+    class Linux < Base
       def path
         return nil if file_path.nil?
         File.dirname file_path
