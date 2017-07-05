@@ -20,5 +20,6 @@ dependencies:
 
 test:
   post:
+    - bundle exec codeclimate-test-reporter
     - mkdir -p $CIRCLE_TEST_REPORTS/minitest/
     - cp -r test/reports/*.xml $CIRCLE_TEST_REPORTS/minitest/
