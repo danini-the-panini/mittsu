@@ -10,7 +10,7 @@ module Mittsu
         self::Linux.new
       else
         warn "WARNING: Unsupported platform: #{OpenGL.get_platform}"
-        self::Base.new
+        Base.new
       end
     end
 
