@@ -1,6 +1,13 @@
 # Mittsu
 
-[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Build status](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master) [![Coverage Status](https://coveralls.io/repos/github/jellymann/mittsu/badge.svg?branch=master)](https://coveralls.io/github/jellymann/mittsu?branch=master) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
+[![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu)
+[![Coverage Status](https://coveralls.io/repos/github/jellymann/mittsu/badge.svg?branch=master)](https://coveralls.io/github/jellymann/mittsu?branch=master)
+[![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+
+🍎 [![Circle CI Build Status (macOS)](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master)
+&nbsp; 🐧 [![Travis Build Status (Ubuntu)](https://travis-ci.org/jellymann/mittsu.svg?branch=master)](https://travis-ci.org/jellymann/mittsu)
+&nbsp; 🖼 [![AppVeyor Build status (Windows)](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master)
 
 3D Graphics Library for Ruby
 
