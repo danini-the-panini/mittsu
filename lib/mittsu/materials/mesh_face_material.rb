@@ -2,6 +2,8 @@ require 'securerandom'
 
 module Mittsu
   class MeshFaceMaterial
+    attr_reader :materials
+
     def initialize(materials = [])
       @uuid = SecureRandom.uuid
       @type = 'MeshFaceMaterial'
