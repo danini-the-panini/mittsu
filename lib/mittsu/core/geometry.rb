@@ -438,7 +438,6 @@ module Mittsu
         end
       end
       face_indices_to_remove.reverse_each do |idx|
-        idx = face_indices_to_remove[i]
         @faces.delete_at idx
         @face_vertex_uvs.each do |uv|
           uv.delete_at idx
