@@ -8,7 +8,7 @@ module Mittsu
     end
 
     def [](key)
-      if key.is_a? Fixnum
+      if key.is_a? Integer
         @array[key]
       else
         @hash[key]
@@ -16,7 +16,7 @@ module Mittsu
     end
 
     def []=(key, value)
-      if key.is_a? Fixnum
+      if key.is_a? Integer
         @array[key] = value
       else
         @hash[key] = value

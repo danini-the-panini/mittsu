@@ -128,7 +128,7 @@ class TestMath < Minitest::Test
     RANDOM_SAMPLES.times do
       [[-10, 10], [0, 100]].each do |(low, high)|
         r = Mittsu::Math.rand_int(low, high)
-        assert_kind_of Fixnum, r
+        assert_kind_of Integer, r
         assert_includes (low..high), r
       end
     end

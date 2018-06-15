@@ -28,12 +28,12 @@ module Mittsu
       case value
       when Color
         self.copy(value)
-      when Fixnum
+      when Integer
         self.set_hex(value)
       when String
         self.set_style(value)
       else
-        raise ArgumentError, "Arguments must be Color, Fixnum or String"
+        raise ArgumentError, "Arguments must be Color, Integer or String"
       end
       self
     end
