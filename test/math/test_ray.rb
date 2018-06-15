@@ -115,15 +115,15 @@ class TestRay < Minitest::Test
 
     # sphere (radius of 2) located behind ray a0, should result in nil
     b = Mittsu::Sphere.new(Mittsu::Vector3.new(0, 0, 3), 2)
-    assert_equal(nil, a0.intersect_sphere(b))
+    assert_nil a0.intersect_sphere(b)
 
     # sphere (radius of 2) located in front of, but too far right of ray a0, should result in nil
     b = Mittsu::Sphere.new(Mittsu::Vector3.new(3, 0, -1), 2)
-    assert_equal(nil, a0.intersect_sphere(b))
+    assert_nil a0.intersect_sphere(b)
 
     # sphere (radius of 2) located below ray a1, should result in nil
     b = Mittsu::Sphere.new(Mittsu::Vector3.new(1, -2, 1), 2)
-    assert_equal(nil, a1.intersect_sphere(b))
+    assert_nil a1.intersect_sphere(b)
 
     # sphere (radius of 1) located to the left of ray a1, should result in intersection at 0, 1, 1
     b = Mittsu::Sphere.new(Mittsu::Vector3.new(-1, 1, 1), 1)
@@ -139,7 +139,7 @@ class TestRay < Minitest::Test
 
     # same situation as above, but move the sphere a fraction more to the right, and ray a0 should now just miss
     b = Mittsu::Sphere.new(Mittsu::Vector3.new(2.01, 0, -1), 2)
-    assert_equal(nil, a0.intersect_sphere(b))
+    assert_nil a0.intersect_sphere(b)
 
     # following tests are for situations where the ray origin is inside the sphere
 
@@ -192,11 +192,11 @@ class TestRay < Minitest::Test
 
     # parallel plane behind
     b = Mittsu::Plane.new.set_from_normal_and_coplanar_point(Mittsu::Vector3.new(0, 0, 1), Mittsu::Vector3.new(1, 1, -1))
-    assert_equal(nil, a.intersect_plane(b))
+    assert_nil a.intersect_plane(b)
 
     # parallel plane coincident with origin
     c = Mittsu::Plane.new.set_from_normal_and_coplanar_point(Mittsu::Vector3.new(0, 0, 1), Mittsu::Vector3.new(1, 1, 0))
-    assert_equal(nil, a.intersect_plane(c))
+    assert_nil a.intersect_plane(c)
 
     # parallel plane infront
     d = Mittsu::Plane.new.set_from_normal_and_coplanar_point(Mittsu::Vector3.new(0, 0, 1), Mittsu::Vector3.new(1, 1, 1))
@@ -208,7 +208,7 @@ class TestRay < Minitest::Test
 
     # perpendical ray that doesn't overlap
     f = Mittsu::Plane.new.set_from_normal_and_coplanar_point(Mittsu::Vector3.new(1, 0, 0), zero3)
-    assert_equal(nil, a.intersect_plane(f))
+    assert_nil a.intersect_plane(f)
   end
 
   def test_apply_matrix4
@@ -281,7 +281,7 @@ class TestRay < Minitest::Test
     b = Mittsu::Ray.new(Mittsu::Vector3.new(-2, 0, 0), Mittsu::Vector3.new(-1, 0, 0))
     #ray is point away from box, it should not intersect
     assert_equal(false, b.intersection_box?(box))
-    assert_equal(nil, b.intersect_box(box))
+    assert_nil b.intersect_box(box)
 
     c = Mittsu::Ray.new(Mittsu::Vector3.new(0, 0, 0), Mittsu::Vector3.new(1, 0, 0))
     # ray is inside box, should return exit point
@@ -301,7 +301,7 @@ class TestRay < Minitest::Test
     f = Mittsu::Ray.new(Mittsu::Vector3.new(1, -2, 0), Mittsu::Vector3.new(0, -1, 0).normalize)
     #handle case where ray is coplanar with one of the boxes side - box behind ray
     assert_equal(false, f.intersection_box?(box))
-    assert_equal(nil, f.intersect_box(box))
+    assert_nil f.intersect_box(box)
 
   end
 
