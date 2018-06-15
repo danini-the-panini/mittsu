@@ -139,12 +139,12 @@ class TestPlane < Minitest::Test
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), -11)
 
     refute(a.intersection_line?(l1))
-    assert_equal(nil, a.intersect_line(l1))
+    assert_nil a.intersect_line(l1)
 
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), 11)
 
     refute(a.intersection_line?(l1))
-    assert_equal(nil, a.intersect_line(l1))
+    assert_nil a.intersect_line(l1)
 
   end
 
