@@ -3,10 +3,22 @@ jobs:
   build:
     macos:
       xcode: "9.4.1"
+    working_directory: ~/mittsu
     steps:
       ## SETUP
+      - checkout
       - run: brew install glfw
-      - run: bundle install
+      
+      - restore_cache:
+          keys:
+            - mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-bundler-v1-{{ .Branch }}-
+            - mittsu-bundler-v1-
+      - run: bundle install --path vendor/bundle
+      - save_cache:
+          key: mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          paths:
+            - vendor/bundle
       
       ## TEST
       - run:
