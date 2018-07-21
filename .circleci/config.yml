@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    macos:
+      xcode: "9.4.1"
+    working_directory: ~/mittsu
+    steps:
+      ## SETUP
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - mittsu-brew-v1-{{ .Branch }}
+            - mittsu-brew-v1-
+      - run: brew install glfw
+      - save_cache:
+          key: mittsu-brew-v1-{{ .Branch }}
+          paths:
+            - /usr/local/Homebrew
+      
+      - restore_cache:
+          keys:
+            - mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-bundler-v1-{{ .Branch }}-
+            - mittsu-bundler-v1-
+      - run: bundle install --path vendor/bundle
+      - save_cache:
+          key: mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          paths:
+            - vendor/bundle
+      
+      ## TEST
+      - run:
+          name: Run tests
+          command: bundle exec rake test
+          environment:
+            MITTSU_LIBGLFW_PATH: /usr/local/lib
+            MITTSU_LIBGLFW_FILE: libglfw.dylib
+            MINITEST_REPORTER: JUnitReporter
+
+      ## COLLECT RESULTS
+      - run: bundle exec codeclimate-test-reporter
+      - store_test_results:
+          path: test/reports
