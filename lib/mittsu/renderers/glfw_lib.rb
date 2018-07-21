@@ -33,7 +33,8 @@ module Mittsu
       end
 
       def file
-        'libglfw3.dylib'
+        matches = Dir.glob('/usr/local/lib/libglfw*.dylib').map { |path| File.basename(path) }
+        return matches.find('libglfw3.dylib') || matches.find('libglfw.3.dylib') || matches.first
       end
     end
   end
