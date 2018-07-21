@@ -1,10 +1,10 @@
+version: 2
 jobs:
   build:
     macos:
       xcode: "9.4.1"
     steps:
       ## SETUP
-      - run: chruby 2.3.7
       - run: brew install glfw
       - run: bundle install
       
