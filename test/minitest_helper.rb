@@ -1,3 +1,5 @@
+ENV["MITTSU_ENV"] = 'test'
+
 require 'pry'
 
 require 'simplecov'
