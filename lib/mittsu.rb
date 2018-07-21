@@ -4,6 +4,14 @@ module Mittsu
   def self.debug?
     DEBUG
   end
+
+  def self.env
+    ENV["MITTSU_ENV"]
+  end
+
+  def self.test?
+    env == 'test'
+  end
 end
 
 require "mittsu/version"
