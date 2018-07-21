@@ -4,7 +4,7 @@ require 'glfw'
 require 'mittsu'
 require 'mittsu/renderers/glfw_lib'
 glfw_lib = Mittsu::GLFWLib.discover
-GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path)
+GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path) unless Mittsu.test?
 
 include GLFW
 
