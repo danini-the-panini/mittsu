@@ -40,10 +40,5 @@ jobs:
 
       ## COLLECT RESULTS
       - run: bundle exec codeclimate-test-reporter
-      - run:
-          name: Collect test results
-          command: |
-            mkdir -p $CIRCLE_TEST_REPORTS/minitest/
-            cp -r test/reports/*.xml $CIRCLE_TEST_REPORTS/minitest/
       - store_test_results:
           path: test/reports
