@@ -6,12 +6,12 @@ machine:
   environment:
     MITTSU_LIBGLFW_PATH: /usr/local/lib
     MITTSU_LIBGLFW_FILE: libglfw.dylib
-    MINITEST_REPORTER: JUnit
+    MINITEST_REPORTER: JUnitReporter
 
   # Version of ruby to use
   ruby:
     version:
-      2.0.0
+      2.3.0
 
 ## Customize dependencies
 dependencies:

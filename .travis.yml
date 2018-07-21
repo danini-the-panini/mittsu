@@ -3,7 +3,7 @@ rvm:
   2.4.0
 
 env:
-- MITTSU_LIBGLFW_PATH=/usr/local/lib MITTSU_LIBGLFW_FILE=libglfw.so MINITEST_REPORTER=JUnit
+- MITTSU_LIBGLFW_PATH=/usr/local/lib MITTSU_LIBGLFW_FILE=libglfw.so MINITEST_REPORTER=JUnitReporter
 
 addons:
   apt:
