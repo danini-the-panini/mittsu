@@ -164,7 +164,11 @@ class TestRBSLLoader < Minitest::Test
   def assert_uniform(expected, actual, name)
     assert_kind_of(Mittsu::Uniform, actual, "#{name} is not a Uniform")
     assert_equal(expected.type, actual.type, "#{name} has the wrong type")
-    assert_equal(expected.value, actual.value, "#{name} has the wrong value")
+    if expected.value.nil?
+      assert_nil(actual.value, "#{name} has the wrong value")
+    else
+      assert_equal(expected.value, actual.value, "#{name} has the wrong value")
+    end
   end
 
   def test_load_shader
