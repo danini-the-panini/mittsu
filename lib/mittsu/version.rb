@@ -1,4 +1,4 @@
 module Mittsu
-  VERSION = "0.2.2"
+  VERSION = "0.2.3"
   REVISION = "71"
 end
