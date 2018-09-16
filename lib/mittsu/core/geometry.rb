@@ -163,12 +163,12 @@ module Mittsu
       end
     end
 
-    def compute_vertex_normals(area_weigted)
+    def compute_vertex_normals(area_weighted = false)
       vertices = Array.new(@vertices.length)
       @vertices.length.times do |v|
         vertices[v] = Mittsu::Vector3.new
       end
-      if area_weigted
+      if area_weighted
         # vertex normals weighted by triangle areas
         # http:#www.iquilezles.org/www/articles/normals/normals.htm
         cb = Mittsu::Vector3.new, ab = Mittsu::Vector3.new

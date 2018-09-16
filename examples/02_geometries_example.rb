@@ -24,7 +24,8 @@ geometries = [
   Mittsu::TetrahedronGeometry.new,
   Mittsu::PlaneGeometry.new(1.0, 1.0),
   Mittsu::TorusGeometry.new(0.5, 0.2),
-  Mittsu::TorusGeometry.new(0.5, 0.2, 8, 6, Math::PI * 1.1)
+  Mittsu::TorusGeometry.new(0.5, 0.2, 8, 6, Math::PI * 1.1),
+  Mittsu::TorusKnotGeometry.new(0.5, 0.15)
 ]
 
 colors = [
@@ -55,8 +56,8 @@ end
 
 renderer.window.run do
   meshes.each do |mesh|
-    mesh.rotation.x += 0.1
-    mesh.rotation.y += 0.1
+    mesh.rotation.x += 0.05
+    mesh.rotation.y += 0.05
   end
 
   renderer.render(scene, camera)
