@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'mittsu'
+require 'securerandom'
 
 module Mittsu
   class Geometry
@@ -18,6 +19,8 @@ module Mittsu
       super
 
       @id = (@@id ||= 1).tap { @@id += 1 }
+
+      @uuid = SecureRandom.uuid
 
       @name = ''
       @type = 'Geometry'
