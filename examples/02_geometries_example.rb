@@ -20,7 +20,8 @@ geometries = [
   Mittsu::CylinderGeometry.new(1.0, 1.0, 2.0),
   Mittsu::DodecahedronGeometry.new(),
   Mittsu::IcosahedronGeometry.new(),
-  Mittsu::OctahedronGeometry.new()
+  Mittsu::OctahedronGeometry.new(),
+  Mittsu::PlaneGeometry.new(1.0, 1.0)
 ]
 
 colors = [

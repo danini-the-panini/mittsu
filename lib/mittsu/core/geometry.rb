@@ -108,7 +108,7 @@ module Mittsu
       }
       if indices
         draw_calls = geometry.draw_calls
-        if !draw_calls.length.empty?
+        if !draw_calls.empty?
           draw_calls.each do |draw_call|
             start = draw_call.start
             count = draw_call.count
@@ -122,7 +122,7 @@ module Mittsu
           end
         else
           indices.each_slice(3).with_index do |index|
-            add_face(*index)
+            add_face[*index]
           end
         end
       else
@@ -133,10 +133,10 @@ module Mittsu
         end
       end
       self.compute_face_normals
-      if geometry.boundingBox
+      if geometry.bounding_box
         @bounding_box = geometry.bounding_box.clone
       end
-      if geometry.boundingSphere
+      if geometry.bounding_sphere
         @bounding_sphere = geometry.bounding_sphere.clone
       end
       self
