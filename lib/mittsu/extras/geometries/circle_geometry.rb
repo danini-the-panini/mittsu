@@ -17,7 +17,10 @@ module Mittsu
 
       segments = [3, segments].max
 
+      center = Vector3.new
       center_uv = Vector2.new(0.5, 0.5)
+
+      @vertices << center
       uvs = [center_uv]
 
       for i in 0...segments do
@@ -28,13 +31,13 @@ module Mittsu
         vertex.y = radius * Math.sin(segment)
 
         @vertices << vertex
-        uvs << Vecotr2.new((vertex.x / radius + 1.0) / 2.0, (vertex.y / radius + 1.0) / 2.0))
+        uvs << Vector2.new((vertex.x / radius + 1.0) / 2.0, (vertex.y / radius + 1.0) / 2.0)
       end
 
       n = Vector3.new
 
       for i in 1...segments do
-        @faces << Face3.new(i, i + 1, 0, [n.clone, n.clone, n.clone]))
+        @faces << Face3.new(i, i + 1, 0, [n.clone, n.clone, n.clone])
         @face_vertex_uvs[0] << [uvs[i].clone, uvs[i + 1].clone, center_uv.clone]
       end
 
