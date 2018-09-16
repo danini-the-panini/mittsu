@@ -1,11 +1,10 @@
 version: 2
 jobs:
-  build:
+  test-macos:
     macos:
       xcode: "9.4.1"
     working_directory: ~/mittsu
     steps:
-      ## SETUP
       - checkout
       
       - restore_cache:
@@ -42,3 +41,47 @@ jobs:
       - run: bundle exec codeclimate-test-reporter
       - store_test_results:
           path: test/reports
+
+  test-linux:
+    docker:
+      - image: dansmith45/circleci-ruby-glfw:2.5.1
+        environment:
+          MITTSU_LIBGLFW_PATH: /usr/local/lib
+          MITTSU_LIBGLFW_FILE: libglfw.so
+          MINITEST_REPORTER: JUnitReporter
+    working_directory: ~/mittsu
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - mittsu-linux-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-linux-bundler-v1-{{ .Branch }}-
+            - mittsu-linux-bundler-v1-
+      - run: bundle install --path vendor/bundle
+      - save_cache:
+          key: mittsu-linux-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          paths:
+            - vendor/bundle
+      
+      ## TEST
+      - run:
+          name: Run tests
+          command: bundle exec rake test
+          environment:
+            MITTSU_LIBGLFW_PATH: /usr/local/lib
+            MITTSU_LIBGLFW_FILE: libglfw.dylib
+            MINITEST_REPORTER: JUnitReporter
+
+      ## COLLECT RESULTS
+      - run: bundle exec codeclimate-test-reporter
+      - store_test_results:
+          path: test/reports
+
+workflows:
+  version: 2
+
+  test:
+    jobs:
+      - test-macos
+      - test-linux
