@@ -34,7 +34,7 @@ module Mittsu
 
       def file
         matches = Dir.glob('/usr/local/lib/libglfw*.dylib').map { |path| File.basename(path) }
-        return matches.find('libglfw3.dylib') || matches.find('libglfw.3.dylib') || matches.first
+        return matches.find { |m| m == 'libglfw3.dylib' || m == 'libglfw.3.dylib' } || matches.first
       end
     end
   end
