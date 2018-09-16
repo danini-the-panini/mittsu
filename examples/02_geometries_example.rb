@@ -13,12 +13,13 @@ renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT
 geometries = [
   Mittsu::BoxGeometry.new(1.0, 1.0, 1.0),
   Mittsu::SphereGeometry.new(1.0),
-  Mittsu::RingGeometry.new(1.0, 2.0, 16, 4, 0.0, Math::PI*1.2),
-  Mittsu::RingGeometry.new(1.0, 2.0),
+  Mittsu::RingGeometry.new(0.5, 1.0, 16, 4, 0.0, Math::PI*1.2),
+  Mittsu::RingGeometry.new(0.5, 1.0),
   Mittsu::CircleGeometry.new(1.0, 8, 0.0, Math::PI * 1.3),
   Mittsu::CircleGeometry.new(1.0, 8),
   Mittsu::CylinderGeometry.new(1.0, 1.0, 2.0),
-  Mittsu::DodecahedronGeometry.new()
+  Mittsu::DodecahedronGeometry.new(),
+  Mittsu::IcosahedronGeometry.new()
 ]
 
 colors = [

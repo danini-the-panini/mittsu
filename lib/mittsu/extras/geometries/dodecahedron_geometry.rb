@@ -45,12 +45,12 @@ module Mittsu
 
       super(vertices, indices, radius, detail)
 
+      @type = 'DodecahedronGeometry'
+
       @parameters = {
         radius: radius,
         detail: detail
       }
-
-      @type = 'DodecahedronGeometry'
     end
   end
 end

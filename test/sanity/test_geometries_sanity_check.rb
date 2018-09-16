@@ -15,7 +15,8 @@ class TestGeometriesSanityCheck < Minitest::Test
       Mittsu::RingGeometry.new,
       Mittsu::CircleGeometry.new,
       Mittsu::CylinderGeometry.new,
-      Mittsu::DodecahedronGeometry.new
+      Mittsu::DodecahedronGeometry.new,
+      Mittsu::IcosahedronGeometry.new
     ].each do |geom|
       mesh = Mittsu::Mesh.new(geom, material)
       scene.add(mesh)
