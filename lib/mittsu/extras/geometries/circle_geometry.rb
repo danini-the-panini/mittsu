@@ -23,7 +23,7 @@ module Mittsu
       @vertices << center
       uvs = [center_uv]
 
-      for i in 0...segments do
+      for i in 0..segments do
         vertex = Vector3.new
         segment = theta_start + i.to_f / segments.to_f * theta_length
 
@@ -36,7 +36,7 @@ module Mittsu
 
       n = Vector3.new
 
-      for i in 1...segments do
+      for i in 1..segments do
         @faces << Face3.new(i, i + 1, 0, [n.clone, n.clone, n.clone])
         @face_vertex_uvs[0] << [uvs[i].clone, uvs[i + 1].clone, center_uv.clone]
       end
