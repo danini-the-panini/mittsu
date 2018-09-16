@@ -22,7 +22,9 @@ geometries = [
   Mittsu::IcosahedronGeometry.new,
   Mittsu::OctahedronGeometry.new,
   Mittsu::TetrahedronGeometry.new,
-  Mittsu::PlaneGeometry.new(1.0, 1.0)
+  Mittsu::PlaneGeometry.new(1.0, 1.0),
+  Mittsu::TorusGeometry.new(0.5, 0.2),
+  Mittsu::TorusGeometry.new(0.5, 0.2, 8, 6, Math::PI * 1.1)
 ]
 
 colors = [
@@ -37,8 +39,8 @@ colors = [
 meshes = geometries.each_with_index.map do |geometry, i|
   material = Mittsu::MeshBasicMaterial.new(color: colors[i % colors.length])
   mesh = Mittsu::Mesh.new(geometry, material)
-  mesh.position.x = Math.sin((i.to_f / geometries.length.to_f) * TWO_PI) * 5.0
-  mesh.position.y = Math.cos((i.to_f / geometries.length.to_f) * TWO_PI) * 5.0
+  mesh.position.x = Math.sin((i.to_f / geometries.length.to_f) * TWO_PI) * 6.0
+  mesh.position.y = Math.cos((i.to_f / geometries.length.to_f) * TWO_PI) * 6.0
   scene.add(mesh)
   mesh
 end

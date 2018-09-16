@@ -19,7 +19,8 @@ class TestGeometriesSanityCheck < Minitest::Test
       Mittsu::IcosahedronGeometry.new,
       Mittsu::OctahedronGeometry.new,
       Mittsu::TetrahedronGeometry.new,
-      Mittsu::PlaneGeometry.new(1.0, 1.0)
+      Mittsu::PlaneGeometry.new(1.0, 1.0),
+      Mittsu::TorusGeometry.new
     ].each do |geom|
       mesh = Mittsu::Mesh.new(geom, material)
       scene.add(mesh)
