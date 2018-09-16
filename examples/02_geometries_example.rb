@@ -18,9 +18,10 @@ geometries = [
   Mittsu::CircleGeometry.new(1.0, 8, 0.0, Math::PI * 1.3),
   Mittsu::CircleGeometry.new(1.0, 8),
   Mittsu::CylinderGeometry.new(1.0, 1.0, 2.0),
-  Mittsu::DodecahedronGeometry.new(),
-  Mittsu::IcosahedronGeometry.new(),
-  Mittsu::OctahedronGeometry.new(),
+  Mittsu::DodecahedronGeometry.new,
+  Mittsu::IcosahedronGeometry.new,
+  Mittsu::OctahedronGeometry.new,
+  Mittsu::TetrahedronGeometry.new,
   Mittsu::PlaneGeometry.new(1.0, 1.0)
 ]
 
