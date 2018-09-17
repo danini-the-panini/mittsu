@@ -21,7 +21,8 @@ class TestGeometriesSanityCheck < Minitest::Test
       Mittsu::TetrahedronGeometry.new,
       Mittsu::PlaneGeometry.new(1.0, 1.0),
       Mittsu::TorusGeometry.new,
-      Mittsu::TorusKnotGeometry.new
+      Mittsu::TorusKnotGeometry.new,
+      Mittsu::ParametricGeometry.new(Mittsu::ParametricGeometry.klein, 25, 25)
     ].each do |geom|
       mesh = Mittsu::Mesh.new(geom, material)
       scene.add(mesh)

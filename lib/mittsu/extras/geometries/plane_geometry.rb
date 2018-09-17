@@ -14,7 +14,7 @@ module Mittsu
         height:          height,
         width_segments:  width_segments,
         height_segments: height_segments
-      };
+      }
 
       from_buffer_geometry(PlaneBufferGeometry.new(width, height, width_segments, height_segments))
     end
