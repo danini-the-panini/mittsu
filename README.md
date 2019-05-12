@@ -181,4 +181,6 @@ renderer.render(scene, camera)
 
 Mittsu follows a similar structure to THREE.js, so you can generally use [the same documentation](http://threejs.org/docs/) for a description of the various classes and how they work.
 
+### Examples
+
 If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
