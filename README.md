@@ -173,52 +173,8 @@ Last but not least, we tell the renderer to draw our scene this frame, which wil
 renderer.render(scene, camera)
 ```
 
-Easy peasy! :)
-
-```ruby
-end
-```
-
-
-### More Resources
+### THREE.js documentation (not recommended)
 
 Mittsu follows a similar structure to THREE.js, so you can generally use [the same documentation](http://threejs.org/docs/) for a description of the various classes and how they work.
 
 If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
-
-## Where you can help
-
-1. Testing!
-
-    Currently the only unit tests are for most of the maths library, otherwise the library is tested by running the examples and checking that they look correct.
-
-2. Refactoring!
-
-    The code is unfortunately still a mess. Mittsu started out as a direct port of THREE.js, and JavaScript to Ruby is not an exact science.
-
-3. Find Bugs!
-
-    Mittsu is still very young, and there are plenty of small bugs and glitches that need to be ironed out. If you find a bug, create an issue so we can track it and squash it.
-
-4. Add all the features!
-
-    Some of the things I'd like to see ported from THREE.js include:
-
-    * Picking (clicking on 3D objects in a scene)
-    * Bone structure/animation (e.g. for character movements)
-    * Lens Flares! (for JJ Abrams)
-    * All the Extras and Helpers (who doesn't need extra help?)
-
-5. Write documentation!
-
-    You can use the same docs as THREE.js for now, but I would like to provide Mittsu-specific documentation so devs don't have to keep replacing `new THREE.Thing()` with `Mittsu::Thing.new`.
-
-## Contributing
-
-1. Fork it ( https://github.com/jellymann/mittsu/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
-
-Thank you for helping me help you help us all. ;)
