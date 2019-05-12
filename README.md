@@ -1,5 +1,7 @@
 # Mittsu
 
+[![Gitter](https://badges.gitter.im/mittsu-lemonandroid/community.svg)](https://gitter.im/mittsu-lemonandroid/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 [![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
 [![Coverage Status](https://coveralls.io/repos/github/jellymann/mittsu/badge.svg?branch=master)](https://coveralls.io/github/jellymann/mittsu?branch=master)
 [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
