@@ -12,7 +12,11 @@
 
 3D Graphics Library for Ruby
 
-Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of [THREE.js](http://threejs.org). No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!
+Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of [THREE.js](http://threejs.org). Simply think of something awesome and make it!
+
+Inside joke(?)
+
+` No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). `
 
 ## GIFs!
 
