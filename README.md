@@ -1,3 +1,9 @@
+
+### Examples
+
+If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
+
+
 # Mittsu
 
 [![Gitter](https://badges.gitter.im/mittsu-lemonandroid/community.svg)](https://gitter.im/mittsu-lemonandroid/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -180,7 +186,3 @@ renderer.render(scene, camera)
 ### THREE.js documentation (not recommended)
 
 Mittsu follows a similar structure to THREE.js, so you can generally use [the same documentation](http://threejs.org/docs/) for a description of the various classes and how they work.
-
-### Examples
-
-If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
