@@ -1,12 +1,13 @@
 
+[![Gitter](https://badges.gitter.im/mittsu-lemonandroid/community.svg)](https://gitter.im/mittsu-lemonandroid/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+
 ### Examples
 
 If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
 
 
 # Mittsu
-
-[![Gitter](https://badges.gitter.im/mittsu-lemonandroid/community.svg)](https://gitter.im/mittsu-lemonandroid/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 [![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
 [![Coverage Status](https://coveralls.io/repos/github/jellymann/mittsu/badge.svg?branch=master)](https://coveralls.io/github/jellymann/mittsu?branch=master)
