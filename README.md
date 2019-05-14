@@ -24,12 +24,6 @@ Inside joke(?)
 
 ` No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). `
 
-## GIFs!
-
-![Normal-mapped Earth](https://cloud.githubusercontent.com/assets/1171825/18411863/45328540-7781-11e6-986b-6e3f2551c719.gif)
-![Point Light](https://cloud.githubusercontent.com/assets/1171825/18411861/4531bb4c-7781-11e6-92b4-b6ebda60e2c9.gif)
-
-
 ## Installation
 
 Install the prerequisites:
