@@ -77,7 +77,7 @@ module Mittsu
 
   	# Fallback filters for non-power-of-2 textures
   	def filter_fallback(filter)
-  		if filter == NearestFilter || filter == NearestMipMapNearestFilter || f == NearestMipMapLinearFilter
+  		if filter == NearestFilter || filter == NearestMipMapNearestFilter || filter == NearestMipMapLinearFilter
   			GL_NEAREST
   		end
 
