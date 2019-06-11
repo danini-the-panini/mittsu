@@ -19,12 +19,12 @@ jobs:
       
       - restore_cache:
           keys:
-            - mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
-            - mittsu-bundler-v1-{{ .Branch }}-
-            - mittsu-bundler-v1-
+            - mittsu-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-bundler-v2-{{ .Branch }}-
+            - mittsu-bundler-v2-
       - run: bundle install --path vendor/bundle
       - save_cache:
-          key: mittsu-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          key: mittsu-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
           paths:
             - vendor/bundle
       
@@ -55,12 +55,12 @@ jobs:
       
       - restore_cache:
           keys:
-            - mittsu-linux-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
-            - mittsu-linux-bundler-v1-{{ .Branch }}-
-            - mittsu-linux-bundler-v1-
+            - mittsu-linux-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-linux-bundler-v2-{{ .Branch }}-
+            - mittsu-linux-bundler-v2-
       - run: bundle install --path vendor/bundle
       - save_cache:
-          key: mittsu-linux-bundler-v1-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          key: mittsu-linux-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
           paths:
             - vendor/bundle
       
