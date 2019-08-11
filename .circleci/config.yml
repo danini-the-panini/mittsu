@@ -1,4 +1,5 @@
-version: 2
+version: 2.1
+
 jobs:
   test-macos:
     macos:
@@ -38,7 +39,6 @@ jobs:
             MINITEST_REPORTER: JUnitReporter
 
       ## COLLECT RESULTS
-      - run: bundle exec codeclimate-test-reporter
       - store_test_results:
           path: test/reports
 
@@ -52,6 +52,12 @@ jobs:
     working_directory: ~/mittsu
     steps:
       - checkout
+
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
       
       - restore_cache:
           keys:
@@ -67,16 +73,15 @@ jobs:
       ## TEST
       - run:
           name: Run tests
-          command: bundle exec rake test
-          environment:
-            MITTSU_LIBGLFW_PATH: /usr/local/lib
-            MITTSU_LIBGLFW_FILE: libglfw.dylib
-            MINITEST_REPORTER: JUnitReporter
+          command: |
+            ./cc-test-reporter before-build
+            bundle exec rake test
+            ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
 
       ## COLLECT RESULTS
-      - run: bundle exec codeclimate-test-reporter
       - store_test_results:
           path: test/reports
+
 
 workflows:
   version: 2
