@@ -1,4 +1,5 @@
-version: 2
+version: 2.1
+
 jobs:
   test-macos:
     macos:
@@ -68,10 +69,6 @@ jobs:
       - run:
           name: Run tests
           command: bundle exec rake test
-          environment:
-            MITTSU_LIBGLFW_PATH: /usr/local/lib
-            MITTSU_LIBGLFW_FILE: libglfw.dylib
-            MINITEST_REPORTER: JUnitReporter
 
       ## COLLECT RESULTS
       - run: bundle exec codeclimate-test-reporter
