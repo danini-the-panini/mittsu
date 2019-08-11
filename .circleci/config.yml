@@ -39,7 +39,6 @@ jobs:
             MINITEST_REPORTER: JUnitReporter
 
       ## COLLECT RESULTS
-      - run: bundle exec codeclimate-test-reporter
       - store_test_results:
           path: test/reports
 
