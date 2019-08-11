@@ -3,10 +3,8 @@ ENV["MITTSU_ENV"] = 'test'
 require 'pry'
 
 require 'simplecov'
-require 'coveralls'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  Coveralls::SimpleCov::Formatter,
   SimpleCov::Formatter::HTMLFormatter
 ]
 SimpleCov.start do
