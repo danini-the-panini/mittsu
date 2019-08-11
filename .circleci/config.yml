@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@1.0.0
+
 jobs:
   test-macos:
     macos:
@@ -82,6 +85,40 @@ jobs:
       - store_test_results:
           path: test/reports
 
+  test-windows:
+    executor: win/vs2019
+    steps:
+      - checkout
+
+      - run:
+          name: Install GLFW
+          command: ps install_glfw.ps1
+
+      - restore_cache:
+          keys:
+            - mittsu-windows-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+            - mittsu-windows-bundler-v2-{{ .Branch }}-
+            - mittsu-windows-bundler-v2-
+      - run: bundle install --path vendor\bundle
+      - save_cache:
+          key: mittsu-windows-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
+          paths:
+            - vendor/bundle
+
+      ## TEST
+      - run:
+          name: Run tests
+          command: bundle exec rake test
+          environment:
+            MITTSU_LIBGLFW_FILE: glfw3.dll
+            MINITEST_REPORTER: JUnitReporter
+
+      ## COLLECT RESULTS
+      - store_test_results:
+          path: test\reports
+
+
+
 workflows:
   version: 2
 
@@ -89,3 +126,4 @@ workflows:
     jobs:
       - test-macos
       - test-linux
+      - test-windows
