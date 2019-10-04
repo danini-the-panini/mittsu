@@ -1,6 +1,4 @@
 require 'securerandom'
-require 'mittsu'
-require 'securerandom'
 
 module Mittsu
   class Geometry

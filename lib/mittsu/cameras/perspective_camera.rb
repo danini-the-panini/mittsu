@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class PerspectiveCamera < Camera
     attr_accessor :zoom, :fov, :aspect, :near, :far

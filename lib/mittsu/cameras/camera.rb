@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class Camera < Object3D
     attr_accessor :projection_matrix, :matrix_world_inverse

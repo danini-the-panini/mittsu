@@ -1,5 +1,4 @@
 require 'securerandom'
-require 'mittsu'
 
 module Mittsu
   class Material

@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class CubeCamera < Object3D
     attr_accessor :render_target

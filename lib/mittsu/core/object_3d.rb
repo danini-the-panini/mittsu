@@ -1,5 +1,4 @@
 require 'securerandom'
-require 'mittsu'
 
 module Mittsu
   class Object3D
@@ -22,6 +21,7 @@ module Mittsu
       @type = 'Object3D'
 
       @children = []
+      @parent = nil
 
       @up = DefaultUp.clone
 
