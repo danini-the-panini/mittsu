@@ -20,6 +20,7 @@ module Mittsu
       @num_morph_normals = num_morph_normals
 
       @renderer = renderer
+      @custom_attributes_list = []
     end
 
     def create_mesh_buffers

@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Triangle
     attr_accessor :a, :b, :c

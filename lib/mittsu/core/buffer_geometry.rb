@@ -20,6 +20,7 @@ module Mittsu
       @attributes = {}
 
       @draw_calls = []
+      @_listeners = {}
     end
 
     def keys

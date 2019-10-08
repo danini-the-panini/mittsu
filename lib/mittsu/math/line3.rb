@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Line3
     attr_accessor :start_point, :end_point

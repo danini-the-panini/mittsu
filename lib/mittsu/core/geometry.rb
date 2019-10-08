@@ -50,6 +50,8 @@ module Mittsu
       @colors_need_update = false
       @line_distances_need_update = false
       @groups_need_update = false
+
+      @_listeners = {}
     end
 
     def apply_matrix(matrix)
@@ -427,12 +429,10 @@ module Mittsu
         face.b = changes[face.b]
         face.c = changes[face.c]
         indices = [face.a, face.b, face.c]
-        dup_index = -1
         # if any duplicate vertices are found in a Face3
         # we have to remove the face as nothing can be saved
         3.times do |n|
           if indices[n] == indices[(n + 1) % 3]
-            dup_index = n
             face_indices_to_remove << i
             break
           end

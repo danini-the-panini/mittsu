@@ -23,6 +23,10 @@ module Mittsu
 
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
+      @object = nil
+      @mesh = nil
+      @material = nil
+      @_listeners = {}
     end
 
     def load(url)

@@ -2,7 +2,6 @@ require 'opengl'
 require 'glfw'
 require 'fiddle'
 
-
 require 'mittsu/renderers/opengl/opengl_lib'
 opengl_lib = Mittsu::OpenGLLib.discover
 OpenGL.load_lib(ENV["MITTSU_LIBGL_FILE"] || opengl_lib.file, ENV["MITTSU_LIBGL_PATH"] || opengl_lib.path)
@@ -29,9 +28,11 @@ require 'mittsu/renderers/opengl/opengl_mittsu_params'
 
 module Mittsu
   class OpenGLRenderer
-    attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input, :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade, :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
+    attr_accessor :auto_clear, :auto_clear_color, :auto_clear_depth, :auto_clear_stencil, :sort_objects, :gamma_factor, :gamma_input,
+      :gamma_output, :shadow_map_enabled, :shadow_map_type, :shadow_map_cull_face, :shadow_map_debug, :shadow_map_cascade,
+      :max_morph_targets, :max_morph_normals, :info, :pixel_ratio, :window, :width, :height, :state
 
-    attr_reader :logarithmic_depth_buffer, :max_morph_targets, :max_morph_normals, :shadow_map_type, :shadow_map_debug, :shadow_map_cascade, :programs, :light_renderer, :proj_screen_matrix
+    attr_reader :logarithmic_depth_buffer, :programs, :light_renderer, :proj_screen_matrix
 
     def initialize(parameters = {})
       puts "OpenGLRenderer (Revision #{REVISION})"
@@ -80,11 +81,6 @@ module Mittsu
 
     # TODO: get_context ???
     # TODO: force_context_loss ???
-
-    def supports_vertex_textures?
-      @_supports_vertex_textures
-    end
-
     # TODO: supports_float_textures? ???
     # TODO: supports[half|standard|compressed|blend min max] ... ???
 

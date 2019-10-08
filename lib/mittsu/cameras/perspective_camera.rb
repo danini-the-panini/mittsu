@@ -13,6 +13,7 @@ module Mittsu
       @aspect = aspect.to_f
       @near = near.to_f
       @far = far.to_f
+      @full_width = nil
 
       update_projection_matrix
     end

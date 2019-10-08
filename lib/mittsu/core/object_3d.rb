@@ -22,6 +22,7 @@ module Mittsu
 
       @children = []
       @parent = nil
+      @name = nil
 
       @up = DefaultUp.clone
 
@@ -55,6 +56,7 @@ module Mittsu
       @render_order = 0
 
       @user_data = {}
+      @_listeners = {}
     end
 
     def name
