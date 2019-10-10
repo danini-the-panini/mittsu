@@ -6,7 +6,7 @@ module Mittsu
 
     def initialize(x = 0.0, y = 0.0, z = 0.0, w = 1.0)
       @x, @y, @z, @w = x, y, z, w
-      @on_change_callback = false
+      @on_change_callback = nil
     end
 
     def set(x, y, z, w)
