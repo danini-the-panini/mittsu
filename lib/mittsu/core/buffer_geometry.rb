@@ -1,5 +1,4 @@
 require 'securerandom'
-require 'mittsu'
 require 'mittsu/core/event_dispatcher'
 
 module Mittsu
@@ -21,6 +20,7 @@ module Mittsu
       @attributes = {}
 
       @draw_calls = []
+      @_listeners = {}
     end
 
     def keys

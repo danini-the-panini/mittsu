@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Ray
     attr_accessor :origin, :direction

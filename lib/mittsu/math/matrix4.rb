@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Matrix4
     attr_accessor :elements

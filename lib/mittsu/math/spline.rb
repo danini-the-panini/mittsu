@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Spline
     Point = Struct.new(:x, :y, :z)

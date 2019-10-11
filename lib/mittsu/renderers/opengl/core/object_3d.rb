@@ -1,6 +1,6 @@
 module Mittsu
   class Object3D
-    attr_accessor :morph_target_influences, :renderer
+    attr_accessor :morph_target_influences, :renderer, :initted
     attr_reader :model_view_matrix
     attr_writer :active
 

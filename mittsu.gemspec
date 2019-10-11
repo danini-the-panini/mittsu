@@ -23,15 +23,15 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.0.0'
   spec.requirements << 'OpenGL 3.3+ capable hardware and drivers'
 
-  spec.add_runtime_dependency 'opengl-bindings', "~> 1.5"
-  spec.add_runtime_dependency 'ffi', "~> 1.9"
-  spec.add_runtime_dependency 'chunky_png', "~> 1.3"
+  spec.add_runtime_dependency 'opengl-bindings'
+  spec.add_runtime_dependency 'ffi'
+  spec.add_runtime_dependency 'chunky_png'
 
-  spec.add_development_dependency "bundler", "~> 1.9"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency 'minitest', '~> 5.7'
-  spec.add_development_dependency 'minitest-reporters', '~> 1.1'
-  spec.add_development_dependency 'pry', '~> 0.10'
-  spec.add_development_dependency 'benchmark-ips', '~> 2.3'
-  spec.add_development_dependency 'simplecov', '~> 0.17'
+  spec.add_development_dependency "bundler"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency 'minitest'
+  spec.add_development_dependency 'minitest-reporters'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'benchmark-ips'
+  spec.add_development_dependency 'simplecov'
 end

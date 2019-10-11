@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Plane
     attr_accessor :normal, :constant

@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Sphere
     attr_accessor :center, :radius

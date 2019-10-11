@@ -1,10 +1,9 @@
 require 'erb'
-
 require 'mittsu/renderers/opengl/opengl_shader'
 
 module Mittsu
   class OpenGLProgram
-    attr_reader :id, :program, :uniforms, :attributes
+    attr_reader :id, :program, :uniforms
     attr_accessor :code, :used_times, :attributes, :vertex_shader, :fragment_shader
 
     def initialize(renderer, code, material, parameters)

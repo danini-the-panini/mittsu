@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Euler
     RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ]
@@ -9,6 +7,7 @@ module Mittsu
 
     def initialize(x = 0.0, y = 0.0, z = 0.0, order = DefaultOrder)
       @x, @y, @z, @order = x.to_f, y.to_f, z.to_f, order
+      @on_change_callback = nil
     end
 
     def set(x, y, z, order = nil)
