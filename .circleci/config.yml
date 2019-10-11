@@ -7,6 +7,12 @@ jobs:
     working_directory: ~/mittsu
     steps:
       - checkout
+
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
       
       - restore_cache:
           keys:
@@ -32,7 +38,10 @@ jobs:
       ## TEST
       - run:
           name: Run tests
-          command: bundle exec rake test
+          command: |
+            ./cc-test-reporter before-build
+            bundle exec rake test
+            ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
           environment:
             MITTSU_LIBGLFW_PATH: /usr/local/lib
             MITTSU_LIBGLFW_FILE: libglfw.dylib
@@ -42,51 +51,9 @@ jobs:
       - store_test_results:
           path: test/reports
 
-  test-linux:
-    docker:
-      - image: dansmith45/circleci-ruby-glfw:2.5.1
-        environment:
-          MITTSU_LIBGLFW_PATH: /usr/local/lib
-          MITTSU_LIBGLFW_FILE: libglfw.so
-          MINITEST_REPORTER: JUnitReporter
-    working_directory: ~/mittsu
-    steps:
-      - checkout
-
-      - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-      
-      - restore_cache:
-          keys:
-            - mittsu-linux-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
-            - mittsu-linux-bundler-v2-{{ .Branch }}-
-            - mittsu-linux-bundler-v2-
-      - run: bundle install --path vendor/bundle
-      - save_cache:
-          key: mittsu-linux-bundler-v2-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "mittsu.gemspec" }}
-          paths:
-            - vendor/bundle
-      
-      ## TEST
-      - run:
-          name: Run tests
-          command: |
-            ./cc-test-reporter before-build
-            bundle exec rake test
-            ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
-
-      ## COLLECT RESULTS
-      - store_test_results:
-          path: test/reports
-
-
 workflows:
   version: 2
 
   test:
     jobs:
       - test-macos
-      - test-linux
