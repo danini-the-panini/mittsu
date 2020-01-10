@@ -1,7 +1,6 @@
 name: 'Install GLFW'
 description: 'Install GLFW'
 author: 'jellymann'
-inputs: 
 runs:
   using: 'bash'
   main: 'install-glfw-3.1.2.sh'
