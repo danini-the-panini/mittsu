@@ -1,0 +1,74 @@
+name: Build
+on: [push]
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+          restore-keys: |
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
+            gems-v1-${{ runner.os }}-
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'
+      - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
+      - run: bash install-glfw-3.1.2.sh
+      - run: bundle install --path vendor/bundle
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v2.2.1
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: bundle exec rake test
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+          restore-keys: |
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
+            gems-v1-${{ runner.os }}-
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'
+      - run: brew install glfw
+      - run: bundle install --path vendor/bundle
+      - run: bundle exec rake test
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    env:
+      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+          restore-keys: |
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
+            gems-v1-${{ runner.os }}-
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'
+      - run: .\install_glfw.ps1
+      - run: bundle install --path vendor/bundle
+      - run: bundle exec rake test

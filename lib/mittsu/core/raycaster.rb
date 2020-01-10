@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class Raycaster
     attr_accessor :near, :far, :ray, :params, :precision

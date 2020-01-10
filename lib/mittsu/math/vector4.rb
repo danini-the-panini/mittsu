@@ -1,4 +1,3 @@
-require 'mittsu/math'
 require 'mittsu/math/vector'
 
 module Mittsu

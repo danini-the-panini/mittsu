@@ -1,5 +1,4 @@
 require 'securerandom'
-require 'mittsu'
 
 module Mittsu
   class Material
@@ -7,9 +6,13 @@ module Mittsu
 
     attr_reader :id, :uuid, :type
 
-    attr_accessor :name, :side, :opacity, :transparent, :blending, :blend_src, :blend_dst, :blend_equation, :blend_src_alpha, :blend_dst_alpha, :blend_equation_alpha, :depth_test, :depth_write, :color_write, :polygon_offset, :polygon_offset_factor, :polygon_offset_units, :alpha_test, :overdraw, :visible, :attributes, :shading, :program
+    attr_accessor :name, :side, :opacity, :transparent, :blending, :blend_src, :blend_dst, :blend_equation, :blend_src_alpha,
+      :blend_dst_alpha, :blend_equation_alpha, :depth_test, :depth_write, :color_write, :polygon_offset, :polygon_offset_factor,
+      :polygon_offset_units, :alpha_test, :overdraw, :visible, :attributes, :shading, :program
 
-    attr_accessor :map, :env_map, :light_map, :light_map, :normal_map, :specular_map, :alpha_map, :combine, :vertex_colors, :fog, :size_attenuation, :skinning, :morph_targets, :morph_normals, :metal, :wrap_around, :defines, :lights, :color, :bump_map, :reflectivity, :refraction_ratio, :wireframe, :default_attribute_values, :uniforms, :vertex_shader, :fragment_shader
+    attr_accessor :map, :env_map, :light_map, :normal_map, :specular_map, :alpha_map, :combine, :vertex_colors, :fog,
+      :size_attenuation, :skinning, :morph_targets, :morph_normals, :metal, :wrap_around, :defines, :lights, :color, :bump_map,
+      :reflectivity, :refraction_ratio, :wireframe, :default_attribute_values, :uniforms, :vertex_shader, :fragment_shader
 
     def initialize
       super

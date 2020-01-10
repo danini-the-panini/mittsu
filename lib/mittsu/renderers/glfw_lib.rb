@@ -24,18 +24,17 @@ module Mittsu
       end
     end
 
-    class Windows
-      def path; nil; end
-      def file; nil; end
+    class Windows < GenericLib::Base
     end
 
-    class MacOS
+    class MacOS < GenericLib::Base
       def path
         '/usr/local/lib'
       end
 
       def file
-        'libglfw3.dylib'
+        matches = Dir.glob('/usr/local/lib/libglfw*.dylib').map { |path| File.basename(path) }
+        return matches.find { |m| m == 'libglfw3.dylib' || m == 'libglfw.3.dylib' } || matches.first
       end
     end
   end

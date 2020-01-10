@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Frustum
     attr_accessor :planes

@@ -10,9 +10,10 @@ module Mittsu
     DEFAULT_IMAGE = nil
     DEFAULT_MAPPING = UVMapping
 
-    attr_reader :id, :uuid, :type
+    attr_reader :id, :uuid
 
-    attr_accessor :image, :name, :source_file, :mipmaps, :offset, :repeat, :generate_mipmaps, :premultiply_alpha, :filp_y, :unpack_alignment, :on_update, :mipmaps, :mapping, :wrap_s, :wrap_t, :mag_filter, :min_filter, :anisotropy, :format, :type
+    attr_accessor :image, :name, :source_file, :mipmaps, :offset, :repeat, :generate_mipmaps, :premultiply_alpha, :filp_y,
+      :unpack_alignment, :on_update, :mapping, :wrap_s, :wrap_t, :mag_filter, :min_filter, :anisotropy, :format, :type
 
     def initialize(image = DEFAULT_IMAGE, mapping = DEFAULT_MAPPING, wrap_s = ClampToEdgeWrapping, wrap_t = ClampToEdgeWrapping, mag_filter = LinearFilter, min_filter = LinearMipMapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1)
       super()
@@ -42,6 +43,7 @@ module Mittsu
 
       @_needs_update = false
       @on_update = nil
+      @_listeners = {}
     end
 
     def needs_update?

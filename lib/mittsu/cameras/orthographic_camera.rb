@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class OrthographicCamera < Camera
     attr_accessor :zoom, :left, :right, :top, :bottom, :near, :far
@@ -25,8 +23,8 @@ module Mittsu
     def update_projection_matrix
       dx = (right - left) / (2.0 * zoom)
       dy = (top - bottom) / (2.0 * zoom)
-      cx = (right - left) / 2.0
-      cy = (top - bottom) / 2.0
+      cx = (right + left) / 2.0
+      cy = (top + bottom) / 2.0
 
       projection_matrix.make_orthographic(cx - dx, cx + dx, cy + dy, cy - dy, near, far)
     end

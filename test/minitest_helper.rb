@@ -1,13 +1,11 @@
+ENV["MITTSU_ENV"] = 'test'
+
 require 'pry'
 
-require 'codeclimate-test-reporter'
 require 'simplecov'
-require 'coveralls'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  Coveralls::SimpleCov::Formatter,
-  SimpleCov::Formatter::HTMLFormatter,
-  CodeClimate::TestReporter::Formatter
+  SimpleCov::Formatter::HTMLFormatter
 ]
 SimpleCov.start do
   add_filter "/test/"

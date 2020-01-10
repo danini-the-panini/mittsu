@@ -1,11 +1,4 @@
-module Mittsu
-  DEBUG = ENV["DEBUG"] == "true"
-
-  def self.debug?
-    DEBUG
-  end
-end
-
+require "mittsu/utils"
 require "mittsu/version"
 require "mittsu/math"
 require "mittsu/core"

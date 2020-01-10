@@ -1,5 +1,4 @@
 require 'securerandom'
-require 'mittsu'
 
 module Mittsu
   class Geometry
@@ -18,6 +17,8 @@ module Mittsu
       super
 
       @id = (@@id ||= 1).tap { @@id += 1 }
+
+      @uuid = SecureRandom.uuid
 
       @name = ''
       @type = 'Geometry'
@@ -49,6 +50,8 @@ module Mittsu
       @colors_need_update = false
       @line_distances_need_update = false
       @groups_need_update = false
+
+      @_listeners = {}
     end
 
     def apply_matrix(matrix)
@@ -105,7 +108,7 @@ module Mittsu
       }
       if indices
         draw_calls = geometry.draw_calls
-        if !draw_calls.length.empty?
+        if !draw_calls.empty?
           draw_calls.each do |draw_call|
             start = draw_call.start
             count = draw_call.count
@@ -119,7 +122,7 @@ module Mittsu
           end
         else
           indices.each_slice(3).with_index do |index|
-            add_face(*index)
+            add_face[*index]
           end
         end
       else
@@ -130,10 +133,10 @@ module Mittsu
         end
       end
       self.compute_face_normals
-      if geometry.boundingBox
+      if geometry.bounding_box
         @bounding_box = geometry.bounding_box.clone
       end
-      if geometry.boundingSphere
+      if geometry.bounding_sphere
         @bounding_sphere = geometry.bounding_sphere.clone
       end
       self
@@ -160,12 +163,12 @@ module Mittsu
       end
     end
 
-    def compute_vertex_normals(area_weigted)
+    def compute_vertex_normals(area_weighted = false)
       vertices = Array.new(@vertices.length)
       @vertices.length.times do |v|
         vertices[v] = Mittsu::Vector3.new
       end
-      if area_weigted
+      if area_weighted
         # vertex normals weighted by triangle areas
         # http:#www.iquilezles.org/www/articles/normals/normals.htm
         cb = Mittsu::Vector3.new, ab = Mittsu::Vector3.new
@@ -426,19 +429,16 @@ module Mittsu
         face.b = changes[face.b]
         face.c = changes[face.c]
         indices = [face.a, face.b, face.c]
-        dup_index = -1
         # if any duplicate vertices are found in a Face3
         # we have to remove the face as nothing can be saved
         3.times do |n|
           if indices[n] == indices[(n + 1) % 3]
-            dup_index = n
             face_indices_to_remove << i
             break
           end
         end
       end
       face_indices_to_remove.reverse_each do |idx|
-        idx = face_indices_to_remove[i]
         @faces.delete_at idx
         @face_vertex_uvs.each do |uv|
           uv.delete_at idx

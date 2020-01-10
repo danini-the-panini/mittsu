@@ -4,7 +4,7 @@ module Mittsu
   class OpenGLGeometryGroup
     include OpenGLGeometryLike
 
-    attr_reader :id
+    attr_reader :id, :material_index
 
     alias :initted_arrays? :initted_arrays
 
@@ -20,6 +20,7 @@ module Mittsu
       @num_morph_normals = num_morph_normals
 
       @renderer = renderer
+      @custom_attributes_list = []
     end
 
     def create_mesh_buffers

@@ -1,6 +1,9 @@
 # Mittsu
 
-[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu) [![Dependency Status](https://gemnasium.com/jellymann/mittsu.svg)](https://gemnasium.com/jellymann/mittsu) [![Circle CI](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master) [![Build status](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master) [![Test Coverage](https://codeclimate.com/github/jellymann/mittsu/badges/coverage.svg)](https://codeclimate.com/github/jellymann/mittsu/coverage) [![Code Climate](https://codeclimate.com/github/jellymann/mittsu/badges/gpa.svg)](https://codeclimate.com/github/jellymann/mittsu)
+[![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/jellymann/mittsu/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/jellymann/mittsu/maintainability)
+[![Build Status](https://github.com/jellymann/mittsu/workflows/Build/badge.svg)](https://github.com/jellymann/mittsu/actions?query=workflow%3A%22Build%22)
 
 3D Graphics Library for Ruby
 
@@ -11,6 +14,8 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 ![Normal-mapped Earth](https://cloud.githubusercontent.com/assets/1171825/18411863/45328540-7781-11e6-986b-6e3f2551c719.gif)
 ![Point Light](https://cloud.githubusercontent.com/assets/1171825/18411861/4531bb4c-7781-11e6-92b4-b6ebda60e2c9.gif)
 ![Tank Demo](https://cloud.githubusercontent.com/assets/1171825/18411862/4531fe9a-7781-11e6-9665-b172df1a3645.gif)
+
+(You can find the source for the Tank Demo [here](https://github.com/jellymann/mittsu-tank-demo))
 
 ## Installation
 

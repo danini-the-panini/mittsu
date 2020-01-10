@@ -26,12 +26,12 @@ module Mittsu
 
     def dispatch_event(event = {})
       return if @_listeners.nil?
-      listener_array = @_listeners[event.type]
+      listener_array = @_listeners[event[:type]]
       if listener_array
         evt = Event.new(event[:type], self)
         array = listener_array.dup
         array.each do |l|
-          l.call(self, evt)
+          l.call(evt)
         end
       end
     end

@@ -1,6 +1,6 @@
 module Mittsu
   class Vector
-    attr_accessor :elements
+    attr_accessor :elements, :uv, :index
 
     def initialize(elements)
       @elements = elements
