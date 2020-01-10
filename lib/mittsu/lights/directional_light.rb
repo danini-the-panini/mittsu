@@ -120,12 +120,16 @@ module Mittsu
       light.shadow_cascade_offset.copy(@shadow_cascade_offset)
       light.shadow_cascade_count = @shadow_cascade_count
 
-    	light.shadow_cascade_bias = @shadow_cascade_bias.dup
-    	light.shadow_cascade_width = @shadow_cascade_width.dup
-    	light.shadow_cascade_height = @shadow_cascade_height.dup
+      light.shadow_cascade_bias = @shadow_cascade_bias.dup
+      light.shadow_cascade_width = @shadow_cascade_width.dup
+      light.shadow_cascade_height = @shadow_cascade_height.dup
 
-    	light.shadow_cascade_near_z = @shadow_cascade_near_z.dup
-    	light.shadow_cascade_far_z  = @shadow_cascade_far_z.dup
+      light.shadow_cascade_near_z = @shadow_cascade_near_z.dup
+      light.shadow_cascade_far_z  = @shadow_cascade_far_z.dup
+    end
+
+    def virtual?
+      false
     end
 
     protected
