@@ -1,0 +1,15 @@
+name: Build on macOS
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'
+      - run: brew install glfw
+      - run: bundle install --path vendor/bundle
+      - run: bundle exec rake test
