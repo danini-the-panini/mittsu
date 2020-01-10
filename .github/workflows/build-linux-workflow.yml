@@ -5,7 +5,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    step:
+    steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-ruby@v1
         with:
