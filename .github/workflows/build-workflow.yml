@@ -7,6 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with: &cachegems
+          path: vendor/bundle
+          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+          restore-keys: |
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
+            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
+            gems-v1-${{ runner.os }}-
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'
@@ -25,6 +34,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with: *cachegems
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'
@@ -39,6 +51,9 @@ jobs:
       MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
     steps:
       - uses: actions/checkout@v1
+      - name: Cache gems
+        uses: actions/cache@v1
+        with: *cachegems
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'
