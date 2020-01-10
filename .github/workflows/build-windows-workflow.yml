@@ -12,6 +12,6 @@ jobs:
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'
-      - run: powershell install_glfw.ps1
+      - run: .\install_glfw.ps1
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
