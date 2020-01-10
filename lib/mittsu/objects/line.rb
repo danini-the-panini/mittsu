@@ -54,7 +54,6 @@ module Mittsu
           offsets.each_with_index do |offset, oi|
             start = offset[:start]
             count = offset[:count]
-            index = offset[:index]
 
             (start...(count-1)).step(step).each do |i|
               v_start.from_array(positions, a * 3)

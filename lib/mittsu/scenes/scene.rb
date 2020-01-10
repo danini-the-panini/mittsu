@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class Scene < Object3D
 

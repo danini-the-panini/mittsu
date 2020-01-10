@@ -1,0 +1,17 @@
+name: Build on Windows
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    env:
+      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.x'
+      - run: .\install_glfw.ps1
+      - run: bundle install --path vendor/bundle
+      - run: bundle exec rake test

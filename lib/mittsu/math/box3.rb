@@ -1,5 +1,3 @@
-require 'mittsu/math'
-
 module Mittsu
   class Box3
     attr_accessor :min, :max

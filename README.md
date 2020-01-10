@@ -4,8 +4,9 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/jellymann/mittsu/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/jellymann/mittsu/maintainability)
 
-🍎/🐧 [![Circle CI Build Status (macOS and Linux)](https://circleci.com/gh/jellymann/mittsu/tree/master.svg?style=shield)](https://circleci.com/gh/jellymann/mittsu/tree/master)
-&nbsp; 🖼 [![AppVeyor Build status (Windows)](https://ci.appveyor.com/api/projects/status/x7k8r95m5f5fg9cu/branch/master?svg=true)](https://ci.appveyor.com/project/jellymann/mittsu/branch/master)
+![](https://github.com/jellymann/mittsu/workflows/Build%20on%20Linux/badge.svg)
+![](https://github.com/jellymann/mittsu/workflows/Build%20on%20macOS/badge.svg)
+![](https://github.com/jellymann/mittsu/workflows/Build%20on%20Windows/badge.svg)
 
 3D Graphics Library for Ruby
 

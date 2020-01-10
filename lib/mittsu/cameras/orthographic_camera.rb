@@ -1,5 +1,3 @@
-require 'mittsu'
-
 module Mittsu
   class OrthographicCamera < Camera
     attr_accessor :zoom, :left, :right, :top, :bottom, :near, :far
