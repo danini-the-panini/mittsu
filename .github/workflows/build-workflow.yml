@@ -54,7 +54,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     env:
-      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
+      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw\glfw3.dll
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
