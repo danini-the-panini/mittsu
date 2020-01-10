@@ -20,7 +20,7 @@ jobs:
         with:
           ruby-version: '2.x'
       - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
-      - run: bash install-glfw-3.1.2.sh
+      - run: bash install-glfw.sh
       - run: bundle install --path vendor/bundle
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.2.1
@@ -54,7 +54,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     env:
-      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.2.1.bin.WIN32\lib-mingw\glfw3.dll
+      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw\glfw3.dll
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -69,6 +69,6 @@ jobs:
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.x'
-      - run: .\install_glfw.ps1
+      - run: .\install-glfw.ps1
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
