@@ -3,10 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/jellymann/mittsu/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/jellymann/mittsu/maintainability)
-
-![](https://github.com/jellymann/mittsu/workflows/Build%20on%20Linux/badge.svg)
-![](https://github.com/jellymann/mittsu/workflows/Build%20on%20macOS/badge.svg)
-![](https://github.com/jellymann/mittsu/workflows/Build%20on%20Windows/badge.svg)
+[![Build Status](https://github.com/jellymann/mittsu/workflows/Build/badge.svg)](https://github.com/jellymann/mittsu/actions?query=workflow%3A%22Build%22)
 
 3D Graphics Library for Ruby
 
