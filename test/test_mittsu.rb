@@ -1,12 +1,3 @@
-module RefineObject
-  refine Object do
-    def clone
-      super
-      # do some other things....
-    end
-  end
-end
-
 require 'minitest_helper'
 
 class TestMittsu < Minitest::Test

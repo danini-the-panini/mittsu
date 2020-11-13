@@ -23,7 +23,7 @@ module Mittsu
   module Math
     extend BuiltInMath
     include BuiltInMath
-    BuiltInMath.methods.each { |m| public_class_method m }
+    BuiltInMath.instance_methods.each { |m| public_class_method m }
 
     def self.sign(x)
       return Float::NAN unless x.is_a? Numeric
