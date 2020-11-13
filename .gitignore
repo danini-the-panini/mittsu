@@ -9,3 +9,4 @@
 /tmp/
 /test/reports
 *.gem
+.tool-versions
