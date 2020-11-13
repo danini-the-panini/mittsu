@@ -1,7 +1,8 @@
 module RefineObject
   refine Object do
-    def to_s
+    def clone
       super
+      # do some other things....
     end
   end
 end
