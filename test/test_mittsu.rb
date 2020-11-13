@@ -1,3 +1,11 @@
+module RefineObject
+  refine Object do
+    def to_s
+      super
+    end
+  end
+end
+
 require 'minitest_helper'
 
 class TestMittsu < Minitest::Test
