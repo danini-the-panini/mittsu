@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class SphereGeometry < Geometry
-    def initialize(radius = 50.0, width_segments = 8, height_segments = 6, phi_start = 0.0, phi_length = (Math::PI * 2.0), theta_start = 0.0, theta_length = Math::PI)
+    def initialize(radius = 50.0, width_segments = 8, height_segments = 6, phi_start = 0.0, phi_length = (::Math::PI * 2.0), theta_start = 0.0, theta_length = ::Math::PI)
       super()
 
       @type = 'SphereGeometry'
@@ -33,9 +33,9 @@ module Mittsu
           v = y / height_segments.to_f
 
           vertex = Vector3.new
-          vertex.x = -radius * Math.cos(phi_start + u * phi_length) * Math.sin(theta_start + v * theta_length)
-          vertex.y = radius * Math.cos(theta_start + v * theta_length)
-          vertex.z = radius * Math.sin(phi_start + u * phi_length) * Math.sin(theta_start + v * theta_length)
+          vertex.x = -radius * ::Math.cos(phi_start + u * phi_length) * ::Math.sin(theta_start + v * theta_length)
+          vertex.y = radius * ::Math.cos(theta_start + v * theta_length)
+          vertex.z = radius * ::Math.sin(phi_start + u * phi_length) * ::Math.sin(theta_start + v * theta_length)
 
           @vertices << vertex
 

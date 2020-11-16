@@ -5,7 +5,7 @@ require 'mittsu/extras/geometries/polyhedron_geometry'
 module Mittsu
   class DodecahedronGeometry < PolyhedronGeometry
     def initialize(radius = 1.0, detail = 0)
-      t = (1.0 + Math.sqrt(5.0)) / 2.0
+      t = (1.0 + ::Math.sqrt(5.0)) / 2.0
       r = 1.0 / t
 
       vertices = [

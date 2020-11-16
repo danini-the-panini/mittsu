@@ -21,9 +21,9 @@ class TestLineSanityCheck < Minitest::Test
     nr = 200
     np.times do |i|
     	d = (i.to_f / np) * md
-    	r = (i.to_f / np) * Math::PI * nr
-    	x = Math.sin(r) * d
-    	y = Math.cos(r) * d
+    	r = (i.to_f / np) * ::Math::PI * nr
+    	x = ::Math.sin(r) * d
+    	y = ::Math.cos(r) * d
     	geometry.vertices.push(Mittsu::Vector3.new(x, y, 0.0))
     end
 

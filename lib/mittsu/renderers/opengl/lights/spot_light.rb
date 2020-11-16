@@ -35,7 +35,7 @@ module Mittsu
       directions[offset + 1] = @_direction.y
       directions[offset + 2] = @_direction.z
 
-      @cache.angles_cos[index] = Math.cos(angle)
+      @cache.angles_cos[index] = ::Math.cos(angle)
       @cache.exponents[index] = exponent;
       @cache.decays[index] = distance.zero? ? 0.0 : decay
     end

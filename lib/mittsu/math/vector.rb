@@ -160,7 +160,7 @@ module Mittsu
     end
 
     def length
-      Math.sqrt(length_sq)
+      ::Math.sqrt(length_sq)
     end
 
     def normalize
@@ -211,11 +211,11 @@ module Mittsu
       theta = self.dot(v) / (self.length * v.length)
 
       # clamp, to handle numerical problems
-      Math.acos(Math.clamp(theta, -1.0, 1.0))
+      ::Math.acos(Math.clamp(theta, -1.0, 1.0))
     end
 
     def distance_to(v)
-      Math.sqrt(self.distance_to_squared(v))
+      ::Math.sqrt(self.distance_to_squared(v))
     end
 
     def ==(v)

@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class RingGeometry < Geometry
-    def initialize(inner_radius = 0.0, outer_radius = 50.0, theta_segments = 8, phi_segments = 8, theta_start = 0.0, theta_length = (Math::PI * 2.0))
+    def initialize(inner_radius = 0.0, outer_radius = 50.0, theta_segments = 8, phi_segments = 8, theta_start = 0.0, theta_length = (::Math::PI * 2.0))
       super()
 
       @type = 'RingGeometry'
@@ -28,8 +28,8 @@ module Mittsu
         for o in 0..theta_segments do # number of segments per circle
           vertex = Vector3.new
           segment = theta_start + o.to_f / theta_segments.to_f * theta_length
-          vertex.x = radius * Math.cos(segment)
-          vertex.y = radius * Math.sin(segment)
+          vertex.x = radius * ::Math.cos(segment)
+          vertex.y = radius * ::Math.sin(segment)
 
           @vertices << vertex
           uvs << Vector2.new((vertex.x / outer_radius + 1.0) / 2.0, (vertex.y / outer_radius + 1.0) / 2.0)

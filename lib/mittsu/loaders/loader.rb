@@ -151,8 +151,8 @@ module Mittsu
     private
 
     def nearest_pow2(n)
-      l = Math.log(n) / Math::LN2
-      Math.pow(2, Math.round(l))
+      l = ::Math.log(n) / Math::LN2
+      ::Math.pow(2, ::Math.round(l))
     end
 
     def create_texture(where, name, source_file, repeat, offset, wrap, anisotropy)

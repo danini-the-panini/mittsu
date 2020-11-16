@@ -22,15 +22,15 @@ class TestShadowSanityCheck < Minitest::Test
     balls = nb.times.map do |index|
       nr.times.map do |r|
         ring = (3 + r)
-        i = r * 0.1 + (index.to_f / nb.to_f) * Math::PI * 2
+        i = r * 0.1 + (index.to_f / nb.to_f) * ::Math::PI * 2
         Mittsu::Mesh.new(
           Mittsu::SphereGeometry.new(0.5, 16, 16),
           Mittsu::MeshLambertMaterial.new(color: r.even? ? 0x00ffff : 0xff00ff)
         ).tap do |b|
           b.cast_shadow = true
           b.receive_shadow = true
-          b.position.z = Math.cos(i) * ring
-          b.position.x = Math.sin(i) * ring
+          b.position.z = ::Math.cos(i) * ring
+          b.position.x = ::Math.sin(i) * ring
           scene.add(b)
         end
       end
@@ -73,11 +73,11 @@ class TestShadowSanityCheck < Minitest::Test
     x = 0
     renderer.window.run do
       x += 1
-      light.position.x = Math::sin(x * 0.01) * 20.0
-      light.position.z = Math::cos(x * 0.01) * 20.0
+      light.position.x = ::Math.sin(x * 0.01) * 20.0
+      light.position.z = ::Math.cos(x * 0.01) * 20.0
 
       balls.each_with_index do |b, i|
-        b.position.y = (1.0 + Math::sin(x * 0.05 + i)) * 2.0
+        b.position.y = (1.0 + ::Math.sin(x * 0.05 + i)) * 2.0
       end
 
       renderer.render(scene, camera)

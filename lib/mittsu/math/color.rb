@@ -120,9 +120,9 @@ module Mittsu
     end
 
     def convert_linear_to_gamma
-      self.r = Math.sqrt(self.r)
-      self.g = Math.sqrt(self.g)
-      self.b = Math.sqrt(self.b)
+      self.r = ::Math.sqrt(self.r)
+      self.g = ::Math.sqrt(self.g)
+      self.b = ::Math.sqrt(self.b)
       self
     end
 

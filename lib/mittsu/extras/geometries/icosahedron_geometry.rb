@@ -5,7 +5,7 @@ require 'mittsu/extras/geometries/polyhedron_geometry'
 module Mittsu
   class IcosahedronGeometry < PolyhedronGeometry
     def initialize(radius = 1.0, detail = 0)
-      t = (1.0 + Math.sqrt(5)) / 2.0
+      t = (1.0 + ::Math.sqrt(5)) / 2.0
 
       vertices = [
         - 1,  t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,

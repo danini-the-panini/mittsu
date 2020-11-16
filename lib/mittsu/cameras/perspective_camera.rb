@@ -22,7 +22,7 @@ module Mittsu
     # 35mm (fullframe) camera is used if frame size is not specified;
     # Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
     def set_lens(focal_length, frame_height = 24.0)
-      @fov = 2.0 * Math.rad_to_deg(Math.atan(frame_height / (focal_length * 2.0)))
+      @fov = 2.0 * Math.rad_to_deg(::Math.atan(frame_height / (focal_length * 2.0)))
       update_projection_matrix
     end
 
@@ -72,11 +72,11 @@ module Mittsu
     end
 
     def update_projection_matrix
-      new_fov = Math.rad_to_deg(2.0 * Math.atan(Math.tan(Math.deg_to_rad(@fov) * 0.5) / @zoom))
+      new_fov = Math.rad_to_deg(2.0 * ::Math.atan(::Math.tan(Math.deg_to_rad(@fov) * 0.5) / @zoom))
 
       if @full_width
         aspect = @full_width / @full_height
-        top = Math.tan(Math.deg_to_rad(new_fov * 0.5)) * @near
+        top = ::Math.tan(Math.deg_to_rad(new_fov * 0.5)) * @near
         bottom = -top
         left = aspect * bottom
         right = aspect * top

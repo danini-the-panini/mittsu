@@ -49,8 +49,8 @@ module Mittsu
     def set_axis_angle_from_quaternion(q)
       # http:#www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
       # q is assumed to be normalized
-      @elements[3] = 2.0 * Math.acos(q.w)
-      s = Math.sqrt(1.0 - q.w * q.w)
+      @elements[3] = 2.0 * ::Math.acos(q.w)
+      s = ::Math.sqrt(1.0 - q.w * q.w)
       if s < 0.0001
          @elements[0] = 1.0
          @elements[1] = 0.0
@@ -88,7 +88,7 @@ module Mittsu
           return self # zero angle, arbitrary axis
         end
         # otherwise self singularity is angle = 180
-        angle = Math::PI
+        angle = ::Math::PI
         xx = (m11 + 1.0) / 2.0
         yy = (m22 + 1.0) / 2.0
         zz = (m33 + 1.0) / 2.0
@@ -101,7 +101,7 @@ module Mittsu
             y1 = 0.707106781
             z1 = 0.707106781
           else
-            x1 = Math.sqrt(xx)
+            x1 = ::Math.sqrt(xx)
             y1 = xy / x1
             z1 = xz / x1
           end
@@ -111,7 +111,7 @@ module Mittsu
             y1 = 0.0
             z1 = 0.707106781
           else
-            y1 = Math.sqrt(yy)
+            y1 = ::Math.sqrt(yy)
             x1 = xy / y1
             z1 = yz / y1
           end
@@ -121,7 +121,7 @@ module Mittsu
             y1 = 0.707106781
             z1 = 0.0
           else
-            z1 = Math.sqrt(zz)
+            z1 = ::Math.sqrt(zz)
             x1 = xz / z1
             y1 = yz / z1
           end
@@ -130,7 +130,7 @@ module Mittsu
         return self # return 180 deg rotation
       end
       # as we have reached here there are no singularities so we can handle normally
-      s = Math.sqrt((m32 - m23) * (m32 - m23) +
+      s = ::Math.sqrt((m32 - m23) * (m32 - m23) +
         (m13 - m31) * (m13 - m31) +
         (m21 - m12) * (m21 - m12)) # used to normalize
       s = 1.0 if (s.abs < 0.001)
@@ -139,7 +139,7 @@ module Mittsu
       @elements[0] = (m32 - m23) / s
       @elements[1] = (m13 - m31) / s
       @elements[2] = (m21 - m12) / s
-      @elements[3] = Math.acos((m11 + m22 + m33 - 1.0) / 2.0)
+      @elements[3] = ::Math.acos((m11 + m22 + m33 - 1.0) / 2.0)
       self
     end
 

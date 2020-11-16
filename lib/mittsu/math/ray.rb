@@ -138,7 +138,7 @@ module Mittsu
       d2 = v1.dot(v1) - tca * tca
       radius2 = sphere.radius * sphere.radius
       return nil if d2 > radius2
-      thc = Math.sqrt(radius2 - d2)
+      thc = ::Math.sqrt(radius2 - d2)
       # t0 = first intersect point - entrance on front of sphere
       t0 = tca - thc
       # t1 = second intersect point - exit point on back of sphere

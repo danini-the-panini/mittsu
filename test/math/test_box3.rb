@@ -188,14 +188,14 @@ class TestBox3 < Minitest::Test
     b = Mittsu::Box3.new(one3.clone.negate, one3.clone)
 
     assert_equal(0, a.distance_to_point(Mittsu::Vector3.new(0, 0, 0)))
-    assert_equal(Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
-    assert_equal(Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
+    assert_equal(::Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
+    assert_equal(::Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
 
-    assert_equal(Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(2, 2, 2)))
+    assert_equal(::Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(2, 2, 2)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(0, 0, 0)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
-    assert_equal(Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(-2, -2, -2)))
+    assert_equal(::Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(-2, -2, -2)))
   end
 
   def test_distance_to_point
@@ -203,14 +203,14 @@ class TestBox3 < Minitest::Test
     b = Mittsu::Box3.new(one3.clone.negate, one3.clone)
 
     assert_equal(0, a.distance_to_point(Mittsu::Vector3.new(0, 0, 0)))
-    assert_equal(Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
-    assert_equal(Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
+    assert_equal(::Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
+    assert_equal(::Math.sqrt(3), a.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
 
-    assert_equal(Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(2, 2, 2)))
+    assert_equal(::Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(2, 2, 2)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(1, 1, 1)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(0, 0, 0)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector3.new(-1, -1, -1)))
-    assert_equal(Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(-2, -2, -2)))
+    assert_equal(::Math.sqrt(3), b.distance_to_point(Mittsu::Vector3.new(-2, -2, -2)))
   end
 
   def test_is_intersection_box
@@ -238,8 +238,8 @@ class TestBox3 < Minitest::Test
     c = Mittsu::Box3.new(one3.clone.negate, one3.clone)
 
     assert_equal(Mittsu::Sphere.new(zero3, 0), a.bounding_sphere)
-    assert_equal(Mittsu::Sphere.new(one3.clone.multiply_scalar(0.5), Math.sqrt(3) * 0.5), b.bounding_sphere)
-    assert_equal(Mittsu::Sphere.new(zero3, Math.sqrt(12) * 0.5), c.bounding_sphere)
+    assert_equal(Mittsu::Sphere.new(one3.clone.multiply_scalar(0.5), ::Math.sqrt(3) * 0.5), b.bounding_sphere)
+    assert_equal(Mittsu::Sphere.new(zero3, ::Math.sqrt(12) * 0.5), c.bounding_sphere)
   end
 
   def test_intersect

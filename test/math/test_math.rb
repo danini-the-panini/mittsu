@@ -157,14 +157,14 @@ class TestMath < Minitest::Test
 
   def test_deg_to_rad
     inputs = (-360..720).step(30).to_a
-    outputs = (-Math::PI*2..Math::PI*4).step(Math::PI/6).to_a
+    outputs = (-::Math::PI*2..::Math::PI*4).step(::Math::PI/6).to_a
     inputs.zip(outputs).each do |(input, expected)|
       assert_in_delta expected, Mittsu::Math.deg_to_rad(input), DELTA
     end
   end
 
   def test_rad_to_deg
-    inputs = (-Math::PI*2..Math::PI*4).step(Math::PI/6).to_a
+    inputs = (-::Math::PI*2..::Math::PI*4).step(::Math::PI/6).to_a
     outputs = (-360..720).step(30).to_a
     inputs.zip(outputs).each do |(input, expected)|
       assert_in_delta expected, Mittsu::Math.rad_to_deg(input), DELTA

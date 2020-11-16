@@ -49,8 +49,8 @@ class TestSkyboxSanityCheck < Minitest::Test
 
     x = 0
     renderer.window.run do
-      camera.position.x = 5.0 * Math.sin(x * 0.01)
-      camera.position.z = 5.0 * Math.cos(x * 0.01)
+      camera.position.x = 5.0 * ::Math.sin(x * 0.01)
+      camera.position.z = 5.0 * ::Math.cos(x * 0.01)
       camera.look_at(Mittsu::Vector3.new(0.0, 0.0, 0.0))
       skybox_camera.rotation.copy(camera.rotation)
 
