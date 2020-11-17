@@ -180,7 +180,7 @@ class TestPlane < Minitest::Test
     a = Mittsu::Plane.new(Mittsu::Vector3.new(1, 0, 0), 0)
 
     m = Mittsu::Matrix4.new
-    m.make_rotation_z(Math::PI * 0.5)
+    m.make_rotation_z(::Math::PI * 0.5)
 
     assert(compare_plane(a.clone.apply_matrix4(m), Mittsu::Plane.new(Mittsu::Vector3.new(0, 1, 0), 0)))
 

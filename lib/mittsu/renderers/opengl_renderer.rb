@@ -1001,7 +1001,7 @@ module Mittsu
       glUniformMatrix4fv(uniforms['projectionMatrix'], 1, GL_FALSE, array_to_ptr_easy(camera.projection_matrix.elements))
 
       if @logarithmic_depth_buffer
-        glUniform1f(uniforms['logDepthBuffFC'], 2.0 / Math.log(camera.far + 1.0) / Math::LN2)
+        glUniform1f(uniforms['logDepthBuffFC'], 2.0 / ::Math.log(camera.far + 1.0) / Math::LN2)
       end
 
       if material.needs_camera_position_uniform? && !uniforms['cameraPosition'].nil?

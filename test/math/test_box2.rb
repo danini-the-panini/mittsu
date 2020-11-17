@@ -177,14 +177,14 @@ class TestBox2 < Minitest::Test
     b = Mittsu::Box2.new(one2.clone.negate, one2.clone)
 
     assert_equal(0, a.distance_to_point(Mittsu::Vector2.new(0, 0)))
-    assert_equal(Math.sqrt(2), a.distance_to_point(Mittsu::Vector2.new(1, 1)))
-    assert_equal(Math.sqrt(2), a.distance_to_point(Mittsu::Vector2.new(-1, -1)))
+    assert_equal(::Math.sqrt(2), a.distance_to_point(Mittsu::Vector2.new(1, 1)))
+    assert_equal(::Math.sqrt(2), a.distance_to_point(Mittsu::Vector2.new(-1, -1)))
 
-    assert_equal(Math.sqrt(2), b.distance_to_point(Mittsu::Vector2.new(2, 2)))
+    assert_equal(::Math.sqrt(2), b.distance_to_point(Mittsu::Vector2.new(2, 2)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector2.new(1, 1)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector2.new(0, 0)))
     assert_equal(0, b.distance_to_point(Mittsu::Vector2.new(-1, -1)))
-    assert_equal(Math.sqrt(2), b.distance_to_point(Mittsu::Vector2.new(-2, -2)))
+    assert_equal(::Math.sqrt(2), b.distance_to_point(Mittsu::Vector2.new(-2, -2)))
   end
 
   def test_is_intersection_box

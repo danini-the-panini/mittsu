@@ -78,8 +78,8 @@ module Mittsu
       vertex.index = @vertices.push(vertex).length - 1
 
       # Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
-      u = azimuth(vector) / 2.0 / Math::PI + 0.5
-      v = inclination(vector) / Math::PI + 0.5
+      u = azimuth(vector) / 2.0 / ::Math::PI + 0.5
+      v = inclination(vector) / ::Math::PI + 0.5
       vertex.uv = Vector2.new(u, 1.0 - v)
 
       vertex
@@ -150,18 +150,18 @@ module Mittsu
 
     # Angle around the Y axis, counter-clockwise when looking from above.
     def azimuth(vector)
-      Math.atan2(vector.z, -vector.x)
+      ::Math.atan2(vector.z, -vector.x)
     end
 
     # Angle above the XZ plane.
     def inclination(vector)
-      Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z))
+      ::Math.atan2(-vector.y, ::Math.sqrt(vector.x * vector.x + vector.z * vector.z))
     end
 
     # Texture fixing helper. Spheres have some odd behaviours.
     def correct_uv(uv, vector, azimuth)
       return Vector2.new(uv.x - 1.0, uv.y) if azimuth < 0
-      return Vector2.new(azimuth / 2.0 / Math::PI + 0.5, uv.y) if vector.x.zero? && vector.z.zero?
+      return Vector2.new(azimuth / 2.0 / ::Math::PI + 0.5, uv.y) if vector.x.zero? && vector.z.zero?
       uv.clone
     end
   end

@@ -56,57 +56,57 @@ module Mittsu
       m31 = te[2]; m32 = te[6]; m33 = te[10]
       order = order || @order
       if order == 'XYZ'
-        @y = Math.asin(Math.clamp(m13, -1.0, 1.0))
+        @y = ::Math.asin(Math.clamp(m13, -1.0, 1.0))
         if m13.abs < 0.99999
-          @x = Math.atan2(- m23, m33)
-          @z = Math.atan2(- m12, m11)
+          @x = ::Math.atan2(- m23, m33)
+          @z = ::Math.atan2(- m12, m11)
         else
-          @x = Math.atan2(m32, m22)
+          @x = ::Math.atan2(m32, m22)
           @z = 0.0
         end
       elsif order == 'YXZ'
-        @x = Math.asin(- Math.clamp(m23, -1.0, 1.0))
+        @x = ::Math.asin(- Math.clamp(m23, -1.0, 1.0))
         if m23.abs < 0.99999
-          @y = Math.atan2(m13, m33)
-          @z = Math.atan2(m21, m22)
+          @y = ::Math.atan2(m13, m33)
+          @z = ::Math.atan2(m21, m22)
         else
-          @y = Math.atan2(- m31, m11)
+          @y = ::Math.atan2(- m31, m11)
           @z = 0.0
         end
       elsif order == 'ZXY'
-        @x = Math.asin(Math.clamp(m32, -1.0, 1.0))
+        @x = ::Math.asin(Math.clamp(m32, -1.0, 1.0))
         if m32.abs < 0.99999
-          @y = Math.atan2(- m31, m33)
-          @z = Math.atan2(- m12, m22)
+          @y = ::Math.atan2(- m31, m33)
+          @z = ::Math.atan2(- m12, m22)
         else
           @y = 0.0
-          @z = Math.atan2(m21, m11)
+          @z = ::Math.atan2(m21, m11)
         end
       elsif order == 'ZYX'
-        @y = Math.asin(- Math.clamp(m31, -1.0, 1.0))
+        @y = ::Math.asin(- Math.clamp(m31, -1.0, 1.0))
         if m31.abs < 0.99999
-          @x = Math.atan2(m32, m33)
-          @z = Math.atan2(m21, m11)
+          @x = ::Math.atan2(m32, m33)
+          @z = ::Math.atan2(m21, m11)
         else
           @x = 0.0
-          @z = Math.atan2(- m12, m22)
+          @z = ::Math.atan2(- m12, m22)
         end
       elsif order == 'YZX'
-        @z = Math.asin(Math.clamp(m21, -1.0, 1.0))
+        @z = ::Math.asin(Math.clamp(m21, -1.0, 1.0))
         if m21.abs < 0.99999
-          @x = Math.atan2(- m23, m22)
-          @y = Math.atan2(- m31, m11)
+          @x = ::Math.atan2(- m23, m22)
+          @y = ::Math.atan2(- m31, m11)
         else
           @x = 0.0
-          @y = Math.atan2(m13, m33)
+          @y = ::Math.atan2(m13, m33)
         end
       elsif order == 'XZY'
-        @z = Math.asin(- Math.clamp(m12, -1.0, 1.0))
+        @z = ::Math.asin(- Math.clamp(m12, -1.0, 1.0))
         if m12.abs < 0.99999
-          @x = Math.atan2(m32, m22)
-          @y = Math.atan2(m13, m11)
+          @x = ::Math.atan2(m32, m22)
+          @y = ::Math.atan2(m13, m11)
         else
-          @x = Math.atan2(- m23, m33)
+          @x = ::Math.atan2(- m23, m33)
           @y = 0.0
         end
       else

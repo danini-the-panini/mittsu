@@ -71,7 +71,7 @@ module Mittsu
 
       result_length_sq = target.length_sq
       if (result_length_sq > 0)
-        target.multiply_scalar(1.0 / Math.sqrt(result_length_sq))
+        target.multiply_scalar(1.0 / ::Math.sqrt(result_length_sq))
       else
         target.set(0.0, 0.0, 0.0)
       end

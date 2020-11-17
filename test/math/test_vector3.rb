@@ -192,7 +192,7 @@ class TestVector3 < Minitest::Test
     assert_equal(0, d.length_sq)
 
     a.set(x, y, z)
-    assert_equal(Math.sqrt(x*x + y*y + z*z), a.length)
+    assert_equal(::Math.sqrt(x*x + y*y + z*z), a.length)
     assert_equal((x*x + y*y + z*z), a.length_sq)
   end
 
@@ -300,17 +300,17 @@ class TestVector3 < Minitest::Test
     b = Mittsu::Vector3.new(0, 0.18851655680720186, -0.9820700116639124)
 
     assert_in_delta(a.angle_to(a), 0)
-    assert_in_delta(a.angle_to(b), Math::PI)
+    assert_in_delta(a.angle_to(b), ::Math::PI)
 
     x = Mittsu::Vector3.new(1, 0, 0)
     y = Mittsu::Vector3.new(0, 1, 0)
     z = Mittsu::Vector3.new(0, 0, 1)
 
-    assert_equal(x.angle_to(y), Math::PI / 2)
-    assert_equal(x.angle_to(z), Math::PI / 2)
-    assert_equal(z.angle_to(x), Math::PI / 2)
+    assert_equal(x.angle_to(y), ::Math::PI / 2)
+    assert_equal(x.angle_to(z), ::Math::PI / 2)
+    assert_equal(z.angle_to(x), ::Math::PI / 2)
 
-    assert_in_delta(Math::PI / 4, x.angle_to(Mittsu::Vector3.new(1, 1, 0)), DELTA)
+    assert_in_delta(::Math::PI / 4, x.angle_to(Mittsu::Vector3.new(1, 1, 0)), DELTA)
   end
 
   def test_lerp_clone

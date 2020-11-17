@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class LatheGeometry < Geometry
-    def initialize(points, segments = 12, phi_start = 0.0, phi_length = (Math::PI * 2.0))
+    def initialize(points, segments = 12, phi_start = 0.0, phi_length = (::Math::PI * 2.0))
       super()
 
       @type = 'LatheGeometry'
@@ -21,8 +21,8 @@ module Mittsu
       for i in 0..segments do
         phi = phi_start + i.to_f * inverse_segments * phi_length
 
-        c = Math.cos(phi)
-        s = Math.sin(phi)
+        c = ::Math.cos(phi)
+        s = ::Math.sin(phi)
 
         for j in 0...points.length do
           pt = points[j]

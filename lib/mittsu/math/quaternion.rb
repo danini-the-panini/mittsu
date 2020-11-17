@@ -51,12 +51,12 @@ module Mittsu
       # http:#www.mathworks.com/matlabcentral/fileexchange/
       #   20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
       #  content/SpinCalc.m
-      c1 = Math.cos(euler.x / 2.0)
-      c2 = Math.cos(euler.y / 2.0)
-      c3 = Math.cos(euler.z / 2.0)
-      s1 = Math.sin(euler.x / 2.0)
-      s2 = Math.sin(euler.y / 2.0)
-      s3 = Math.sin(euler.z / 2.0)
+      c1 = ::Math.cos(euler.x / 2.0)
+      c2 = ::Math.cos(euler.y / 2.0)
+      c3 = ::Math.cos(euler.z / 2.0)
+      s1 = ::Math.sin(euler.x / 2.0)
+      s2 = ::Math.sin(euler.y / 2.0)
+      s3 = ::Math.sin(euler.z / 2.0)
       if euler.order == 'XYZ'
         @x = s1 * c2 * c3 + c1 * s2 * s3
         @y = c1 * s2 * c3 - s1 * c2 * s3
@@ -96,11 +96,11 @@ module Mittsu
       # http:#www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
       # assumes axis is normalized
       half_angle = angle / 2.0
-      s = Math.sin(half_angle)
+      s = ::Math.sin(half_angle)
       @x = axis.x * s
       @y = axis.y * s
       @z = axis.z * s
-      @w = Math.cos(half_angle)
+      @w = ::Math.cos(half_angle)
       self.on_change_callback
       self
     end
@@ -114,25 +114,25 @@ module Mittsu
       m31 = te[2]; m32 = te[6]; m33 = te[10]
       trace = m11 + m22 + m33
       if trace > 0
-        s = 0.5 / Math.sqrt(trace + 1.0)
+        s = 0.5 / ::Math.sqrt(trace + 1.0)
         @w = 0.25 / s
         @x = (m32 - m23) * s
         @y = (m13 - m31) * s
         @z = (m21 - m12) * s
       elsif m11 > m22 && m11 > m33
-        s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33)
+        s = 2.0 * ::Math.sqrt(1.0 + m11 - m22 - m33)
         @w = (m32 - m23) / s
         @x = 0.25 * s
         @y = (m12 + m21) / s
         @z = (m13 + m31) / s
       elsif m22 > m33
-        s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33)
+        s = 2.0 * ::Math.sqrt(1.0 + m22 - m11 - m33)
         @w = (m13 - m31) / s
         @x = (m12 + m21) / s
         @y = 0.25 * s
         @z = (m23 + m32) / s
       else
-        s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22)
+        s = 2.0 * ::Math.sqrt(1.0 + m33 - m11 - m22)
         @w = (m21 - m12) / s
         @x = (m13 + m31) / s
         @y = (m23 + m32) / s
@@ -187,7 +187,7 @@ module Mittsu
     end
 
     def length
-      Math.sqrt(@x * @x + @y * @y + @z * @z + @w * @w)
+      ::Math.sqrt(@x * @x + @y * @y + @z * @z + @w * @w)
     end
 
     def normalize
@@ -246,8 +246,8 @@ module Mittsu
         @z = _z
         return self
       end
-      half_theta = Math.acos(cos_half_theta)
-      sin_half_theta = Math.sqrt(1.0 - cos_half_theta * cos_half_theta)
+      half_theta = ::Math.acos(cos_half_theta)
+      sin_half_theta = ::Math.sqrt(1.0 - cos_half_theta * cos_half_theta)
       if sin_half_theta.abs < 0.001
         @w = 0.5 * (_w + @w)
         @x = 0.5 * (_x + @x)
@@ -255,8 +255,8 @@ module Mittsu
         @z = 0.5 * (_z + @z)
         return self
       end
-      ratio_a = Math.sin((1.0. - t) * half_theta) / sin_half_theta,
-      ratio_b = Math.sin(t * half_theta) / sin_half_theta
+      ratio_a = ::Math.sin((1.0. - t) * half_theta) / sin_half_theta,
+      ratio_b = ::Math.sin(t * half_theta) / sin_half_theta
       @w = (_w * ratio_a + @w * ratio_b)
       @x = (_x * ratio_a + @x * ratio_b)
       @y = (_y * ratio_a + @y * ratio_b)

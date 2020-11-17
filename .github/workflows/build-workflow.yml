@@ -5,6 +5,9 @@ jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ['2.5.x', '2.6.x', '2.7.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -18,7 +21,7 @@ jobs:
             gems-v1-${{ runner.os }}-
       - uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.x'
+          ruby-version: ${{ matrix.ruby }}
       - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
       - run: bash install-glfw.sh
       - run: bundle install --path vendor/bundle
@@ -32,6 +35,9 @@ jobs:
   macos:
     name: macOS
     runs-on: macos-latest
+    strategy:
+      matrix:
+        ruby: ['2.5.x', '2.6.x', '2.7.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -45,7 +51,7 @@ jobs:
             gems-v1-${{ runner.os }}-
       - uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.x'
+          ruby-version: ${{ matrix.ruby }}
       - run: brew install glfw
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
@@ -55,6 +61,9 @@ jobs:
     runs-on: windows-latest
     env:
       MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw\glfw3.dll
+    strategy:
+      matrix:
+        ruby: ['2.5.x', '2.6.x', '2.7.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -68,7 +77,7 @@ jobs:
             gems-v1-${{ runner.os }}-
       - uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.x'
+          ruby-version: ${{ matrix.ruby }}
       - run: .\install-glfw.ps1
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test

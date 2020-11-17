@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class CircleGeometry < Geometry
-    def initialize(radius = 50.0, segments = 8, theta_start = 0.0, theta_length = (Math::PI * 2.0))
+    def initialize(radius = 50.0, segments = 8, theta_start = 0.0, theta_length = (::Math::PI * 2.0))
       super()
 
       @type = 'CircleGeometry'
@@ -27,8 +27,8 @@ module Mittsu
         vertex = Vector3.new
         segment = theta_start + i.to_f / segments.to_f * theta_length
 
-        vertex.x = radius * Math.cos(segment)
-        vertex.y = radius * Math.sin(segment)
+        vertex.x = radius * ::Math.cos(segment)
+        vertex.y = radius * ::Math.sin(segment)
 
         @vertices << vertex
         uvs << Vector2.new((vertex.x / radius + 1.0) / 2.0, (vertex.y / radius + 1.0) / 2.0)

@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class CylinderGeometry < Geometry
-    def initialize(radius_top = 20.0, radius_bottom = 20.0, height = 100.0, radial_segments = 8, height_segments = 1, open_ended = false, theta_start = 0.0, theta_length = (Math::PI * 2.0))
+    def initialize(radius_top = 20.0, radius_bottom = 20.0, height = 100.0, radial_segments = 8, height_segments = 1, open_ended = false, theta_start = 0.0, theta_length = (::Math::PI * 2.0))
       super()
 
       @type = 'CylinderGeometry'
@@ -35,9 +35,9 @@ module Mittsu
           u = x.to_f / radial_segments
 
           vertex = Vector3.new
-          vertex.x = radius * Math.sin(u * theta_length + theta_start)
+          vertex.x = radius * ::Math.sin(u * theta_length + theta_start)
           vertex.y = -v * height + height_half
-          vertex.z = radius * Math.cos(u * theta_length + theta_start)
+          vertex.z = radius * ::Math.cos(u * theta_length + theta_start)
 
           @vertices << vertex
 
@@ -63,10 +63,10 @@ module Mittsu
           nb = @vertices[index_rows[1][x + 1]].clone
         end
 
-        na.y = Math.sqrt(na.x * na.x + na.z * na.z) * tan_theta
+        na.y = ::Math.sqrt(na.x * na.x + na.z * na.z) * tan_theta
         na.normalize
 
-        nb.y = Math.sqrt(nb.x * nb.x + nb.z * nb.z) * tan_theta
+        nb.y = ::Math.sqrt(nb.x * nb.x + nb.z * nb.z) * tan_theta
         nb.normalize
 
         for y in 0...height_segments do

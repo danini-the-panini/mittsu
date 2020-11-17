@@ -213,7 +213,7 @@ class TestVector4 < Minitest::Test
     assert_equal(0, e.length_sq)
 
     a.set(x, y, z, w)
-    assert_equal(Math.sqrt(x*x + y*y + z*z + w*w), a.length)
+    assert_equal(::Math.sqrt(x*x + y*y + z*z + w*w), a.length)
     assert_equal((x*x + y*y + z*z + w*w), a.length_sq)
   end
 

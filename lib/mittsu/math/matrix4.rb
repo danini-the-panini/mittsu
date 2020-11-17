@@ -86,9 +86,9 @@ module Mittsu
     def make_rotation_from_euler(euler)
       te = self.elements
       x, y, z = euler.x, euler.y, euler.z
-      a, b = Math.cos(x), Math.sin(x)
-      c, d = Math.cos(y), Math.sin(y)
-      e, f = Math.cos(z), Math.sin(z)
+      a, b = ::Math.cos(x), ::Math.sin(x)
+      c, d = ::Math.cos(y), ::Math.sin(y)
+      e, f = ::Math.cos(z), ::Math.sin(z)
       if euler.order == 'XYZ'
         ae = a * e; af = a * f; be = b * e; bf = b * f
         te[0] = c * e
@@ -399,7 +399,7 @@ module Mittsu
       scale_x_sq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2]
       scale_y_sq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6]
       scale_z_sq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10]
-      Math.sqrt([scale_x_sq, scale_y_sq, scale_z_sq].max)
+      ::Math.sqrt([scale_x_sq, scale_y_sq, scale_z_sq].max)
     end
 
     def make_translation(x, y, z)
@@ -413,7 +413,7 @@ module Mittsu
     end
 
     def make_rotation_x(theta)
-      c, s = Math.cos(theta), Math.sin(theta)
+      c, s = ::Math.cos(theta), ::Math.sin(theta)
       self.set(
         1.0, 0.0,  0.0, 0.0,
         0.0,   c,   -s, 0.0,
@@ -424,7 +424,7 @@ module Mittsu
     end
 
     def make_rotation_y(theta)
-      c, s = Math.cos(theta), Math.sin(theta)
+      c, s = ::Math.cos(theta), ::Math.sin(theta)
       self.set(
            c, 0.0,   s, 0.0,
          0.0, 1.0, 0.0, 0.0,
@@ -435,7 +435,7 @@ module Mittsu
     end
 
     def make_rotation_z(theta)
-      c, s = Math.cos(theta), Math.sin(theta)
+      c, s = ::Math.cos(theta), ::Math.sin(theta)
       self.set(
           c,   -s, 0.0, 0.0,
           s,    c, 0.0, 0.0,
@@ -447,8 +447,8 @@ module Mittsu
 
     def make_rotation_axis(axis, angle)
       # Based on http:#www.gamedev.net/reference/articles/article1199.asp
-      c = Math.cos(angle)
-      s = Math.sin(angle)
+      c = ::Math.cos(angle)
+      s = ::Math.sin(angle)
       t = 1.0 - c
       x, y, z = axis.x, axis.y, axis.z
       tx, ty = t * x, t * y
@@ -534,7 +534,7 @@ module Mittsu
     def make_perspective(fov, aspect, near, far)
       fov, aspect, near, far =
         fov.to_f, aspect.to_f, near.to_f, far.to_f
-      ymax = near * Math.tan(Math.deg_to_rad(fov * 0.5))
+      ymax = near * ::Math.tan(Math.deg_to_rad(fov * 0.5))
       ymin = -ymax
       xmin = ymin * aspect
       xmax = ymax * aspect

@@ -75,9 +75,9 @@ class TestQuaternion < Minitest::Test
     a = Mittsu::Quaternion.new.set_from_axis_angle( Mittsu::Vector3.new(0, 0, 1), 0 )
     assert_equal(zero, a)
 
-    b1 = Mittsu::Quaternion.new.set_from_axis_angle( Mittsu::Vector3.new(1, 0, 0), Math::PI )
+    b1 = Mittsu::Quaternion.new.set_from_axis_angle( Mittsu::Vector3.new(1, 0, 0), ::Math::PI )
     refute_equal(b1, a)
-    b2 = Mittsu::Quaternion.new.set_from_axis_angle( Mittsu::Vector3.new(1, 0, 0), -Math::PI )
+    b2 = Mittsu::Quaternion.new.set_from_axis_angle( Mittsu::Vector3.new(1, 0, 0), -::Math::PI )
     refute_equal(b2, a)
 
     b1.multiply(b2)

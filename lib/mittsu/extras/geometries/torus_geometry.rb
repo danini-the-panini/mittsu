@@ -3,7 +3,7 @@ require 'mittsu/math'
 
 module Mittsu
   class TorusGeometry < Geometry
-    def initialize(radius = 100.0, tube = 40.0, radial_segments = 8, tubular_segments = 6, arc = (Math::PI * 2.0))
+    def initialize(radius = 100.0, tube = 40.0, radial_segments = 8, tubular_segments = 6, arc = (::Math::PI * 2.0))
       super()
 
       @type = 'TorusGeometry'
@@ -23,15 +23,15 @@ module Mittsu
       for j in 0..radial_segments do
         for i in 0..tubular_segments do
           u = i.to_f / tubular_segments * arc
-          v = j.to_f / radial_segments * Math::PI * 2.0
+          v = j.to_f / radial_segments * ::Math::PI * 2.0
 
-          center.x = radius * Math.cos(u)
-          center.y = radius * Math.sin(u)
+          center.x = radius * ::Math.cos(u)
+          center.y = radius * ::Math.sin(u)
 
           vertex = Vector3.new
-          vertex.x = (radius + tube * Math.cos(v)) * Math.cos(u)
-          vertex.y = (radius + tube * Math.cos(v)) * Math.sin(u)
-          vertex.z = tube * Math.sin(v)
+          vertex.x = (radius + tube * ::Math.cos(v)) * ::Math.cos(u)
+          vertex.y = (radius + tube * ::Math.cos(v)) * ::Math.sin(u)
+          vertex.z = tube * ::Math.sin(v)
 
           @vertices << vertex
 

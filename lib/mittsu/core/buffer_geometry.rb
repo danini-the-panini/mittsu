@@ -179,7 +179,7 @@ module Mittsu
           max_radius_sq = [max_radius_sq, center.distance_to_squared(vector)].max
         end
 
-        @bounding_sphere.radius = Math.sqrt(max_radius_sq)
+        @bounding_sphere.radius = ::Math.sqrt(max_radius_sq)
 
         if @bounding_radius.nan?
           puts 'ERROR: Mittsu::BufferGeometry#computeBoundingSphere: Computed radius is NaN. The "position" attribute is likely to have NaN values.'
@@ -558,7 +558,7 @@ module Mittsu
       normals.each_slice(3).with_index do |normal, i|
         x, y, z = *normal
 
-        n = 1.0 / Math.sqrt(x * x + y * y + z * z)
+        n = 1.0 / ::Math.sqrt(x * x + y * y + z * z)
 
         i *= 3
         normals[i] *= n

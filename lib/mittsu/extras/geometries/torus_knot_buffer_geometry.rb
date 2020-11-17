@@ -37,7 +37,7 @@ module Mittsu
 
       for i in 0..tubular_segments do
         # the radian "u" is used to calculate the position on the torus curve of the current tubular segement
-        u = i.to_f / tubular_segments.to_f * p_val.to_f * Math::PI * 2.0
+        u = i.to_f / tubular_segments.to_f * p_val.to_f * ::Math::PI * 2.0
 
         # now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
         # these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
@@ -57,9 +57,9 @@ module Mittsu
         for j in 0..radial_segments do
           # now calculate the vertices. they are nothing more than an extrusion of the torus curve.
           # because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
-          v = j.to_f / radial_segments.to_f * Math::PI * 2.0
-          cx = -tube * Math.cos(v)
-          cy = tube * Math.sin(v)
+          v = j.to_f / radial_segments.to_f * ::Math::PI * 2.0
+          cx = -tube * ::Math.cos(v)
+          cy = tube * ::Math.sin(v)
 
           # now calculate the final vertex position.
           # first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
@@ -107,14 +107,14 @@ module Mittsu
     private
 
     def calculate_position_on_curve(u, p_val, q_val, radius, position)
-      cu = Math.cos(u)
-      su = Math.sin(u)
+      cu = ::Math.cos(u)
+      su = ::Math.sin(u)
       qu_over_p = q_val.to_f / p_val.to_f * u
-      cs = Math.cos(qu_over_p)
+      cs = ::Math.cos(qu_over_p)
 
       position.x = radius * (2.0 + cs) * 0.5 * cu
       position.y = radius * (2.0 + cs) * su * 0.5
-      position.z = radius * Math.sin(qu_over_p) * 0.5
+      position.z = radius * ::Math.sin(qu_over_p) * 0.5
     end
   end
 end

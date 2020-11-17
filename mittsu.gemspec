@@ -33,5 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest-reporters'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'benchmark-ips'
-  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'simplecov', '0.17.1'
 end

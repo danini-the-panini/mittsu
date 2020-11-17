@@ -81,11 +81,11 @@ class TestRay < Minitest::Test
 
     # behind the ray
     b = a.distance_to_point(zero3)
-    assert_equal(Math.sqrt(3), b)
+    assert_equal(::Math.sqrt(3), b)
 
     # front of the ray
     c = a.distance_to_point(Mittsu::Vector3.new(0, 0, 50))
-    assert_equal(Math.sqrt(2), c)
+    assert_equal(::Math.sqrt(2), c)
 
     # exactly on the ray
     d = a.distance_to_point(one3)
@@ -218,10 +218,10 @@ class TestRay < Minitest::Test
     assert_equal(a, a.clone.apply_matrix4(m))
 
     a = Mittsu::Ray.new(zero3.clone, Mittsu::Vector3.new(0, 0, 1))
-    m.make_rotation_z(Math::PI)
+    m.make_rotation_z(::Math::PI)
     assert_equal(a, a.clone.apply_matrix4(m))
 
-    m.make_rotation_x(Math::PI)
+    m.make_rotation_x(::Math::PI)
     b = a.clone
     b.direction.negate
     a2 = a.clone.apply_matrix4(m)
