@@ -97,18 +97,18 @@ module Mittsu
     end
 
     def rotate_x(angle)
-      @_v1 ||= Vector3.new(1, 0, 0)
-      self.rotate_on_axis(@_v1, angle)
+      @_x_axis ||= Vector3.new(1, 0, 0)
+      self.rotate_on_axis(@_x_axis, angle)
     end
 
     def rotate_y(angle)
-      @_v1 ||= Vector3.new(0, 1, 0)
-      self.rotate_on_axis(@_v1, angle)
+      @_y_axis ||= Vector3.new(0, 1, 0)
+      self.rotate_on_axis(@_y_axis, angle)
     end
 
     def rotate_z(angle)
-      @_v1 ||= Vector3.new(0, 0, 1)
-      self.rotate_on_axis(@_v1, angle)
+      @_z_axis ||= Vector3.new(0, 0, 1)
+      self.rotate_on_axis(@_z_axis, angle)
     end
 
     def translate_on_axis(axis, distance)
