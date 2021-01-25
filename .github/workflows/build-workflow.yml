@@ -86,5 +86,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - run: .\install-glfw.ps1
+      - run: gem install bundler
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
