@@ -34,10 +34,14 @@ jobs:
       - run: bundle install --path vendor/bundle
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.2.1
+        if: github.event_name == 'push'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageCommand: bundle exec rake test
+      - name: Test
+        if: github.event_name != 'push'
+        run: bundle exec rake test
 
   macos:
     name: macOS
