@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x']
+        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -48,7 +48,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x']
+        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
@@ -74,7 +74,7 @@ jobs:
       MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw\glfw3.dll
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x']
+        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
     steps:
       - uses: actions/checkout@v1
       - name: Cache gems
