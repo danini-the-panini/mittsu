@@ -13,7 +13,7 @@ module Mittsu
     class Window
       attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler, :framebuffer_size_handler
 
-      def initialize(width, height, title)
+      def initialize(width, height, title, antialias)
         glfwInit
 
         glfwWindowHint GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE
@@ -21,6 +21,10 @@ module Mittsu
         glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR, 3
         glfwWindowHint GLFW_CONTEXT_VERSION_MINOR, 3
         glfwWindowHint GLFW_CONTEXT_REVISION, 0
+
+        if antialias > 0
+          glfwWindowHint GLFW_SAMPLES, antialias
+        end
 
         @width, @height, @title = width, height, title
         @handle = glfwCreateWindow(@width, @height, @title, nil, nil)

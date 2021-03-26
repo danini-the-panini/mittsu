@@ -935,7 +935,6 @@ module Mittsu
       @_alpha = parameters.fetch(:alpha, false)
       @_depth = parameters.fetch(:depth, true)
       @_stencil = parameters.fetch(:stencil, true)
-      @_antialias = parameters.fetch(:antialias, false)
       @_premultiplied_alpha = parameters.fetch(:premultiplied_alpha, true)
       @_preserve_drawing_buffer = parameters.fetch(:preserve_drawing_buffer, false)
       @logarithmic_depth_buffer = parameters.fetch(:logarithmic_depth_buffer, false)
@@ -943,6 +942,7 @@ module Mittsu
       @width = parameters.fetch(:width, 800)
       @height = parameters.fetch(:height, 600)
       @title = parameters.fetch(:title, "Mittsu #{REVISION}")
+      @antialias = parameters.fetch(:antialias, 0)
     end
 
     def get_gpu_capabilities
@@ -974,7 +974,7 @@ module Mittsu
       #   preserve_drawing_buffer: _preserve_drawing_buffer
       # }
 
-      @window = GLFW::Window.new(@width, @height, @title)
+      @window = GLFW::Window.new(@width, @height, @title, @antialias)
 
       default_target.set_viewport_size(*(@window.framebuffer_size))
 
