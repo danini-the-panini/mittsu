@@ -974,7 +974,7 @@ module Mittsu
       #   preserve_drawing_buffer: _preserve_drawing_buffer
       # }
 
-      @window = GLFW::Window.new(@width, @height, @title, @antialias)
+      @window = GLFW::Window.new(@width, @height, @title, antialias: @antialias)
 
       default_target.set_viewport_size(*(@window.framebuffer_size))
 
