@@ -4,4 +4,4 @@ set -e
 
 cd examples
 
-ls *.rb | grep '^[0-9]' | xargs -n 1 ruby
+ls *_example.rb | xargs -n 1 ruby
