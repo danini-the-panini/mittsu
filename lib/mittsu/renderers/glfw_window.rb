@@ -4,6 +4,10 @@ require 'glfw'
 require 'mittsu/utils'
 require 'mittsu/renderers/glfw_lib'
 glfw_lib = Mittsu::GLFWLib.discover
+# Workaround until https://github.com/vaiorabbit/ruby-opengl/pull/32 gets merged
+GLFW.class_variable_get('@@lib_signature').each do |sig|
+  sig.gsub!(/const void(?!\s*\*)/, 'void')
+end
 GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path) unless Mittsu.test?
 
 include GLFW
