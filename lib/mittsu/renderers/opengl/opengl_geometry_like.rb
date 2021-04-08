@@ -40,7 +40,7 @@ module Mittsu
     def update_vertex_buffer(attribute)
       glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
       @renderer.state.enable_attribute(attribute)
-      glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, 0, 0)
+      glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, 0, nil)
     end
 
     def update_other_buffers(object, material, attributes)
@@ -126,7 +126,7 @@ module Mittsu
     def update_attribute(attribute, buffer, size)
       glBindBuffer(GL_ARRAY_BUFFER, buffer)
       @renderer.state.enable_attribute(attribute)
-      glVertexAttribPointer(attribute, size, GL_FLOAT, GL_FALSE, 0, 0)
+      glVertexAttribPointer(attribute, size, GL_FLOAT, GL_FALSE, 0, nil)
     end
   end
 end

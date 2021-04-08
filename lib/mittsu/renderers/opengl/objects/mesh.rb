@@ -10,12 +10,12 @@ module Mittsu
         @renderer.state.set_line_width(material.wireframe_linewidth * @renderer.pixel_ratio)
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.line_buffer) if update_buffers
-        glDrawElements(GL_LINES, geometry_group.line_count, type, 0)
+        glDrawElements(GL_LINES, geometry_group.line_count, type, nil)
 
       # triangles
       else
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.face_buffer) if update_buffers
-        glDrawElements(GL_TRIANGLES, geometry_group.face_count, type, 0)
+        glDrawElements(GL_TRIANGLES, geometry_group.face_count, type, nil)
       end
 
       @renderer.info[:render][:calls] += 1
