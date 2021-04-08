@@ -131,8 +131,8 @@ module Mittsu
 
       glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
 
-      glVertexAttribPointer(@attributes[:position], 2, GL_FLOAT, GL_FALSE, 2 * 8, 0)
-      glVertexAttribPointer(@attributes[:uv], 2, GL_FLOAT, GL_FALSE, 2 * 8, 8)
+      glVertexAttribPointer(@attributes[:position], 2, GL_FLOAT, GL_FALSE, 2 * 8, Fiddle::Pointer[0])
+      glVertexAttribPointer(@attributes[:uv], 2, GL_FLOAT, GL_FALSE, 2 * 8, Fiddle::Pointer[8])
 
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, @element_buffer)
 
