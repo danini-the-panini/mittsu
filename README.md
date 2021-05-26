@@ -34,6 +34,7 @@ $ sudo apt-get install libglfw3
 **NOTE:** On Windows, you will have to manually specify the glfw3.dll path in an environment variable
 (you can download it [here](http://www.glfw.org/download.html))
 ```bash
+# ex) set MITTSU_LIBGLFW_PATH=C:\Users\username\lib-mingw-w64
 > set MITTSU_LIBGLFW_PATH=C:\path\to\glfw3.dll
 > ruby your_awesome_mittsu_app.rb
 ```

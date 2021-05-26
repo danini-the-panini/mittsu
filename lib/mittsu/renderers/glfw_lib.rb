@@ -25,6 +25,9 @@ module Mittsu
     end
 
     class Windows < GenericLib::Base
+      def file
+        'glfw3.dll'
+      end
     end
 
     class MacOS < GenericLib::Base
