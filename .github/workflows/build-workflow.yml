@@ -71,7 +71,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     env:
-      MITTSU_LIBGLFW_FILE: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw\glfw3.dll
+      MITTSU_LIBGLFW_PATH: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw
     strategy:
       matrix:
         ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
