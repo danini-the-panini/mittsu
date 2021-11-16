@@ -348,4 +348,109 @@ class TestVector3 < Minitest::Test
     assert_equal(b, a)
     assert_equal(a, b)
   end
+
+  def test_set_scalar
+    a = Mittsu::Vector3.new(1,2,3)
+
+    a.set_scalar(5)
+
+    assert_equal(a.x, 5)
+    assert_equal(a.y, 5)
+    assert_equal(a.z, 5)
+  end
+
+  def test_set_component
+    a = Mittsu::Vector3.new(5,4,3)
+
+    a.set_component(0, 4)
+    a.set_component(1, 5)
+    a.set_component(2, 6)
+
+    assert_equal(a.x, 4)
+    assert_equal(a.y, 5)
+    assert_equal(a.z, 6)
+  end
+
+  def test_get_component
+    a = Mittsu::Vector3.new(9,8,7)
+
+    assert_equal(a.get_component(0), 9)
+    assert_equal(a.get_component(1), 8)
+    assert_equal(a.get_component(2), 7)
+  end
+
+  def test_add_scaled_vector
+    a = Mittsu::Vector3.new(1,2,3)
+    b = Mittsu::Vector3.new(4,5,6)
+
+    a.add_scaled_vector(b, 2)
+
+    assert_equal(a.x, 8)
+    assert_equal(a.y, 10)
+    assert_equal(a.z, 12)
+  end
+
+  def test_set_from_spherical_coords
+    a = Mittsu::Vector3.new(1,2,3)
+
+    a.set_from_spherical_coords(1, 45, 35)
+
+    assert_equal(a.x, -0.36434214261870246)
+    assert_equal(a.y, 0.5253219888177297)
+    assert_equal(a.z, -0.7689548824063724)
+  end
+
+  def test_set_from_cylindrical_coords
+    a = Mittsu::Vector3.new(1,2,3)
+
+    a.set_from_cylindrical_coords(1, 45, 35)
+    assert_equal(a.x, 0.8509035245341184)
+    assert_equal(a.y, 35.0)
+    assert_equal(a.z, 0.8509035245341184)
+  end
+
+  def test_set_from_matrix_3_column
+    a = Mittsu::Vector3.new(1,2,3)
+    b = Mittsu::Vector3.new(0.0, 0.0, 1.0)
+    m = Mittsu::Matrix3.new
+
+
+    result = a.set_from_matrix3_column(m, 2)
+    assert_equal(b, result)
+  end
+
+  def test_vector_equals
+    a = Mittsu::Vector3.new(1,2,3)
+    b = Mittsu::Vector3.new(4,5,6)
+    c = Mittsu::Vector3.new(1,2,3)
+
+    assert_equal(a,c)
+    refute_equal(a,b)
+  end
+
+  def test_from_buffer_attribute
+    a = Mittsu::BufferAttribute.new([1,2,3], 1)
+    b = Mittsu::Vector3.new(1,2,3)
+
+    b.from_buffer_attribute(a, 0)
+    assert_equal(b.x, 1.0)
+    assert_equal(b.y, 2.0)
+    assert_equal(b.z, 3.0)
+  end
+
+  def test_clamp_length
+    a = Mittsu::Vector3.new(1,2,3)
+    b = Mittsu::Vector3.new(2.6726124191242437, 5.3452248382484875, 8.017837257372731)
+
+    result = a.clamp_length(10, 100)
+    assert_equal(b, result)
+  end
+
+  def test_manhattan_distance_to
+    a = Mittsu::Vector3.new(1,2,3)
+    b = Mittsu::Vector3.new(4,5,6)
+
+    result = a.manhattan_distance_to(b)
+    assert_equal(result, 9)
+  end
 end
