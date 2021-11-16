@@ -50,6 +50,18 @@ module Mittsu
       self
     end
 
+    def get_x(index)
+      @array[index * @item_size]
+    end
+
+    def get_y(index)
+      @array[index * @item_size + 1]
+    end
+
+    def get_z(index)
+      @array[index * @item_size + 2]
+    end
+
     def set_xy(index, x, y)
       index *= @item_size
 

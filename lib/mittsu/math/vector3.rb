@@ -187,6 +187,144 @@ module Mittsu
       self
     end
 
+    def set_scalar(scalar)
+      _x, _y, _z = *@elements
+
+      _x = scalar
+      _y = scalar
+      _z = scalar
+
+      self
+    end
+
+    def set_component(index, value)
+      _x, _y, _z = *@elements
+
+      case index
+      when 0
+        _x = value
+        break
+      when 1
+        _y = value
+        break
+      when 2
+        _z = value
+        break
+      else
+        raise ArgumentError, "index is out of range: #{index}"
+      end
+
+      self
+    end
+
+    def get_component(index)
+      _x, _y, _z = *@elements
+
+      case index
+      when 0
+        return _x
+      when 1
+        return _y
+      when 2
+        return _z
+      else
+        raise ArgumentError, "index is out of range: #{index}"
+      end
+    end
+
+    def add_scaled_vector(vector, scalar)
+      _x, _y, _z = *@elements
+
+      _x = vector.x * scalar
+      _y = vector.y * scalar
+      _z = vector.z * scalar
+
+      self
+    end
+
+    def set_from_spherical(sphere)
+      set_from_spherical_coords(sphere.radius, sphere.phi, sphere.theta)
+    end
+
+    def set_from_spherical_coords(radius, phi, theta)
+      _x, _y, _z = *@elements
+
+      sin_phi_radius = Math.sin(phi) * radius
+      _x = sin_phi_radius * Math.sin(theta)
+      _y = Math.cos(phi) * radius
+      _z = sin_phi_radius * Math.cos(theta)
+
+      self
+    end
+
+    def set_from_cylindrical(cylinder)
+      set_from_cylindrical_coords(cylinder.radius, cylinder.theta, cylinder.y)
+    end
+
+    def set_from_cylindrical_coords(radius, theta, y)
+      _x, _y, _z = *@elements
+
+      _x = radius * Math.sin(theta)
+      _y = y
+      _z = radius * Math.cos(theta)
+
+      self
+    end
+
+    def set_from_matrix_3_column(matrix, index)
+      from_array(matrix.elements, index * 3)
+    end
+
+    def equals(vector)
+      _x, _y, _z = *@elements
+
+      ((vector.x == _x) && (vector.y == _y) && (vector.z == _z ))
+    end
+
+    def from_buffer_attribute(attribute, index)
+      _x, _y, _z = *@elements
+
+      _x = attribute.get_x(index);
+      _y = attribute.get_y(index);
+      _z = attribute.get_z(index);
+
+      self
+    end
+
+    def clamp_length(min, max)
+      divide_scalar(length || 1).multiply_scalar(Math.max(min, Math.min(max, length)))
+    end
+
+    def manhattan_distance_to(vector)
+      _x, _y, _z = *@elements
+
+      (_x - vector.x).abs + (_y - vector.y).abs + (_z - vector.z).abs
+    end
+
+    def random
+      _x, _y, _z = *@elements
+
+      _x = Math.random
+      _y = Math.random
+      _z = Math.random
+
+      self
+    end
+
+    def random_direction()
+      _x, _y, _z = *@elements
+
+      u = (Math.random() - 0.5) *2
+      t = Math.random() * Math::PI * 2
+      f = (1 - u ** 2).sqrt
+
+      _x = f * Math.cos(t)
+      _y = f * Math.sin(t)
+      _z = u
+
+      self
+    end
+
     def from_attribute(attribute, index, offset = 0)
       index = index * attribute.itemSize + offset
 
