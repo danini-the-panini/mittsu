@@ -1,9 +1,9 @@
 # Mittsu
 
 [![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/jellymann/mittsu/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/jellymann/mittsu/maintainability)
-[![Build Status](https://github.com/jellymann/mittsu/workflows/Build/badge.svg)](https://github.com/jellymann/mittsu/actions?query=workflow%3A%22Build%22)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/danini-the-panini/mittsu/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/danini-the-panini/mittsu/maintainability)
+[![Build Status](https://github.com/danini-the-panini/mittsu/workflows/Build/badge.svg)](https://github.com/danini-the-panini/mittsu/actions?query=workflow%3A%22Build%22)
 
 3D Graphics Library for Ruby
 
@@ -15,7 +15,7 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 ![Point Light](https://cloud.githubusercontent.com/assets/1171825/18411861/4531bb4c-7781-11e6-92b4-b6ebda60e2c9.gif)
 ![Tank Demo](https://cloud.githubusercontent.com/assets/1171825/18411862/4531fe9a-7781-11e6-9665-b172df1a3645.gif)
 
-(You can find the source for the Tank Demo [here](https://github.com/jellymann/mittsu-tank-demo))
+(You can find the source for the Tank Demo [here](https://github.com/danini-the-panini/mittsu-tank-demo))
 
 ## Installation
 
@@ -213,7 +213,7 @@ If you just want to see what Mittsu can do and how to do it, take a peek inside 
 
 ## Contributing
 
-1. Fork it ( https://github.com/jellymann/mittsu/fork )
+1. Fork it ( https://github.com/danini-the-panini/mittsu/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

@@ -6,15 +6,15 @@ require 'mittsu/version'
 Gem::Specification.new do |spec|
   spec.name          = "mittsu"
   spec.version       = Mittsu::VERSION
-  spec.authors       = ["Daniel Smith"]
-  spec.email         = ["jellymann@gmail.com"]
+  spec.authors       = ["Danielle Smith"]
+  spec.email         = ["danini@hey.com"]
 
   spec.summary       = %q{3D Graphics Library for Ruby}
   spec.description   = %q{Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of THREE.js. No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!}
-  spec.homepage      = "https://github.com/jellymann/mittsu"
+  spec.homepage      = "https://github.com/danini-the-panini/mittsu"
   spec.license       = "MIT"
   spec.metadata = {
-    "bug_tracker" => "https://github.com/jellymann/mittsu/issues"
+    "bug_tracker" => "https://github.com/danini-the-panini/mittsu/issues"
   }
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples)/|\.sh$)}) }
