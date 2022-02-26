@@ -27,7 +27,6 @@ module Mittsu
         v1 = @vertices[indices[i]]
         v2 = @vertices[indices[i + 1]]
         v3 = @vertices[indices[i + 2]]
-        binding.irb if v1.nil? || v2.nil? || v3.nil?
 
         faces[j] = Face3.new(v1.index, v2.index, v3.index, [v1.clone, v2.clone, v3.clone])
 
