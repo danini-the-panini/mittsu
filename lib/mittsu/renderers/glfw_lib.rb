@@ -31,14 +31,32 @@ module Mittsu
     end
 
     class MacOS < GenericLib::Base
+      SEARCH_GLOBS = ['/usr/local/lib/**',
+                      '/usr/lib/**',
+                      '/opt/homebrew/**']
+
       def path
-        '/usr/local/lib'
+        File.dirname(match)
       end
 
       def file
-        matches = Dir.glob('/usr/local/lib/libglfw*.dylib').map { |path| File.basename(path) }
-        return matches.find { |m| m == 'libglfw3.dylib' || m == 'libglfw.3.dylib' } || matches.first
+        File.basename(match)
       end
+
+      private
+
+        def match
+          @match ||= find_match
+        end
+
+        def find_match
+          SEARCH_GLOBS.each do |glob|
+            matches = Dir.glob("#{glob}/libglfw*.dylib")
+            next if matches.empty?
+
+            return matches.find { |m| m.end_with?('libglfw3.dylib') || m.end_with?('libglfw.3.dylib') } || matches.first
+          end
+        end
     end
   end
 end

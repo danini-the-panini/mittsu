@@ -13,21 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
+        ruby: ['2.6.9', '2.7.5', '3.0.3', '3.1.1']
     steps:
       - uses: actions/checkout@v1
-      - name: Cache gems
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-          restore-keys: |
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
-            gems-v1-${{ runner.os }}-
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
       - run: bash install-glfw.sh
       - run: gem install bundler
@@ -48,21 +40,13 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
+        ruby: ['2.6.9', '2.7.5', '3.0.3', '3.1.1']
     steps:
       - uses: actions/checkout@v1
-      - name: Cache gems
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-          restore-keys: |
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
-            gems-v1-${{ runner.os }}-
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - run: brew install glfw
       - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
@@ -74,21 +58,13 @@ jobs:
       MITTSU_LIBGLFW_PATH: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw
     strategy:
       matrix:
-        ruby: ['2.5.x', '2.6.x', '2.7.x', '3.0.x']
+        ruby: ['2.6.9', '2.7.5', '3.0.3', '3.1.1']
     steps:
       - uses: actions/checkout@v1
-      - name: Cache gems
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-          restore-keys: |
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-${{ hashFiles('**/*.gemspec') }}-
-            gems-v1-${{ runner.os }}-${{ hashFiles('**/Gemfile') }}-
-            gems-v1-${{ runner.os }}-
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - run: .\install-glfw.ps1
       - run: gem install bundler
       - run: bundle install --path vendor/bundle
