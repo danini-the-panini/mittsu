@@ -35,7 +35,7 @@ module Mittsu
     attr_reader :logarithmic_depth_buffer, :programs, :light_renderer, :proj_screen_matrix
 
     def initialize(parameters = {})
-      puts "OpenGLRenderer (Revision #{REVISION})"
+      puts "Mittsu OpenGL Renderer #{VERSION}"
 
       fetch_parameters(parameters)
 
@@ -941,7 +941,7 @@ module Mittsu
 
       @width = parameters.fetch(:width, 800)
       @height = parameters.fetch(:height, 600)
-      @title = parameters.fetch(:title, "Mittsu #{REVISION}")
+      @title = parameters.fetch(:title, "Mittsu #{VERSION}")
       @antialias = parameters.fetch(:antialias, 0)
     end
 
