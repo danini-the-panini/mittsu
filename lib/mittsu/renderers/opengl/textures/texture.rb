@@ -61,14 +61,14 @@ module Mittsu
         glTexParameteri(texture_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
 
         if wrap_s != ClampToEdgeWrapping || wrap_t != ClampToEdgeWrapping
-          puts "WARNING: Mittsu::Texture: Texture is not power of two. Texture.wrap_s and Texture.wrap_t should be set to Mittsu::ClampToEdgeWrapping. (#{texture.source_file})"
+          puts "WARNING: Mittsu::Texture: Texture is not power of two. Texture.wrap_s and Texture.wrap_t should be set to Mittsu::ClampToEdgeWrapping. (#{source_file})"
         end
 
         glTexParameteri(texture_type, GL_TEXTURE_MAG_FILTER, filter_fallback(mag_filter))
         glTexParameteri(texture_type, GL_TEXTURE_MIN_FILTER, filter_fallback(min_filter))
 
         if min_filter != NearestFilter && min_filter != LinearFilter
-          puts "WARNING: Mittsu::Texture: Texture is not a power of two. Texture.min_filter should be set to Mittsu::NearestFilter or Mittsu::LinearFilter. (#{texture.source_file})"
+          puts "WARNING: Mittsu::Texture: Texture is not a power of two. Texture.min_filter should be set to Mittsu::NearestFilter or Mittsu::LinearFilter. (#{source_file})"
         end
 
         # TODO: anisotropic extension ???
