@@ -98,7 +98,7 @@ module Mittsu
       @_ray.copy(raycaster.ray).apply_matrix4(@_inverse_matrix)
 
       if !geometry.bounding_box.nil?
-        return unless ray.intersection_box?(geometry.bounding_box)
+        return unless @_ray.intersection_box?(geometry.bounding_box)
       end
 
 
@@ -132,9 +132,9 @@ module Mittsu
               v_c.from_array(positions, c * 3)
 
               if material.side == BackSide
-                intersection_point = ray.intersect_triangle(v_c, v_b, v_a, true)
+                intersection_point = @_ray.intersect_triangle(v_c, v_b, v_a, true)
               else
-                intersection_point = ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
+                intersection_point = @_ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
               end
 
               next if intersection_point.nil?
@@ -171,9 +171,9 @@ module Mittsu
             v_c.from_array(positions, j + 6)
 
             if material.side = BackSide
-              intersection_point = ray.intersect_triangle(v_c, v_b, v_a, true)
+              intersection_point = @_ray.intersect_triangle(v_c, v_b, v_a, true)
             else
-              intersection_point = ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
+              intersection_point = @_ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
             end
 
             next if intersection_point.nil?
