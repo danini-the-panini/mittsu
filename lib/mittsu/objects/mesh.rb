@@ -170,7 +170,7 @@ module Mittsu
             v_b.from_array(positions, j + 3)
             v_c.from_array(positions, j + 6)
 
-            if material.side = BackSide
+            if material.side == BackSide
               intersection_point = @_ray.intersect_triangle(v_c, v_b, v_a, true)
             else
               intersection_point = @_ray.intersect_triangle(v_a, v_b, v_c, material.side != DoubleSide)
