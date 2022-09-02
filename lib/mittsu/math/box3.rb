@@ -42,14 +42,14 @@ module Mittsu
             vertices = geometry.vertices
             vertices.each do |vertex|
               v1.copy(vertex)
-              v1.apply_matrix4(node.matrixWorld)
+              v1.apply_matrix4(node.matrix_world)
               scope.expand_by_point(v1)
             end
           elsif geometry.is_a?(Mittsu::BufferGeometry) && geometry.attributes['position'] != nil
             positions = geometry.attributes['position'].array
             positions.each_slice(3) do |postition|
               v1.set(position[0], position[1], position[2])
-              v1.apply_matrix4(node.matrixWorld)
+              v1.apply_matrix4(node.matrix_world)
               scope.expand_by_point(v1)
             end
           end
