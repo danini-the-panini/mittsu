@@ -20,7 +20,7 @@ module Mittsu
       @_ray.copy(raycaster.ray).apply_matrix4(@_inverse_matrix)
 
       if !geometry.bounding_box.nil?
-        return if ray.intersection_box?(geometry.bounding_box) == false
+        return if @_ray.intersection_box?(geometry.bounding_box) == false
       end
 
       local_threshold = threshold / ((self.scale.x + self.scale.y + self.scale.z) / 3.0)
