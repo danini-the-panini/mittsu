@@ -16,7 +16,7 @@ module Mittsu
 
     def raycast(raycaster, intersects)
       threshold = raycaster.params[:point_cloud][:threshold]
-      @_inverse_matrix.inverse(self.materix_world)
+      @_inverse_matrix.inverse(self.matrix_world)
       @_ray.copy(raycaster.ray).apply_matrix4(@_inverse_matrix)
 
       if !geometry.bounding_box.nil?
