@@ -141,7 +141,7 @@ module Mittsu
 
               intersection_point.apply_matrix4(@matrix_world)
 
-              distance = racaster.ray.origin.distance_to(intersection_point)
+              distance = raycaster.ray.origin.distance_to(intersection_point)
 
               next if distance < precision || distance < raycaster.near || distance > raycaster.far
 
@@ -180,7 +180,7 @@ module Mittsu
 
             intersection_point.apply_matrix4(@matrix_world)
 
-            distance = racaster.ray.origin.distance_to(intersection_point)
+            distance = raycaster.ray.origin.distance_to(intersection_point)
 
             next if distance < precision || distance < raycaster.near || distance > raycaster.far
 
