@@ -82,7 +82,7 @@ module Mittsu
     def test_point(point, index, local_threshold, raycaster, intersects)
       ray_point_distance = @_ray.distance_to_point(point)
       if ray_point_distance < local_threshold
-        intersect_point = @_ray.closes_point_to_point(point)
+        intersect_point = @_ray.closest_point_to_point(point)
         intersect_point.apply_matrix4(self.matrix_world)
 
         distance = raycaster.ray.origin.distance_to(intersect_point)
