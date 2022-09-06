@@ -38,18 +38,18 @@ module Mittsu
       object.traverse do |node|
         geometry = node.geometry
         if geometry != nil
-          if geometry instanceof Mittsu::Geometry
+          if geometry.is_a?(Mittsu::Geometry)
             vertices = geometry.vertices
             vertices.each do |vertex|
               v1.copy(vertex)
-              v1.apply_matrix4(node.matrixWorld)
+              v1.apply_matrix4(node.matrix_world)
               scope.expand_by_point(v1)
             end
-          elsif geometry instanceof Mittsu::BufferGeometry && geometry.attributes['position'] != nil
+          elsif geometry.is_a?(Mittsu::BufferGeometry) && geometry.attributes['position'] != nil
             positions = geometry.attributes['position'].array
             positions.each_slice(3) do |postition|
               v1.set(position[0], position[1], position[2])
-              v1.apply_matrix4(node.matrixWorld)
+              v1.apply_matrix4(node.matrix_world)
               scope.expand_by_point(v1)
             end
           end

@@ -16,11 +16,11 @@ module Mittsu
 
     def raycast(raycaster, intersects)
       threshold = raycaster.params[:point_cloud][:threshold]
-      @_inverse_matrix.inverse(self.materix_world)
+      @_inverse_matrix.inverse(self.matrix_world)
       @_ray.copy(raycaster.ray).apply_matrix4(@_inverse_matrix)
 
       if !geometry.bounding_box.nil?
-        return if ray.intersection_box?(geometry.bounding_box) == false
+        return if @_ray.intersection_box?(geometry.bounding_box) == false
       end
 
       local_threshold = threshold / ((self.scale.x + self.scale.y + self.scale.z) / 3.0)
@@ -82,7 +82,7 @@ module Mittsu
     def test_point(point, index, local_threshold, raycaster, intersects)
       ray_point_distance = @_ray.distance_to_point(point)
       if ray_point_distance < local_threshold
-        intersect_point = @_ray.closes_point_to_point(point)
+        intersect_point = @_ray.closest_point_to_point(point)
         intersect_point.apply_matrix4(self.matrix_world)
 
         distance = raycaster.ray.origin.distance_to(intersect_point)

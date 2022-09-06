@@ -397,7 +397,7 @@ module Mittsu
     end
 
     def merge_mesh(mesh)
-      if mesh instanceof Mittsu::Mesh == false
+      if mesh.is_a?(Mittsu::Mesh) == false
         puts('ERROR: Mittsu::Geometry#merge_mesh: mesh not an instance of Mittsu::Mesh.', mesh.inspect)
         return
       end
