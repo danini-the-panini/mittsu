@@ -36,11 +36,11 @@ module Mittsu
                       '/opt/homebrew/**']
 
       def path
-        File.dirname(match)
+        File.dirname(match.to_s)
       end
 
       def file
-        File.basename(match)
+        File.basename(match.to_s)
       end
 
       private
