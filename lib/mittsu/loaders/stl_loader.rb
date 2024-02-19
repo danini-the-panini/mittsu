@@ -26,7 +26,7 @@ module Mittsu
     def parse(data)
       stream = StringIO.new(data, "rb")
       # Load STL header (first 80 bytes max)
-      header = stream.gets(80)
+      header = stream.read(80)
       if header.slice(0,5) === "solid"
         stream.rewind
         parse_ascii(stream)
@@ -96,7 +96,7 @@ module Mittsu
     def parse_binary(stream)
       vertices = []
       faces = []
-      num_faces = stream.gets(4).unpack('S<').first
+      num_faces = stream.read(4).unpack('S<').first
       num_faces.times do |i|
         # Face normal
         normal = read_binary_vector(stream)
@@ -105,7 +105,7 @@ module Mittsu
         vertices << read_binary_vector(stream)
         vertices << read_binary_vector(stream)
         # Throw away the attribute bytes
-        stream.gets(2)
+        stream.read(2)
         # Store data
         faces << Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
         @vertex_count += 3
@@ -133,7 +133,7 @@ module Mittsu
     end
 
     def read_le_float(stream)
-      stream.gets(4).unpack('e').first
+      stream.read(4).unpack('e').first
     end
 
     def read_line(stream)

@@ -4,8 +4,8 @@ class TestSTLBinaryLoader < Minitest::Test
   def test_parse_binary
     loader = Mittsu::STLLoader.new
 
-    object = loader.parse File.read(
-      File.join(File.dirname(__FILE__), "..", "support", "samples", "square.binary.stl")
+    object = loader.load(
+      File.expand_path('../../support/samples/square.binary.stl', __FILE__)
     )
 
     assert_kind_of Mittsu::Group, object
@@ -22,7 +22,7 @@ class TestSTLBinaryLoader < Minitest::Test
       Mittsu::Vector3.new(0.0, 2.0, 0.0),
       Mittsu::Vector3.new(0.0, 0.0, 0.0),
       Mittsu::Vector3.new(2.0, 2.0, 0.0),
-      Mittsu::Vector3.new(2.0, 0.0, 0.0)
+      Mittsu::Vector3.new(2.2037353515625, 0.0, 0.0) # 2.2 in order to test EOL conversion - hex includes 0D0A
     ].each_with_index { |v, i|
       assert_equal v, square_mesh.geometry.vertices[i]
     }
