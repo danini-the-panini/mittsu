@@ -7,6 +7,7 @@ module Mittsu
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
       @vertex_count = 0
+      @line_num = 0
       @_listeners = {}
     end
 
@@ -26,10 +27,12 @@ module Mittsu
 
     def parse_ascii(stream)
       @group = Group.new
-      while line = stream.gets
+      while line = read_line(stream)
         case line
-        when /^solid/
+        when /^\s*solid/
           @group.add parse_ascii_solid(stream)
+        else
+          raise_error
         end
       end
       @group
@@ -37,14 +40,16 @@ module Mittsu
 
     def parse_ascii_solid(stream)
       geometry = Geometry.new
-      while line = stream.gets
+      while line = read_line(stream)
         case line
         when /^\s*facet/
           vertices, face = parse_ascii_facet(line, stream)
           geometry.vertices += vertices
           geometry.faces << face
-        when /^endsolid/
+        when /^\s*endsolid/
           break
+        else
+          raise_error
         end
       end
       geometry.merge_vertices
@@ -60,7 +65,7 @@ module Mittsu
       if line.match /([\d\.]+) ([\d\.]+) ([\d\.]+)/
         normal = Vector3.new($1, $2, $3)
       end
-      while line = stream.gets
+      while line = read_line(stream)
         case line
         when /^\s*outer loop/
           nil # Ignored
@@ -70,12 +75,23 @@ module Mittsu
           vertices << Vector3.new($1, $2, $3)
         when /^\s*endfacet/
           break
+        else
+          raise_error
         end
       end
       return nil if vertices.length != 3
       face = Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
       @vertex_count += 3
       return vertices, face
+    end
+
+    def read_line(stream)
+      @line_num += 1
+      stream.gets
+    end
+
+    def raise_error
+      raise "Mittsu::STLLoader: Unhandled line #{@line_num}"
     end
   end
 end

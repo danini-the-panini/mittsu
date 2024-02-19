@@ -4,8 +4,7 @@ class TestSTLLoader < Minitest::Test
   def test_parse
     loader = Mittsu::STLLoader.new
 
-    object = loader.parse """
-solid
+    object = loader.parse """solid
   facet normal 0 0 1
     outer loop
       vertex 0 2 0
@@ -54,6 +53,22 @@ endsolid
       assert_equal(c, face.c)
       assert_equal(Mittsu::Vector3.new(0, 0, 1), face.normal)
     }
+  end
+
+  def test_parse_with_error
+    loader = Mittsu::STLLoader.new
+
+    assert_raises('Mittsu::STLLoader: Unhandled line 3') { loader.parse """solid
+  facet normal 0 0 1
+    broken
+    outer loop
+      vertex 0 2 0
+      vertex 0 0 0
+      vertex 2 2 0
+    endloop
+  endfacet
+endsolid
+""" }
   end
 
 end
