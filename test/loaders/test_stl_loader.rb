@@ -7,16 +7,16 @@ class TestSTLLoader < Minitest::Test
     object = loader.parse """solid
   facet normal 0 0 1
     outer loop
-      vertex 0 2 0
-      vertex 0 0 0
-      vertex 2 2 0
+      vertex -1 100.0e-2 0
+      vertex -1 -1e0 0
+      vertex 1 100.0e-2 0
     endloop
   endfacet
   facet normal 0 0 1
     outer loop
-      vertex 0 0 0
-      vertex 2 0 0
-      vertex 2 2 0
+      vertex -1 -1e0 0
+      vertex 1 -1e0 0
+      vertex 1 100.0e-2 0
     endloop
   endfacet
 endsolid
@@ -33,10 +33,10 @@ endsolid
     assert_kind_of Mittsu::Mesh, square_mesh
     assert_kind_of Mittsu::Geometry, square_mesh.geometry
     [
-      Mittsu::Vector3.new(0.0, 2.0, 0.0),
-      Mittsu::Vector3.new(0.0, 0.0, 0.0),
-      Mittsu::Vector3.new(2.0, 2.0, 0.0),
-      Mittsu::Vector3.new(2.0, 0.0, 0.0)
+      Mittsu::Vector3.new(-1.0, 1.0, 0),
+      Mittsu::Vector3.new(-1.0, -1.0, 0),
+      Mittsu::Vector3.new(1.0, 1.0, 0),
+      Mittsu::Vector3.new(1.0, -1.0, 0)
     ].each_with_index { |v, i|
       assert_equal v, square_mesh.geometry.vertices[i]
     }
@@ -62,9 +62,9 @@ endsolid
   facet normal 0 0 1
     broken
     outer loop
-      vertex 0 2 0
-      vertex 0 0 0
-      vertex 2 2 0
+      vertex -1 1 -1
+      vertex -1 -1 -1
+      vertex 1 1 -1
     endloop
   endfacet
 endsolid

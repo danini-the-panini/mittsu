@@ -4,6 +4,10 @@ module Mittsu
   class STLLoader
     include EventDispatcher
 
+    FLOAT = /[\d|.|+|\-|e]+/
+    NORMAL_PATTERN = /normal\s+(#{FLOAT})\s+(#{FLOAT})\s+(#{FLOAT})/
+    VERTEX_PATTERN = /^\s*vertex\s+(#{FLOAT})\s+(#{FLOAT})\s+(#{FLOAT})/
+
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
       @vertex_count = 0
@@ -62,7 +66,7 @@ module Mittsu
     def parse_ascii_facet(line, stream)
       vertices = []
       normal = nil
-      if line.match /([\d\.]+) ([\d\.]+) ([\d\.]+)/
+      if line.match NORMAL_PATTERN
         normal = Vector3.new($1, $2, $3)
       end
       while line = read_line(stream)
@@ -71,7 +75,7 @@ module Mittsu
           nil # Ignored
         when /^\s*endloop/
           nil # Ignored
-        when /^\s*vertex ([\d\.]+) ([\d\.]+) ([\d\.]+)/
+        when VERTEX_PATTERN
           vertices << Vector3.new($1, $2, $3)
         when /^\s*endfacet/
           break
