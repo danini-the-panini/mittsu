@@ -10,6 +10,7 @@ module Mittsu
 
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
+      @group = Group.new
       @vertex_count = 0
       @line_num = 0
       @_listeners = {}
@@ -18,12 +19,12 @@ module Mittsu
     def load(url)
       loader = FileLoader.new(@manager)
 
-      text = loader.load(url)
-      parse(text)
+      data = loader.load(url)
+      parse(data)
     end
 
-    def parse(text)
-      stream = StringIO.new(text)
+    def parse(data)
+      stream = StringIO.new(data)
       # Load STL header (first 80 bytes max)
       header = stream.gets(80)
       if header.slice(0,5) === "solid"
@@ -33,42 +34,38 @@ module Mittsu
         stream.binmode
         parse_binary(stream)
       end
+      @group
     end
 
     private
 
     def parse_ascii(stream)
-      @group = Group.new
       while line = read_line(stream)
         case line
         when /^\s*solid/
-          @group.add parse_ascii_solid(stream)
+          parse_ascii_solid(stream)
         else
           raise_error
         end
       end
-      @group
     end
 
     def parse_ascii_solid(stream)
-      geometry = Geometry.new
+      vertices = []
+      faces = []
       while line = read_line(stream)
         case line
         when /^\s*facet/
-          vertices, face = parse_ascii_facet(line, stream)
-          geometry.vertices += vertices
-          geometry.faces << face
+          facet_vertices, face = parse_ascii_facet(line, stream)
+          vertices += facet_vertices
+          faces << face
         when /^\s*endsolid/
           break
         else
           raise_error
         end
       end
-      geometry.merge_vertices
-      geometry.compute_bounding_sphere
-      object = Object3D.new
-      object.add(Mesh.new(geometry))
-      object
+      add_mesh vertices, faces
     end
 
     def parse_ascii_facet(line, stream)
@@ -98,28 +95,34 @@ module Mittsu
     end
 
     def parse_binary(stream)
-      @group = Group.new
-      geometry = Geometry.new
+      vertices = []
+      faces = []
       num_faces = stream.gets(4).unpack('S<').first
       num_faces.times do |i|
         # Face normal
         normal = read_binary_vector(stream)
         # Vertices
-        geometry.vertices << read_binary_vector(stream)
-        geometry.vertices << read_binary_vector(stream)
-        geometry.vertices << read_binary_vector(stream)
+        vertices << read_binary_vector(stream)
+        vertices << read_binary_vector(stream)
+        vertices << read_binary_vector(stream)
         # Throw away the attribute bytes
         stream.gets(2)
         # Store data
-        geometry.faces << Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
+        faces << Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
         @vertex_count += 3
       end
+      add_mesh vertices, faces
+    end
+
+    def add_mesh(vertices, faces)
+      geometry = Geometry.new
+      geometry.vertices = vertices
+      geometry.faces = faces
       geometry.merge_vertices
       geometry.compute_bounding_sphere
       object = Object3D.new
       object.add(Mesh.new(geometry))
-      @group.add(object)
-      @group
+      @group.add object
     end
 
     def read_binary_vector(stream)
