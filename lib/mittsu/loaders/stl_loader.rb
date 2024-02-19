@@ -24,14 +24,13 @@ module Mittsu
     end
 
     def parse(data)
-      stream = StringIO.new(data)
+      stream = StringIO.new(data, "rb")
       # Load STL header (first 80 bytes max)
       header = stream.gets(80)
       if header.slice(0,5) === "solid"
         stream.rewind
         parse_ascii(stream)
       else
-        stream.binmode
         parse_binary(stream)
       end
       @group
@@ -127,10 +126,14 @@ module Mittsu
 
     def read_binary_vector(stream)
       Vector3.new(
-        stream.gets(4).unpack('e').first,
-        stream.gets(4).unpack('e').first,
-        stream.gets(4).unpack('e').first
+        read_le_float(stream),
+        read_le_float(stream),
+        read_le_float(stream)
       )
+    end
+
+    def read_le_float(stream)
+      stream.gets(4).unpack('e').first
     end
 
     def read_line(stream)
