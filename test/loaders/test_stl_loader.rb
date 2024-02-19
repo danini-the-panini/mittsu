@@ -71,4 +71,31 @@ endsolid
 """ }
   end
 
+
+  def test_multiple_solids
+    loader = Mittsu::STLLoader.new
+
+    object = loader.parse """solid
+  facet normal 0 0 1
+    outer loop
+      vertex -1 100.0e-2 0
+      vertex -1 -1e0 0
+      vertex 1 100.0e-2 0
+    endloop
+  endfacet
+endsolid
+solid
+  facet normal 0 0 1
+    outer loop
+      vertex -1 -1e0 0
+      vertex 1 -1e0 0
+      vertex 1 100.0e-2 0
+    endloop
+  endfacet
+endsolid
+"""
+
+    assert_kind_of Mittsu::Group, object
+    assert_equal 2, object.children.count
+  end
 end
