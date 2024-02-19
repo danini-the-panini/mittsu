@@ -1,6 +1,6 @@
 require 'minitest_helper'
 
-class TestSTLLoader < Minitest::Test
+class TestSTLASCIILoader < Minitest::Test
   def test_parse
     loader = Mittsu::STLLoader.new
 
@@ -72,7 +72,7 @@ endsolid
   end
 
 
-  def test_multiple_solids
+  def test_parse_multiple_solids
     loader = Mittsu::STLLoader.new
 
     object = loader.parse """solid
