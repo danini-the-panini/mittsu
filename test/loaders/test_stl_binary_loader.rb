@@ -19,10 +19,10 @@ class TestSTLBinaryLoader < Minitest::Test
     assert_kind_of Mittsu::Mesh, square_mesh
     assert_kind_of Mittsu::Geometry, square_mesh.geometry
     [
-      Mittsu::Vector3.new(-1.0, 1.0, 0),
-      Mittsu::Vector3.new(-1.0, -1.0, 0),
-      Mittsu::Vector3.new(1.0, 1.0, 0),
-      Mittsu::Vector3.new(1.0, -1.0, 0)
+      Mittsu::Vector3.new(0.0, 2.0, 0.0),
+      Mittsu::Vector3.new(0.0, 0.0, 0.0),
+      Mittsu::Vector3.new(2.0, 2.0, 0.0),
+      Mittsu::Vector3.new(2.0, 0.0, 0.0)
     ].each_with_index { |v, i|
       assert_equal v, square_mesh.geometry.vertices[i]
     }
@@ -40,4 +40,5 @@ class TestSTLBinaryLoader < Minitest::Test
       assert_equal(Mittsu::Vector3.new(0, 0, 1), face.normal)
     }
   end
+
 end

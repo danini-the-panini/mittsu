@@ -24,7 +24,15 @@ module Mittsu
 
     def parse(text)
       stream = StringIO.new(text)
-      parse_ascii(stream)
+      # Load STL header (first 80 bytes max)
+      header = stream.gets(80)
+      if header.slice(0,5) === "solid"
+        stream.rewind
+        parse_ascii(stream)
+      else
+        stream.binmode
+        parse_binary(stream)
+      end
     end
 
     private
@@ -87,6 +95,39 @@ module Mittsu
       face = Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
       @vertex_count += 3
       return vertices, face
+    end
+
+    def parse_binary(stream)
+      @group = Group.new
+      geometry = Geometry.new
+      num_faces = stream.gets(4).unpack('S<').first
+      num_faces.times do |i|
+        # Face normal
+        normal = read_binary_vector(stream)
+        # Vertices
+        geometry.vertices << read_binary_vector(stream)
+        geometry.vertices << read_binary_vector(stream)
+        geometry.vertices << read_binary_vector(stream)
+        # Throw away the attribute bytes
+        stream.gets(2)
+        # Store data
+        geometry.faces << Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
+        @vertex_count += 3
+      end
+      geometry.merge_vertices
+      geometry.compute_bounding_sphere
+      object = Object3D.new
+      object.add(Mesh.new(geometry))
+      @group.add(object)
+      @group
+    end
+
+    def read_binary_vector(stream)
+      Vector3.new(
+        stream.gets(4).unpack('e').first,
+        stream.gets(4).unpack('e').first,
+        stream.gets(4).unpack('e').first
+      )
     end
 
     def read_line(stream)
