@@ -1,22 +1,25 @@
 require 'minitest_helper'
 
 class Test3MFExporter < Minitest::Test
-  def test_3mf_content
-    # Create a test object
-    box = Mittsu::Mesh.new(
+  def setup
+    @tmpdir = Dir.mktmpdir
+    @box = Mittsu::Mesh.new(
       Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
     )
+    @box.name = "box"
+    @exporter = Mittsu::ThreeMFExporter.new
+  end
 
-    # Export to 3MF
-    exporter = Mittsu::ThreeMFExporter.new
-    file = exporter.send(:export_uncompressed, box)
-
-    assert_equal file, 42
+  def test_3mf_exports_3d_model_part
+    @exporter.send(:export_uncompressed, @tmpdir, @box)
+    assert File.exist?(File.join(@tmpdir, "3D/box.model"))
   end
 
   def test_export_method_alias
-    exporter = Mittsu::ThreeMFExporter.new
-    result = exporter.parse(Mittsu::Group.new())
-    assert_kind_of(String, result)
+    assert @exporter.parse(Mittsu::Group.new())
+  end
+
+  def teardown
+    FileUtils.remove_entry @tmpdir
   end
 end
