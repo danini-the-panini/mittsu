@@ -119,9 +119,7 @@ module Mittsu
       geometry.faces = faces
       geometry.merge_vertices
       geometry.compute_bounding_sphere
-      object = Object3D.new
-      object.add(Mesh.new(geometry))
-      @group.add object
+      @group.add Mesh.new(geometry)
     end
 
     def read_binary_vector(stream)

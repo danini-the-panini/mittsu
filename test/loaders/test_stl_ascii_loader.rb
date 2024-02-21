@@ -25,11 +25,7 @@ endsolid
     assert_kind_of Mittsu::Group, object
     assert_equal 1, object.children.count
 
-    square = object.children.first
-    assert_kind_of Mittsu::Object3D, square
-    assert_equal 1, square.children.count
-
-    square_mesh = square.children.first
+    square_mesh = object.children.first
     assert_kind_of Mittsu::Mesh, square_mesh
     assert_kind_of Mittsu::Geometry, square_mesh.geometry
     [
