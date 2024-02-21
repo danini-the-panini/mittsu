@@ -1,7 +1,7 @@
 require 'minitest_helper'
 
 class Test3MFExporter < Minitest::Test
-  def test_3mf_container
+  def test_3mf_content
     # Create a test object
     box = Mittsu::Mesh.new(
       Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
@@ -13,7 +13,7 @@ class Test3MFExporter < Minitest::Test
 
     # Export to 3MF
     exporter = Mittsu::ThreeMFExporter.new
-    file = exporter.export(group)
+    file = exporter.send(:export_uncompressed, group)
 
     assert_equal file, 42
   end
