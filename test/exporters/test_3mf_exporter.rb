@@ -13,8 +13,14 @@ class Test3MFExporter < Minitest::Test
 
     # Export to 3MF
     exporter = Mittsu::ThreeMFExporter.new
-    file = exporter.parse(group)
+    file = exporter.export(group)
 
     assert_equal file, 42
+  end
+
+  def test_export_method_alias
+    exporter = Mittsu::ThreeMFExporter.new
+    result = exporter.parse(Mittsu::Group.new())
+    assert_kind_of(String, result)
   end
 end
