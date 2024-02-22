@@ -14,8 +14,10 @@ class Test3MFExporter < Minitest::Test
 
   def test_3mf_exports_3d_model_part
     @exporter.send(:export_uncompressed, @tmpdir, @box)
-    REXML::Document.new File.read(File.join(@tmpdir, "3D/box.model"))
+    xml = REXML::Document.new File.read(File.join(@tmpdir, "3D/box.model"))
     assert_equal "millimeter", REXML::XPath.first(xml, "/model/@unit").value
+    assert_equal "model", REXML::XPath.first(xml, "/model/resources/object/@type").value
+  end
 
   def test_3mf_exports_content_types
     @exporter.send(:export_uncompressed, @tmpdir, @box)
@@ -32,7 +34,7 @@ class Test3MFExporter < Minitest::Test
   end
 
   def test_export_method_alias
-    assert @exporter.parse(Mittsu::Group.new())
+    assert @exporter.parse(@box)
   end
 
   def teardown

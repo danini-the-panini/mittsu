@@ -57,7 +57,30 @@ module Mittsu
         xml = Builder::XmlMarkup.new(target: file, indent: 2)
         xml.instruct! :xml, encoding: "UTF-8"
         xml.model unit: "millimeter", "xml:lang": "en-US", xmlns:"http://schemas.microsoft.com/3dmanufacturing/core/2015/02" do
-
+          objectIDs = []
+          xml.resources do
+            uuid = SecureRandom.uuid
+            objectIDs << uuid
+            xml.object id: uuid, type: "model" do
+              xml.mesh do
+                xml.vertices do
+                  object.geometry.vertices.each do |vertex|
+                    xml.vertex x: vertex.x, y: vertex.y, z: vertex.z
+                  end
+                end
+                xml.triangles do
+                  object.geometry.faces.each do |face|
+                    xml.triangle v1: face.a, v2: face.b, v3: face.c
+                  end
+                end
+              end
+            end
+          end
+          xml.build do
+            objectIDs.each do |id|
+              xml.item objectid: id
+            end
+          end
         end
       end
       filename
