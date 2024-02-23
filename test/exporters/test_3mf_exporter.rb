@@ -4,7 +4,6 @@ require 'rexml/xpath'
 
 class Test3MFExporter < Minitest::Test
   def setup
-    @tmpdir = Dir.mktmpdir
     @box = Mittsu::Mesh.new(
       Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
     )
@@ -36,10 +35,11 @@ class Test3MFExporter < Minitest::Test
   end
 
   def test_export_method_alias
-    assert @exporter.parse(@box)
+    Dir.mktmpdir do |dir|
+      filename = File.join(dir, "test.3mf")
+      @exporter.parse(@box, filename)
+      assert File.exist?(filename)
+    end
   end
 
-  def teardown
-    FileUtils.remove_entry @tmpdir
-  end
 end
