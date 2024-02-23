@@ -12,20 +12,25 @@ class Test3MFExporter < Minitest::Test
     @exporter = Mittsu::ThreeMFExporter.new
   end
 
-  def test_3mf_exports_3d_model_part
-    @exporter.send(:export_uncompressed, @tmpdir, @box)
-    xml = REXML::Document.new File.read(File.join(@tmpdir, "3D/box.model"))
+  def test_3mf_model_file
+    file = @exporter.send(:model_file, @box)
+    xml = REXML::Document.new file
     assert_equal "millimeter", REXML::XPath.first(xml, "/model/@unit").value
     assert_equal "model", REXML::XPath.first(xml, "/model/resources/object/@type").value
     assert_equal 8, REXML::XPath.match(xml, "/model/resources/object/mesh/vertices/vertex").count
     assert_equal 12, REXML::XPath.match(xml, "/model/resources/object/mesh/triangles/triangle").count
+  end
+
+  def test_content_types_file
+    file = @exporter.send(:content_types_file)
+    xml = REXML::Document.new file
     assert_equal "application/vnd.openxmlformats-package.relationships+xml",
       REXML::XPath.first(xml, "/Types/Default[@Extension='rels']/@ContentType").value
   end
 
-  def test_3mf_exports_rels
-    @exporter.send(:export_uncompressed, @tmpdir, @box)
-    xml = REXML::Document.new File.read(File.join(@tmpdir, "_rels/.rels"))
+  def test_rels_file
+    file = @exporter.send(:rels_file, ["box"])
+    xml = REXML::Document.new file
     assert_equal "/3D/box.model",
       REXML::XPath.first(xml, "/Relationships/Relationship/@Target").value
   end

@@ -6,13 +6,24 @@ module Mittsu
     def initialize(options = {})
     end
 
-    def export(object)
-      Dir.mktmpdir do |dir|
-        Zip::File.open("output.3mf", Zip::File::CREATE) do |zip|
-          Dir.glob("**/*", File::FNM_DOTMATCH, base: dir) do |f|
-            zip.add(f, File.join(dir, f))
-          end
+    def export(object, filename)
+      Zip::OutputStream.open(filename) do |zip|
+        # OPC content types file
+        store(zip, "[Content_Types].xml", content_types_file)
+        # Add models
+        models = [object]
+        model_names = models.map do |model|
+          # Set a model name if there isn't one
+          model.name ||= SecureRandom.uuid
+          # Make model name filesystem-safe
+          name = model.name.parameterize
+          # Store model
+          store(zip, "3D/#{name}.model", model_file(model))
+          # Remember the name for later
+          name
         end
+        # Add OPC rels file with list of contained models
+        store(zip, "_rels/.rels", rels_file(model_names))
       end
       true
     end
@@ -22,17 +33,20 @@ module Mittsu
 
     private
 
-    def export_uncompressed(dir, object)
-      export_content_types(dir)
-      filename = export_3d_model_part(dir, object)
-      export_rels(dir, [filename])
+    def store(zip, filename, data)
+      zip.put_next_entry(filename)
+      zip.write(data)
     end
 
-    def export_content_types(dir)
-      filename = File.join(dir, "[Content_Types].xml")
-      File.open(filename, "wb") do |file|
-        xml = Builder::XmlMarkup.new(target: file, indent: 2)
-        xml.instruct! :xml, encoding: "UTF-8"
+    def build &block
+      xml = Builder::XmlMarkup.new
+      xml.instruct! :xml, encoding: "UTF-8"
+      yield xml
+      xml.target!
+    end
+
+    def content_types_file
+      build do |xml|
         xml.Types xmlns: "http://schemas.openxmlformats.org/package/2006/content-types" do
           xml.Default Extension: "rels", ContentType: "application/vnd.openxmlformats-package.relationships+xml"
           xml.Default Extension: "model", ContentType: "application/vnd.ms-package.3dmanufacturing-3dmodel+xml"
@@ -40,12 +54,8 @@ module Mittsu
       end
     end
 
-    def export_rels(dir, models)
-      FileUtils.mkdir_p File.join(dir, "_rels")
-      filename = File.join(dir, "_rels/.rels")
-      File.open(filename, "wb") do |file|
-        xml = Builder::XmlMarkup.new(target: file, indent: 2)
-        xml.instruct! :xml, encoding: "UTF-8"
+    def rels_file(models)
+      build do |xml|
         xml.Relationships xmlns: "http://schemas.openxmlformats.org/package/2006/relationships" do
           models.each do |name|
             xml.Relationship Target: "/3D/#{name}.model", Id: name, ContentType: "http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"
@@ -54,13 +64,8 @@ module Mittsu
       end
     end
 
-    def export_3d_model_part(dir, object)
-      FileUtils.mkdir_p File.join(dir, "3D")
-      filename = object.name.parameterize || SecureRandom.uuid
-      pathname = File.join(dir, "3D/#{filename}.model")
-      File.open(pathname, "wb") do |file|
-        xml = Builder::XmlMarkup.new(target: file, indent: 2)
-        xml.instruct! :xml, encoding: "UTF-8"
+    def model_file(object)
+      build do |xml|
         xml.model unit: "millimeter", "xml:lang": "en-US", xmlns:"http://schemas.microsoft.com/3dmanufacturing/core/2015/02" do
           objectIDs = []
           xml.resources do
@@ -88,7 +93,6 @@ module Mittsu
           end
         end
       end
-      filename
     end
   end
 end
