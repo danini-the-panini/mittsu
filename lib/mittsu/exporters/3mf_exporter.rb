@@ -15,12 +15,10 @@ module Mittsu
         model_names = models.map do |model|
           # Set a model name if there isn't one
           model.name ||= SecureRandom.uuid
-          # Make model name filesystem-safe
-          name = model.name.parameterize
           # Store model
-          store(zip, "3D/#{name}.model", model_file(model))
+          store(zip, "3D/#{model.name}.model", model_file(model))
           # Remember the name for later
-          name
+          model.name
         end
         # Add OPC rels file with list of contained models
         store(zip, "_rels/.rels", rels_file(model_names))
