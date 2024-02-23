@@ -1,4 +1,5 @@
 require 'builder'
+require 'zip/filesystem'
 
 module Mittsu
   class ThreeMFExporter
@@ -7,9 +8,13 @@ module Mittsu
 
     def export(object)
       Dir.mktmpdir do |dir|
-        export_uncompressed(dir, object)
-        # TODO compress into single file
+        Zip::File.open("output.3mf", Zip::File::CREATE) do |zip|
+          Dir.glob("**/*", File::FNM_DOTMATCH, base: dir) do |f|
+            zip.add(f, File.join(dir, f))
+          end
+        end
       end
+      true
     end
 
     # Parse is here for consistency with THREE.js's weird naming of exporter methods
