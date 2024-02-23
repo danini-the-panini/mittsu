@@ -17,11 +17,8 @@ class Test3MFExporter < Minitest::Test
     xml = REXML::Document.new File.read(File.join(@tmpdir, "3D/box.model"))
     assert_equal "millimeter", REXML::XPath.first(xml, "/model/@unit").value
     assert_equal "model", REXML::XPath.first(xml, "/model/resources/object/@type").value
-  end
-
-  def test_3mf_exports_content_types
-    @exporter.send(:export_uncompressed, @tmpdir, @box)
-    xml = REXML::Document.new File.read(File.join(@tmpdir, "[Content_Types].xml"))
+    assert_equal 8, REXML::XPath.match(xml, "/model/resources/object/mesh/vertices/vertex").count
+    assert_equal 12, REXML::XPath.match(xml, "/model/resources/object/mesh/triangles/triangle").count
     assert_equal "application/vnd.openxmlformats-package.relationships+xml",
       REXML::XPath.first(xml, "/Types/Default[@Extension='rels']/@ContentType").value
   end
