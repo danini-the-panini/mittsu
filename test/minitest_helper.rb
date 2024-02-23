@@ -11,6 +11,7 @@ SimpleCov.start do
   add_filter "/test/"
   add_group 'Cameras', 'lib/mittsu/cameras'
   add_group 'Core', 'lib/mittsu/core'
+  add_group 'Exporters', 'lib/mittsu/exporters'
   add_group 'Extras', 'lib/mittsu/extras'
   add_group 'Lights', 'lib/mittsu/lights'
   add_group 'Loaders', 'lib/mittsu/loaders'
