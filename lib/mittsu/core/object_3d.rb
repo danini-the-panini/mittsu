@@ -357,7 +357,7 @@ module Mittsu
 
       if !self.children.empty?
         data[:children] = @children.map do |child|
-          child.jsonify
+          child.to_json
         end
       end
 
