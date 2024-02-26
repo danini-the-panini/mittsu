@@ -27,6 +27,10 @@ class Test3MFExporter < Minitest::Test
     file = @exporter.send(:model_file, group)
     xml = REXML::Document.new file
     assert_equal 2, REXML::XPath.match(xml, "/model/resources/object/mesh").count
+    assert_equal 8, REXML::XPath.match(xml, "/model/resources/object[1]/mesh/vertices/vertex").count
+    assert_equal 12, REXML::XPath.match(xml, "/model/resources/object[1]/mesh/triangles/triangle").count
+    assert_equal 63, REXML::XPath.match(xml, "/model/resources/object[2]/mesh/vertices/vertex").count
+    assert_equal 88, REXML::XPath.match(xml, "/model/resources/object[2]/mesh/triangles/triangle").count
     assert_equal 2, REXML::XPath.match(xml, "/model/build/item").count
   end
 
