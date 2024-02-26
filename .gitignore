@@ -10,4 +10,4 @@
 /test/reports
 *.gem
 .tool-versions
-/examples/output.3mf
+/examples/mittsu-export.3mf
