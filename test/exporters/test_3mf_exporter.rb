@@ -20,6 +20,16 @@ class Test3MFExporter < Minitest::Test
     assert_equal 12, REXML::XPath.match(xml, "/model/resources/object/mesh/triangles/triangle").count
   end
 
+  def test_grouped_meshes
+    group = Mittsu::Group.new
+    group.add(@box)
+    group.add(Mittsu::Mesh.new(Mittsu::SphereGeometry.new()))
+    file = @exporter.send(:model_file, group)
+    xml = REXML::Document.new file
+    assert_equal 2, REXML::XPath.match(xml, "/model/resources/object/mesh").count
+    assert_equal 2, REXML::XPath.match(xml, "/model/build/item").count
+  end
+
   def test_content_types_file
     file = @exporter.send(:content_types_file)
     xml = REXML::Document.new file
