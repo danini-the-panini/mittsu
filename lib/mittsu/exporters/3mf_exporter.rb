@@ -67,20 +67,9 @@ module Mittsu
         xml.model unit: "millimeter", "xml:lang": "en-US", xmlns:"http://schemas.microsoft.com/3dmanufacturing/core/2015/02" do
           objectIDs = []
           xml.resources do
-            uuid = SecureRandom.uuid
-            objectIDs << uuid
-            xml.object id: uuid, type: "model" do
-              xml.mesh do
-                xml.vertices do
-                  object.geometry.vertices.each do |vertex|
-                    xml.vertex x: vertex.x, y: vertex.y, z: vertex.z
-                  end
-                end
-                xml.triangles do
-                  object.geometry.faces.each do |face|
-                    xml.triangle v1: face.a, v2: face.b, v3: face.c
-                  end
-                end
+            object.traverse do |x|
+              if (x.is_a? Mesh)
+                objectIDs << build_object(xml, x)
               end
             end
           end
@@ -88,6 +77,29 @@ module Mittsu
             objectIDs.each do |id|
               xml.item objectid: id
             end
+          end
+        end
+      end
+    end
+
+    def build_object(xml, object)
+      uuid = SecureRandom.uuid
+      xml.object id: uuid, type: "model" do
+        build_mesh_element(xml, object.geometry)
+      end
+      uuid
+    end
+
+    def build_mesh_element(xml, geometry)
+      xml.mesh do
+        xml.vertices do
+          geometry.vertices.each do |vertex|
+            xml.vertex x: vertex.x, y: vertex.y, z: vertex.z
+          end
+        end
+        xml.triangles do
+          geometry.faces.each do |face|
+            xml.triangle v1: face.a, v2: face.b, v3: face.c
           end
         end
       end
