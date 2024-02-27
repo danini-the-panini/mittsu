@@ -16,8 +16,9 @@ jobs:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
-      - run: bash install-glfw.sh
+      - uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: libglfw3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
