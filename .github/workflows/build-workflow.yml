@@ -16,12 +16,12 @@ jobs:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
+      - run: bash install-glfw.sh
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
-      - run: bash install-glfw.sh
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.2.1
         if: github.event_name == 'push'
@@ -41,11 +41,11 @@ jobs:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
       - uses: actions/checkout@v4
+      - run: brew install glfw
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - run: brew install glfw
       - run: bundle exec rake test
 
   windows:
@@ -58,9 +58,9 @@ jobs:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
       - uses: actions/checkout@v4
+      - run: .\install-glfw.ps1
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - run: .\install-glfw.ps1
       - run: bundle exec rake test
