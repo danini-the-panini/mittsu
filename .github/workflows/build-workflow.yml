@@ -15,7 +15,7 @@ jobs:
       matrix:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -40,7 +40,7 @@ jobs:
       matrix:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -57,7 +57,7 @@ jobs:
       matrix:
         ruby: ['2.6', '2.7', '3.0', '3.1', 'head']
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
