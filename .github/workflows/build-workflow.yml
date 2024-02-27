@@ -22,7 +22,6 @@ jobs:
           bundler-cache: true
       - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
       - run: bash install-glfw.sh
-      - run: gem install bundler
       - run: bundle install --path vendor/bundle
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.2.1
