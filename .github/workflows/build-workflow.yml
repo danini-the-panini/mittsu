@@ -22,7 +22,6 @@ jobs:
           bundler-cache: true
       - run: sudo apt-get update; sudo apt-get install cmake xorg-dev libgl1-mesa-dev
       - run: bash install-glfw.sh
-      - run: bundle install --path vendor/bundle
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.2.1
         if: github.event_name == 'push'
@@ -47,7 +46,6 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - run: brew install glfw
-      - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
 
   windows:
@@ -65,6 +63,4 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - run: .\install-glfw.ps1
-      - run: gem install bundler
-      - run: bundle install --path vendor/bundle
       - run: bundle exec rake test
