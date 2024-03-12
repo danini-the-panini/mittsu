@@ -50,9 +50,9 @@ module Mittsu
     def init_line_buffers(object)
       nvertices = @vertices.length
 
-      @vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
-      @color_array = Array.new(nvertices * 3, 0.0) # Float32Array
-      @line_distance_array = Array.new(nvertices, 0.0) # Float32Array
+      @vertex_array = Float32Array.new(nvertices * 3, 0.0)
+      @color_array = Float32Array.new(nvertices * 3, 0.0)
+      @line_distance_array = Float32Array.new(nvertices, 0.0)
 
       @line_count = nvertices
 
@@ -62,8 +62,8 @@ module Mittsu
     def init_particle_buffers(object)
       nvertices = @vertices.length
 
-      @vertex_array = Array.new(nvertices * 3, 0.0) # Float32Array
-      @color_array = Array.new(nvertices * 3, 0.0) # Float32Array
+      @vertex_array = Float32Array.new(nvertices * 3, 0.0)
+      @color_array = Float32Array.new(nvertices * 3, 0.0)
 
       @particle_count = nvertices
 
@@ -100,7 +100,7 @@ module Mittsu
         end
 
         glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @vertex_array, hint)
+        glBufferData(GL_ARRAY_BUFFER, @vertex_array.bytesize, @vertex_array.ptr, hint)
       end
 
       if @colors_need_update
@@ -113,7 +113,7 @@ module Mittsu
         end
 
         glBindBuffer(GL_ARRAY_BUFFER, @color_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @color_array, hint)
+        glBufferData(GL_ARRAY_BUFFER, @color_array.bytesize, @color_array.ptr, hint)
       end
 
       if @line_distances_need_update
@@ -122,7 +122,7 @@ module Mittsu
         end
 
         glBindBuffer(GL_ARRAY_BUFFER, @line_distance_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @line_distance_array, hint)
+        glBufferData(GL_ARRAY_BUFFER, @line_distance_array.bytesize, @line_distance_array.ptr, hint)
       end
 
       if @custom_attributes
@@ -173,7 +173,7 @@ module Mittsu
           end
 
           glBindBuffer(GL_ARRAY_BUFFER, custom_attribute.buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, custom_attribute.array, hint)
+          glBufferData(GL_ARRAY_BUFFER, custom_attribute.array.bytesize, custom_attribute.array.ptr, hint)
 
           custom_attribute.needs_update = false
         end
@@ -192,7 +192,7 @@ module Mittsu
 
 
         glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @vertex_array, hint)
+        glBufferData(GL_ARRAY_BUFFER, @vertex_array.bytesize, @vertex_array.ptr, hint)
       end
 
       if @colors_need_update
@@ -205,7 +205,7 @@ module Mittsu
         end
 
         glBindBuffer(GL_ARRAY_BUFFER, @color_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @color_array, hint)
+        glBufferData(GL_ARRAY_BUFFER, @color_array.bytesize, @color_array.ptr, hint)
       end
 
       if @custom_attribute
@@ -330,7 +330,7 @@ module Mittsu
 
             attribute.size = size
 
-            attribute.array = Array.new(nvertices * size) # Float32Array
+            attribute.array = Float32Array.new(nvertices * size)
 
             attribute.buffer = glCreateBuffer
             attribute.buffer.belongs_to_attribute = name

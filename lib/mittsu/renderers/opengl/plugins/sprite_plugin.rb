@@ -2,17 +2,13 @@ module Mittsu
   class SpritePlugin
     include OpenGLHelper
 
-    VERTICES = [
-      -0.5, -0.5, 0.0, 0.0,
-       0.5, -0.5, 1.0, 0.0,
-       0.5,  0.5, 1.0, 1.0,
-      -0.5,  0.5, 0.0, 1.0
-    ] # Float32Array
+    VERTICES = Float32Array.from_array [-0.5, -0.5, 0.0, 0.0,
+                                         0.5, -0.5, 1.0, 0.0,
+                                         0.5,  0.5, 1.0, 1.0,
+                                        -0.5,  0.5, 0.0, 1.0]
 
-    FACES = [
-      0, 1, 2,
-      0, 2, 3
-    ] # Uint16Array
+    FACES = UInt16Array.from_array [0, 1, 2,
+                                    0, 2, 3]
 
     def initialize(renderer, sprites)
       @renderer = renderer
@@ -60,10 +56,10 @@ module Mittsu
       @element_buffer = glCreateBuffer
 
       glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
-      glBufferData_easy(GL_ARRAY_BUFFER, VERTICES, GL_STATIC_DRAW)
+      glBufferData(GL_ARRAY_BUFFER, VERTICES.bytesize, VERTICES.ptr, GL_STATIC_DRAW)
 
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, @element_buffer)
-      glBufferData_easy(GL_ELEMENT_ARRAY_BUFFER, FACES, GL_STATIC_DRAW)
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, FACES.bytesize, FACES.ptr, GL_STATIC_DRAW)
     end
 
     def create_program
@@ -199,7 +195,7 @@ module Mittsu
         end
 
         # draw elements
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0) # GL_UNSIGNED_SHORT
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0)
       end
     end
 

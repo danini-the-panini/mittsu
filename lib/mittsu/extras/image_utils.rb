@@ -43,7 +43,7 @@ module Mittsu
 
       def generate_data_texture(width, height, color)
         size = width * height
-        data = Array.new(3 * size) # Uint8Array
+        data = UInt8Array.new(3 * size)
 
         r = (color.r * 255).floor
         g = (color.g * 255).floor
