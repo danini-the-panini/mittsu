@@ -4,6 +4,10 @@ require 'glfw'
 require 'mittsu/utils'
 require 'mittsu/renderers/glfw_lib'
 glfw_lib = Mittsu::GLFWLib.discover
+# Workaround until https://github.com/vaiorabbit/ruby-opengl/pull/32 gets merged
+GLFW.class_variable_get('@@lib_signature').each do |sig|
+  sig.gsub!(/const void(?!\s*\*)/, 'void')
+end
 GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path) unless Mittsu.test?
 
 include GLFW
@@ -45,18 +49,18 @@ module Mittsu
             this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
           end
         end
-        glfwSetKeyCallback(@handle, @key_callback)
+        glfwSetKeyCallback(@handle, Fiddle::Pointer[@key_callback.to_i])
 
         @char_callback = ::GLFW::create_callback(:GLFWcharfun) do |window_handle, codepoint|
           char = [codepoint].pack('U')
           this.char_input_handler.call(char) unless this.char_input_handler.nil?
         end
-        glfwSetCharCallback(@handle, @char_callback)
+        glfwSetCharCallback(@handle, Fiddle::Pointer[@char_callback.to_i])
 
         @cursor_pos_callback = ::GLFW::create_callback(:GLFWcursorposfun) do |window_handle, xpos, ypos|
           this.cursor_pos_handler.call(Vector2.new(xpos, ypos)) unless this.cursor_pos_handler.nil?
         end
-        glfwSetCursorPosCallback(@handle, @cursor_pos_callback)
+        glfwSetCursorPosCallback(@handle, Fiddle::Pointer[@cursor_pos_callback.to_i])
 
         @mouse_button_callback = ::GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
           mpos = this.mouse_position
@@ -66,17 +70,17 @@ module Mittsu
             this.mouse_button_release_handler.call(button, mpos) unless this.mouse_button_release_handler.nil?
           end
         end
-        glfwSetMouseButtonCallback(@handle, @mouse_button_callback)
+        glfwSetMouseButtonCallback(@handle, Fiddle::Pointer[@mouse_button_callback.to_i])
 
         @scroll_callback = ::GLFW::create_callback(:GLFWscrollfun) do |window_handle, xoffset, yoffset|
           this.scroll_handler.call(Vector2.new(xoffset, yoffset)) unless this.scroll_handler.nil?
         end
-        glfwSetScrollCallback(@handle, @scroll_callback)
+        glfwSetScrollCallback(@handle, Fiddle::Pointer[@scroll_callback.to_i])
 
         @frabuffer_size_callback = ::GLFW::create_callback(:GLFWframebuffersizefun) do |window_handle, new_width, new_height|
           this.framebuffer_size_handler.call(new_width, new_height) unless this.framebuffer_size_handler.nil?
         end
-        glfwSetFramebufferSizeCallback(@handle, @frabuffer_size_callback)
+        glfwSetFramebufferSizeCallback(@handle, Fiddle::Pointer[@frabuffer_size_callback.to_i])
 
         @joystick_buttons = poll_all_joysticks_buttons
       end
