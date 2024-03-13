@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'mittsu/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "mittsu"
+  spec.name          = "mittsu-renderer-opengl"
   spec.version       = Mittsu::VERSION
   spec.authors       = ["Danielle Smith"]
   spec.email         = ["danini@hey.com"]
@@ -17,9 +17,13 @@ Gem::Specification.new do |spec|
     "bug_tracker" => "https://github.com/danini-the-panini/mittsu/issues"
   }
 
+  spec.files         = `git ls-files lib/mittsu/renderers -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples)/|\.sh$)}) }
+  spec.require_paths = ["lib"]
+
   spec.required_ruby_version = '>= 2.0.0'
   spec.requirements << 'OpenGL 3.3+ capable hardware and drivers'
 
   spec.add_runtime_dependency 'mittsu-core', Mittsu::VERSION
-  spec.add_runtime_dependency 'mittsu-renderer-opengl', Mittsu::VERSION
+  spec.add_runtime_dependency 'opengl-bindings2'
+  spec.add_runtime_dependency 'ffi'
 end
