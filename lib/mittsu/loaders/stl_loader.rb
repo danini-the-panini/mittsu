@@ -96,7 +96,7 @@ module Mittsu
     def parse_binary(stream)
       vertices = []
       faces = []
-      num_faces = stream.read(4).unpack('S<').first
+      num_faces = stream.read(4).unpack('L<').first
       num_faces.times do |i|
         # Face normal
         normal = read_binary_vector(stream)
