@@ -88,9 +88,9 @@ module Mittsu
         end
       end
       return nil if vertices.length != 3
-      face = Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
-      @vertex_count += 3
-      return vertices, face
+      # Merge with existing vertices
+      face, new_vertices = face_with_merged_vertices(vertices, normal)
+      return new_vertices, face
     end
 
     def parse_binary(stream)
@@ -101,16 +101,24 @@ module Mittsu
         # Face normal
         normal = read_binary_vector(stream)
         # Vertices
+        face_vertices = []
         vertices << read_binary_vector(stream)
         vertices << read_binary_vector(stream)
         vertices << read_binary_vector(stream)
         # Throw away the attribute bytes
         stream.read(2)
         # Store data
-        faces << Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
-        @vertex_count += 3
+        face, new_vertices = face_with_merged_vertices(face_vertices, normal)
+        faces << face
+        vertices += new_vertices
       end
       add_mesh vertices, faces
+    end
+
+    def face_with_merged_vertices(vertices, normal)
+      face = Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
+      @vertex_count += 3
+      return face, vertices
     end
 
     def add_mesh(vertices, faces)
