@@ -10,9 +10,6 @@ module Mittsu
 
     def initialize(manager = DefaultLoadingManager)
       @manager = manager
-      @group = Group.new
-      @vertex_count = 0
-      @line_num = 0
       @_listeners = {}
     end
 
@@ -24,6 +21,7 @@ module Mittsu
     end
 
     def parse(data)
+      reset_loader_vars
       stream = StringIO.new(data, "rb")
       # Load STL header (first 80 bytes max)
       header = stream.read(80)
@@ -37,6 +35,13 @@ module Mittsu
     end
 
     private
+
+    def reset_loader_vars
+      @vertex_hash = {}
+      @vertex_count = 0
+      @line_num = 0
+      @group = Group.new
+    end
 
     def parse_ascii(stream)
       while line = read_line(stream)
