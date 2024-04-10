@@ -128,7 +128,10 @@ module Mittsu
       vertices.each do |v|
         index, is_new = vertex_index(v)
         indices << index
-        new_vertices << v if is_new
+        if is_new
+          new_vertices << v
+          @vertex_count += 1
+        end
       end
       # Return face and new vertex list
       return Face3.new(
@@ -140,12 +143,10 @@ module Mittsu
 
     def vertex_index(vertex)
       key = vertex_key(vertex)
-      unless @vertex_hash.has_key? key
-        index = @vertex_hash[key] = @vertex_count
-        @vertex_count += 1
-        return index, true
+      if i = @vertex_hash[key]
+        return i, false
       else
-        return @vertex_hash[key], false
+        return (@vertex_hash[key] = @vertex_count), true
       end
     end
 
