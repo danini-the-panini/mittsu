@@ -107,9 +107,9 @@ module Mittsu
         normal = read_binary_vector(stream)
         # Vertices
         face_vertices = []
-        vertices << read_binary_vector(stream)
-        vertices << read_binary_vector(stream)
-        vertices << read_binary_vector(stream)
+        face_vertices << read_binary_vector(stream)
+        face_vertices << read_binary_vector(stream)
+        face_vertices << read_binary_vector(stream)
         # Throw away the attribute bytes
         stream.read(2)
         # Store data
@@ -121,28 +121,41 @@ module Mittsu
     end
 
     def face_with_merged_vertices(vertices, normal)
-      new_vertices = vertices
+      new_vertices = []
+      indices = []
+      vertices.each do |v|
+        index, is_new = vertex_index(v)
+        indices << index
+        new_vertices << v if is_new
+      end
       # Create face
       face = Face3.new(
-        vertex_index(vertices[0]),
-        vertex_index(vertices[1]),
-        vertex_index(vertices[2]),
+        indices[0],
+        indices[1],
+        indices[2],
         normal
       )
       return face, new_vertices
     end
 
     def vertex_index(vertex)
-      index = @vertex_count
-      @vertex_count += 1
-      index
+      is_new = false
+      key = vertex_key(vertex)
+      unless @vertex_hash.has_key? key
+        @vertex_hash[key] = @vertex_hash.count
+        is_new = true
+      end
+      return @vertex_hash[key], is_new
+    end
+
+    def vertex_key(vertex)
+      vertex.elements.map(&:to_s).join
     end
 
     def add_mesh(vertices, faces)
       geometry = Geometry.new
       geometry.vertices = vertices
       geometry.faces = faces
-      geometry.merge_vertices
       geometry.compute_bounding_sphere
       @group.add Mesh.new(geometry)
     end
