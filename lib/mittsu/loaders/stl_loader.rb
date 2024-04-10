@@ -94,7 +94,8 @@ module Mittsu
       end
       return nil if vertices.length != 3
       # Merge with existing vertices
-      face, new_vertices = face_with_merged_vertices(vertices, normal)
+      face, new_vertices = face_with_merged_vertices(vertices)
+      face.normal = normal
       return new_vertices, face
     end
 
@@ -113,14 +114,15 @@ module Mittsu
         # Throw away the attribute bytes
         stream.read(2)
         # Store data
-        face, new_vertices = face_with_merged_vertices(face_vertices, normal)
+        face, new_vertices = face_with_merged_vertices(face_vertices)
+        face.normal = normal
         faces << face
         vertices += new_vertices
       end
       add_mesh vertices, faces
     end
 
-    def face_with_merged_vertices(vertices, normal)
+    def face_with_merged_vertices(vertices)
       new_vertices = []
       indices = []
       vertices.each do |v|
@@ -132,8 +134,7 @@ module Mittsu
       return Face3.new(
         indices[0],
         indices[1],
-        indices[2],
-        normal
+        indices[2]
       ), new_vertices
     end
 
