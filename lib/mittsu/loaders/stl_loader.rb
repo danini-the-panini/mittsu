@@ -128,28 +128,28 @@ module Mittsu
         indices << index
         new_vertices << v if is_new
       end
-      # Create face
-      face = Face3.new(
+      # Return face and new vertex list
+      return Face3.new(
         indices[0],
         indices[1],
         indices[2],
         normal
-      )
-      return face, new_vertices
+      ), new_vertices
     end
 
     def vertex_index(vertex)
-      is_new = false
       key = vertex_key(vertex)
       unless @vertex_hash.has_key? key
-        @vertex_hash[key] = @vertex_hash.count
-        is_new = true
+        index = @vertex_hash[key] = @vertex_count
+        @vertex_count += 1
+        return index, true
+      else
+        return @vertex_hash[key], false
       end
-      return @vertex_hash[key], is_new
     end
 
     def vertex_key(vertex)
-      vertex.elements.map(&:to_s).join
+      vertex.elements.pack("D*")
     end
 
     def add_mesh(vertices, faces)
