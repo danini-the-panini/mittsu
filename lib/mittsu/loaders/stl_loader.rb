@@ -121,9 +121,21 @@ module Mittsu
     end
 
     def face_with_merged_vertices(vertices, normal)
-      face = Face3.new(@vertex_count, @vertex_count+1, @vertex_count+2, normal)
-      @vertex_count += 3
-      return face, vertices
+      new_vertices = vertices
+      # Create face
+      face = Face3.new(
+        vertex_index(vertices[0]),
+        vertex_index(vertices[1]),
+        vertex_index(vertices[2]),
+        normal
+      )
+      return face, new_vertices
+    end
+
+    def vertex_index(vertex)
+      index = @vertex_count
+      @vertex_count += 1
+      index
     end
 
     def add_mesh(vertices, faces)
