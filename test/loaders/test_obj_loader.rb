@@ -485,12 +485,12 @@ f 1/2/3 2/1/4 3/3/2 4/4/1
     loader = Mittsu::OBJLoader.new
 
     object = loader.parse """
-o square1
-
 v 0.0 1.0 0.0
 v 0.0 0.0 0.0
 v 1.0 0.0 0.0
 v 1.0 1.0 0.0
+
+o square1
 
 f 1 2 4
 f 2 3 4
