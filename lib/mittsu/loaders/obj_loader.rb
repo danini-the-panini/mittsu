@@ -53,7 +53,7 @@ module Mittsu
 
       when FACE_PATTERN         then parse_face(line)
 
-      when OBJECT_PATTERN       then new_object($1) and reset_vertices
+      when OBJECT_PATTERN       then handle_object($1)
       when GROUP_PATTERN        # ignore
       when SMOOTH_GROUP_PATTERN # ignore
 
@@ -105,9 +105,15 @@ module Mittsu
       raw_lines.split("\n").map(&:strip).reject(&:empty?).reject{|l| l.start_with? '#'}
     end
 
-    def new_object(object_name = '')
-      end_object
-      @object = Object3D.new
+    def handle_object(object_name = '')
+      # Reset if we're already working on a named object
+      # otherwise, just name the one we have in progress
+      unless @object&.name.nil?
+        end_object
+        reset_vertices
+        @object = nil
+      end
+      @object ||= Object3D.new
       @object.name = object_name
     end
 
@@ -120,7 +126,7 @@ module Mittsu
 
     def new_mesh
       end_mesh
-      new_object if @object.nil?
+      handle_object if @object.nil?
       @geometry = Geometry.new
       @mesh = Mesh.new(@geometry, @material || MeshLambertMaterial.new)
       @mesh.name = @object.name
