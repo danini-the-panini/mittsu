@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'opengl-bindings'
   spec.add_runtime_dependency 'ffi'
   spec.add_runtime_dependency 'chunky_png'
+  spec.add_runtime_dependency 'builder'
+  spec.add_runtime_dependency 'rubyzip'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
@@ -34,4 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'benchmark-ips'
   spec.add_development_dependency 'simplecov', '0.17.1'
+  spec.add_development_dependency 'rexml'
 end
