@@ -16,9 +16,10 @@ module Mittsu
           # Set a model name if there isn't one
           model.name ||= SecureRandom.uuid
           # Store model
-          store(zip, "3D/#{model.name}.model", model_file(model))
+          name = filesystem_safe_name(model)
+          store(zip, "3D/#{name}.model", model_file(model))
           # Remember the name for later
-          model.name
+          name
         end
         # Add OPC rels file with list of contained models
         store(zip, "_rels/.rels", rels_file(model_names))
@@ -30,6 +31,10 @@ module Mittsu
     alias_method :parse, :export
 
     private
+
+    def filesystem_safe_name(model)
+      model.name.delete("/\\?*:|\"<>")
+    end
 
     def store(zip, filename, data)
       zip.put_next_entry(filename)

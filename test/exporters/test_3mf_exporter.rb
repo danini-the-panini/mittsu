@@ -11,6 +11,12 @@ class Test3MFExporter < Minitest::Test
     @exporter = Mittsu::ThreeMFExporter.new
   end
 
+  def test_filename_sanitization
+    @box.name = "<box>"
+    name = @exporter.send(:filesystem_safe_name, @box)
+    assert_equal "box", name
+  end
+
   def test_3mf_model_file
     file = @exporter.send(:model_file, @box)
     xml = REXML::Document.new file
