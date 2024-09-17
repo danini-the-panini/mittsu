@@ -2,16 +2,18 @@ module Mittsu
   class Sprite < Object3D
     attr_accessor :material, :z
 
-    INDICES = [0, 1, 2,
-               0, 2, 3] # Uint16Array
-    VERTICES = [-0.5, -0.5, 0.0,
-                0.5, -0.5, 0.0,
-                0.5, 0.5, 0.0,
-                -0.5, 0.5, 0.0] # Float32Array
-    UVS = [0.0, 0.0,
-           1.0, 0.0,
-           1.0, 1.0,
-           0.0, 1.0] # Float32Array
+    INDICES = UInt16Array.from_array [0, 1, 2,
+                                      0, 2, 3]
+
+    VERTICES = Float32Array.from_array [-0.5, -0.5, 0.0,
+                                         0.5, -0.5, 0.0,
+                                         0.5,  0.5, 0.0,
+                                        -0.5,  0.5, 0.0]
+
+    UVS = Float32Array.from_array [0.0, 0.0,
+                                   1.0, 0.0,
+                                   1.0, 1.0,
+                                   0.0, 1.0]
 
     GEOMETRY = BufferGeometry.new
     GEOMETRY[:index] = BufferAttribute.new(INDICES, 1)

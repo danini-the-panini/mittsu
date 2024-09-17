@@ -31,6 +31,7 @@ module Mittsu
     end
 
     def array_to_ptr_easy(data)
+      return data.ptr if data.is_a?(NativeArray)
       if data.first.is_a?(Float)
         size_of_element = Fiddle::SIZEOF_FLOAT
         format_of_element = 'F'
@@ -46,7 +47,7 @@ module Mittsu
 
     def array_to_ptr(data, size, format)
       ptr = Fiddle::Pointer.malloc(size)
-      ptr[0,size] = data.pack(format * data.length)
+      ptr[0,size] = data.pack("#{format}#{data.length}")
       ptr
     end
 
