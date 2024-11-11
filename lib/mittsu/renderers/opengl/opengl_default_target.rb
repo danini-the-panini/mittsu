@@ -25,12 +25,12 @@ module Mittsu
     end
 
     def use
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      GL.BindFramebuffer(GL::FRAMEBUFFER, 0)
       use_viewport
     end
 
     def use_viewport
-      glViewport(@viewport_x, @viewport_y, @viewport_width, @viewport_height)
+      GL.Viewport(@viewport_x, @viewport_y, @viewport_width, @viewport_height)
     end
 
     def set_and_use_viewport(x, y, width, height)

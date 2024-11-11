@@ -89,13 +89,13 @@ module Mittsu
     end
 
     def load_uniforms_matrices(uniforms)
-      glUniformMatrix4fv(uniforms['modelViewMatrix'],
-                         1, GL_FALSE,
+      GL.UniformMatrix4fv(uniforms['modelViewMatrix'],
+                         1, GL::FALSE,
                          array_to_ptr_easy(@model_view_matrix.elements))
 
       if uniforms['normalMatrix']
-        glUniformMatrix3fv(uniforms['normalMatrix'],
-                           1, GL_FALSE,
+        GL.UniformMatrix3fv(uniforms['normalMatrix'],
+                           1, GL::FALSE,
                            array_to_ptr_easy(@normal_matrix.elements))
       end
     end

@@ -123,7 +123,7 @@ module Mittsu
       #  - limit here is ANGLE's 254 max uniform vectors
       #    (up to 54 should be safe)
 
-      n_vertex_uniforms = (glGetParameter(GL_MAX_VERTEX_UNIFORM_COMPONENTS) / 4.0).floor
+      n_vertex_uniforms = (GL.GetParameter(GL::MAX_VERTEX_UNIFORM_COMPONENTS) / 4.0).floor
       n_vertex_matrices = ((n_vertex_uniforms - 20) / 4.0).floor
 
       max_bones = n_vertex_matrices

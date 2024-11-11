@@ -1,7 +1,7 @@
 module Mittsu
   module GenericLib
     def discover
-      case OpenGL.get_platform
+      case GL.get_platform
       when :OPENGL_PLATFORM_WINDOWS
         self::Windows.new
       when :OPENGL_PLATFORM_MACOSX
@@ -9,7 +9,7 @@ module Mittsu
       when :OPENGL_PLATFORM_LINUX
         self::Linux.new
       else
-        warn "WARNING: Unsupported platform: #{OpenGL.get_platform}"
+        warn "WARNING: Unsupported platform: #{GL.get_platform}"
         Base.new
       end
     end

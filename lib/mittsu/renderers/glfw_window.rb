@@ -4,9 +4,7 @@ require 'glfw'
 require 'mittsu/utils'
 require 'mittsu/renderers/glfw_lib'
 glfw_lib = Mittsu::GLFWLib.discover
-GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path) unless Mittsu.test?
-
-include GLFW
+::GLFW.load_lib(ENV["MITTSU_LIBGLFW_FILE"] || glfw_lib.file, ENV["MITTSU_LIBGLFW_PATH"] || glfw_lib.path) unless Mittsu.test?
 
 module Mittsu
   module GLFW
@@ -14,88 +12,88 @@ module Mittsu
       attr_accessor :key_press_handler, :key_release_handler, :key_repeat_handler, :char_input_handler, :cursor_pos_handler, :mouse_button_press_handler, :mouse_button_release_handler, :scroll_handler, :framebuffer_size_handler
 
       def initialize(width, height, title, antialias: 0)
-        glfwInit
+        ::GLFW.Init
 
-        glfwWindowHint GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE
-        glfwWindowHint GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE
-        glfwWindowHint GLFW_CONTEXT_VERSION_MAJOR, 3
-        glfwWindowHint GLFW_CONTEXT_VERSION_MINOR, 3
-        glfwWindowHint GLFW_CONTEXT_REVISION, 0
+        ::GLFW.WindowHint ::GLFW::OPENGL_PROFILE, ::GLFW::OPENGL_CORE_PROFILE
+        ::GLFW.WindowHint ::GLFW::OPENGL_FORWARD_COMPAT, GL::TRUE
+        ::GLFW.WindowHint ::GLFW::CONTEXT_VERSION_MAJOR, 3
+        ::GLFW.WindowHint ::GLFW::CONTEXT_VERSION_MINOR, 3
+        ::GLFW.WindowHint ::GLFW::CONTEXT_REVISION, 0
 
         if antialias > 0
-          glfwWindowHint GLFW_SAMPLES, antialias
+          ::GLFW.WindowHint ::GLFW::SAMPLES, antialias
         end
 
         @width, @height, @title = width, height, title
-        @handle = glfwCreateWindow(@width, @height, @title, nil, nil)
+        @handle = ::GLFW.CreateWindow(@width, @height, @title, nil, nil)
         if @handle.null?
           raise "Unable to create window."
         end
-        glfwMakeContextCurrent @handle
-        glfwSwapInterval 1
+        ::GLFW.MakeContextCurrent @handle
+        ::GLFW.SwapInterval 1
 
         this = self
         @key_callback = ::GLFW::create_callback(:GLFWkeyfun) do |window_handle, key, scancode, action, mods|
-          if action == GLFW_PRESS
+          if action == ::GLFW::PRESS
             this.key_press_handler.call(key) unless this.key_press_handler.nil?
             this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
-          elsif action == GLFW_RELEASE
+          elsif action == ::GLFW::RELEASE
             this.key_release_handler.call(key) unless this.key_release_handler.nil?
-          elsif action == GLFW_REPEAT
+          elsif action == ::GLFW::REPEAT
             this.key_repeat_handler.call(key) unless this.key_repeat_handler.nil?
           end
         end
-        glfwSetKeyCallback(@handle, @key_callback)
+        ::GLFW.SetKeyCallback(@handle, @key_callback)
 
         @char_callback = ::GLFW::create_callback(:GLFWcharfun) do |window_handle, codepoint|
           char = [codepoint].pack('U')
           this.char_input_handler.call(char) unless this.char_input_handler.nil?
         end
-        glfwSetCharCallback(@handle, @char_callback)
+        ::GLFW.SetCharCallback(@handle, @char_callback)
 
         @cursor_pos_callback = ::GLFW::create_callback(:GLFWcursorposfun) do |window_handle, xpos, ypos|
           this.cursor_pos_handler.call(Vector2.new(xpos, ypos)) unless this.cursor_pos_handler.nil?
         end
-        glfwSetCursorPosCallback(@handle, @cursor_pos_callback)
+        ::GLFW.SetCursorPosCallback(@handle, @cursor_pos_callback)
 
         @mouse_button_callback = ::GLFW::create_callback(:GLFWmousebuttonfun) do |window_handle, button, action, mods|
           mpos = this.mouse_position
-          if action == GLFW_PRESS
+          if action == ::GLFW::PRESS
             this.mouse_button_press_handler.call(button, mpos) unless this.mouse_button_press_handler.nil?
-          elsif action == GLFW_RELEASE
+          elsif action == ::GLFW::RELEASE
             this.mouse_button_release_handler.call(button, mpos) unless this.mouse_button_release_handler.nil?
           end
         end
-        glfwSetMouseButtonCallback(@handle, @mouse_button_callback)
+        ::GLFW.SetMouseButtonCallback(@handle, @mouse_button_callback)
 
         @scroll_callback = ::GLFW::create_callback(:GLFWscrollfun) do |window_handle, xoffset, yoffset|
           this.scroll_handler.call(Vector2.new(xoffset, yoffset)) unless this.scroll_handler.nil?
         end
-        glfwSetScrollCallback(@handle, @scroll_callback)
+        ::GLFW.SetScrollCallback(@handle, @scroll_callback)
 
         @frabuffer_size_callback = ::GLFW::create_callback(:GLFWframebuffersizefun) do |window_handle, new_width, new_height|
           this.framebuffer_size_handler.call(new_width, new_height) unless this.framebuffer_size_handler.nil?
         end
-        glfwSetFramebufferSizeCallback(@handle, @frabuffer_size_callback)
+        ::GLFW.SetFramebufferSizeCallback(@handle, @frabuffer_size_callback)
 
         @joystick_buttons = poll_all_joysticks_buttons
       end
 
       def run
-        while glfwWindowShouldClose(@handle) == 0
+        while ::GLFW.WindowShouldClose(@handle) == 0
           yield
 
-          glfwSwapBuffers @handle
-          glfwPollEvents
+          ::GLFW.SwapBuffers @handle
+          ::GLFW.PollEvents
           poll_joystick_events
         end
-        glfwDestroyWindow @handle
-        glfwTerminate
+        ::GLFW.DestroyWindow @handle
+        ::GLFW.Terminate
       end
 
       def framebuffer_size
         width, height = ' '*8, ' '*8
-        glfwGetFramebufferSize(@handle, width, height)
+        ::GLFW.GetFramebufferSize(@handle, width, height)
         [width.unpack('L')[0], height.unpack('L')[0]]
       end
 
@@ -112,7 +110,7 @@ module Mittsu
       end
 
       def key_down?(key)
-        glfwGetKey(@handle, key) == GLFW_PRESS
+        ::GLFW.GetKey(@handle, key) == ::GLFW::PRESS
       end
 
       def on_character_input &block
@@ -133,12 +131,12 @@ module Mittsu
 
       def mouse_position
         xpos, ypos = ' '*8, ' '*8
-        glfwGetCursorPos(@handle, xpos, ypos);
+        ::GLFW.GetCursorPos(@handle, xpos, ypos);
         Vector2.new(xpos.unpack('D')[0], ypos.unpack('D')[0])
       end
 
       def mouse_button_down?(button)
-        glfwGetMouseButton(@handle, button) == GLFW_PRESS
+        ::GLFW.GetMouseButton(@handle, button) == ::GLFW::PRESS
       end
 
       def on_scroll &block
@@ -149,15 +147,15 @@ module Mittsu
         @framebuffer_size_handler = block
       end
 
-      def joystick_buttons(joystick = GLFW_JOYSTICK_1)
+      def joystick_buttons(joystick = ::GLFW::JOYSTICK_1)
         @joystick_buttons = poll_all_joysticks_buttons
         @joystick_buttons[joystick]
       end
 
-      def joystick_axes(joystick = GLFW_JOYSTICK_1)
+      def joystick_axes(joystick = ::GLFW::JOYSTICK_1)
         return [] unless joystick_present?(joystick)
         count = ' ' * 4
-        array = glfwGetJoystickAxes(joystick, count)
+        array = ::GLFW.GetJoystickAxes(joystick, count)
         count = count.unpack('l')[0]
         array[0, count * 4].unpack('f' * count)
       end
@@ -170,30 +168,30 @@ module Mittsu
         @joystick_button_release_handler = block
       end
 
-      def joystick_present?(joystick = GLFW_JOYSTICK_1)
-        glfwJoystickPresent(joystick).nonzero?
+      def joystick_present?(joystick = ::GLFW::JOYSTICK_1)
+        ::GLFW.JoystickPresent(joystick).nonzero?
       end
 
-      def joystick_button_down?(button, joystick = GLFW_JOYSTICK_1)
+      def joystick_button_down?(button, joystick = ::GLFW::JOYSTICK_1)
         @joystick_buttons[joystick][button]
       end
 
-      def joystick_name(joystick = GLFW_JOYSTICK_1)
-        glfwGetJoystickName(joystick)
+      def joystick_name(joystick = ::GLFW::JOYSTICK_1)
+        ::GLFW.GetJoystickName(joystick)
       end
 
       def set_mouselock(value)
         if value
-          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+          ::GLFW.SetInputMode(@handle, ::GLFW::CURSOR, ::GLFW::CURSOR_DISABLED)
         else
-          glfwSetInputMode(@handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
+          ::GLFW.SetInputMode(@handle, ::GLFW::CURSOR, ::GLFW::CURSOR_NORMAL)
         end
       end
 
       private
 
       def poll_all_joysticks_buttons
-        (GLFW_JOYSTICK_1..GLFW_JOYSTICK_LAST).map do |joystick|
+        (::GLFW::JOYSTICK_1..::GLFW::JOYSTICK_LAST).map do |joystick|
           poll_joystick_buttons(joystick)
         end
       end
@@ -201,7 +199,7 @@ module Mittsu
       def poll_joystick_buttons(joystick)
         return nil unless joystick_present?(joystick)
         count = ' ' * 4
-        array = glfwGetJoystickButtons(joystick, count)
+        array = ::GLFW.GetJoystickButtons(joystick, count)
         count = count.unpack('l')[0]
         array[0, count].unpack('c' * count).map(&:nonzero?)
       end

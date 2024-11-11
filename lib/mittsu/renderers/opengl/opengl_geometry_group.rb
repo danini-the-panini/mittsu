@@ -24,26 +24,26 @@ module Mittsu
     end
 
     def create_mesh_buffers
-      @vertex_array_object = glCreateVertexArray
+      @vertex_array_object = GL.CreateVertexArray
 
-      @vertex_buffer = glCreateBuffer
-      @normal_buffer = glCreateBuffer
-      @tangent_buffer = glCreateBuffer
-      @color_buffer = glCreateBuffer
-      @uv_buffer = glCreateBuffer
-      @uv2_buffer = glCreateBuffer
+      @vertex_buffer = GL.CreateBuffer
+      @normal_buffer = GL.CreateBuffer
+      @tangent_buffer = GL.CreateBuffer
+      @color_buffer = GL.CreateBuffer
+      @uv_buffer = GL.CreateBuffer
+      @uv2_buffer = GL.CreateBuffer
 
-      @skin_indices_buffer = glCreateBuffer
-      @skin_weights_buffer = glCreateBuffer
+      @skin_indices_buffer = GL.CreateBuffer
+      @skin_weights_buffer = GL.CreateBuffer
 
-      @face_buffer = glCreateBuffer
-      @line_buffer = glCreateBuffer
+      @face_buffer = GL.CreateBuffer
+      @line_buffer = GL.CreateBuffer
 
       if !@num_morph_targets.nil?
         @morph_targets_buffers = []
 
         @num_morph_targets.times do |m|
-          @morph_targets_buffers << glCreateBuffer
+          @morph_targets_buffers << GL.CreateBuffer
         end
       end
 
@@ -51,7 +51,7 @@ module Mittsu
         @morph_normals_buffers = []
 
         @num_morph_normals.times do |m|
-          @morph_normals_buffers << glCreateBuffer
+          @morph_normals_buffers << GL.CreateBuffer
         end
       end
     end
@@ -141,7 +141,7 @@ module Mittsu
             attribute[:size] = size
             attribute[:array] = Array.new(nvertices * size) # Float32Array
 
-            attribute[:buffer] = glCreateBuffer
+            attribute[:buffer] = GL.CreateBuffer
             attribute[:buffer_belongs_to_attribute] = name
 
             original_attribute[:needs_update] = true
@@ -211,8 +211,8 @@ module Mittsu
           offset += 9
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @vertex_array, hint)
+        GL.BindBuffer(GL::ARRAY_BUFFER, @vertex_buffer)
+        GL.BufferData_easy(GL::ARRAY_BUFFER, @vertex_array, hint)
       end
 
       if geometry.morph_targets_need_update
@@ -275,12 +275,12 @@ module Mittsu
             offset_morph_target += 9
           end
 
-          glBindBuffer(GL_ARRAY_BUFFER, @morph_targets_buffers[vk])
-          glBufferData_easy(GL_ARRAY_BUFFER, @morph_targets_arrays[vk], hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @morph_targets_buffers[vk])
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @morph_targets_arrays[vk], hint)
 
           if material.morph_normals
-            glBindBuffer(GL_ARRAY_BUFFER, @morph_normals_buffers[vk])
-            glBufferData_easy(GL_ARRAY_BUFFER, @morph_normals_arrays[vk], hint)
+            GL.BindBuffer(GL::ARRAY_BUFFER, @morph_normals_buffers[vk])
+            GL.BufferData_easy(GL::ARRAY_BUFFER, @morph_normals_arrays[vk], hint)
           end
         end
       end
@@ -335,11 +335,11 @@ module Mittsu
         end
 
         if offset_skin > 0
-          glBindBuffer(GL_ARRAY_BUFFER, @skin_indices_buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, @skin_indices_array, hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @skin_indices_buffer)
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @skin_indices_array, hint)
 
-          glBindBuffer(GL_ARRAY_BUFFER, @skin_weights_buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, @skin_weight_array, hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @skin_weights_buffer)
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @skin_weight_array, hint)
         end
       end
 
@@ -376,8 +376,8 @@ module Mittsu
         end
 
         if offset_color > 0
-          glBindBuffer(GL_ARRAY_BUFFER, @color_buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, @color_array, hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @color_buffer)
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @color_array, hint)
         end
       end
 
@@ -409,8 +409,8 @@ module Mittsu
           offset_tangent += 12
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, @angent_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @tangent_array, hint)
+        GL.BindBuffer(GL::ARRAY_BUFFER, @angent_buffer)
+        GL.BufferData_easy(GL::ARRAY_BUFFER, @tangent_array, hint)
       end
 
       if geometry.normals_need_update
@@ -441,8 +441,8 @@ module Mittsu
           end
         end
 
-        glBindBuffer(GL_ARRAY_BUFFER, @normal_buffer)
-        glBufferData_easy(GL_ARRAY_BUFFER, @normal_array, hint)
+        GL.BindBuffer(GL::ARRAY_BUFFER, @normal_buffer)
+        GL.BufferData_easy(GL::ARRAY_BUFFER, @normal_array, hint)
       end
 
       if geometry.uvs_need_update && obj_uvs
@@ -462,8 +462,8 @@ module Mittsu
         end
 
         if offset_uv > 0
-          glBindBuffer(GL_ARRAY_BUFFER, @uv_buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, @uv_array, hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @uv_buffer)
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @uv_array, hint)
         end
       end
 
@@ -484,8 +484,8 @@ module Mittsu
         end
 
         if offset_uv2 > 0
-          glBindBuffer(GL_ARRAY_BUFFER, @uv2_buffer)
-          glBufferData_easy(GL_ARRAY_BUFFER, @uv2_array, hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, @uv2_buffer)
+          GL.BufferData_easy(GL::ARRAY_BUFFER, @uv2_array, hint)
         end
       end
 
@@ -511,11 +511,11 @@ module Mittsu
           vertex_index += 3
         end
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, @face_buffer)
-        glBufferData_easy(GL_ELEMENT_ARRAY_BUFFER, @face_array, hint)
+        GL.BindBuffer(GL::ELEMENT_ARRAY_BUFFER, @face_buffer)
+        GL.BufferData_easy(GL::ELEMENT_ARRAY_BUFFER, @face_array, hint)
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, @line_buffer)
-        glBufferData_easy(GL_ELEMENT_ARRAY_BUFFER, @line_array, hint)
+        GL.BindBuffer(GL::ELEMENT_ARRAY_BUFFER, @line_buffer)
+        GL.BufferData_easy(GL::ELEMENT_ARRAY_BUFFER, @line_array, hint)
       end
 
       if @custom_attributes_list
@@ -731,8 +731,8 @@ module Mittsu
             end
           end
 
-          glBindBuffer(GL_ARRAY_BUFFER, custom_attribute[:buffer])
-          glBufferData_easy(GL_ARRAY_BUFFER, custom_attribute[:array], hint)
+          GL.BindBuffer(GL::ARRAY_BUFFER, custom_attribute[:buffer])
+          GL.BufferData_easy(GL::ARRAY_BUFFER, custom_attribute[:array], hint)
         end
       end
 

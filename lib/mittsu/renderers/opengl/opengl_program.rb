@@ -22,7 +22,7 @@ module Mittsu
     private
 
     def compile_and_link_program(material, parameters)
-      @program = glCreateProgram
+      @program = GL.CreateProgram
 
       # TODO: necessary for OpenGL?
       # index0_attribute_name = material.index0_attribute_name
@@ -41,10 +41,10 @@ module Mittsu
         # because potentially expensive emulation is done by __browser__ if attribute 0 is disabled. (no browser here!)
         # And, color, for example is often automatically bound to index 0 so disabling it
 
-      #   glBindAttributeLocation(program, 0, index0_attribute_name)
+      #   GL.BindAttributeLocation(program, 0, index0_attribute_name)
       # end
 
-      glLinkProgram(@program)
+      GL.LinkProgram(@program)
       check_for_link_errors
       post_link_clean_up
     end
@@ -64,18 +64,18 @@ module Mittsu
 
     def link_status
       ptr = ' '*8
-      glGetProgramiv @program, GL_LINK_STATUS, ptr
+      GL.GetProgramiv @program, GL::LINK_STATUS, ptr
       ptr.unpack('L')[0]
     end
 
     def program_info_log
       ptr = ' '*8
-      glGetProgramiv @program, GL_INFO_LOG_LENGTH, ptr
+      GL.GetProgramiv @program, GL::INFO_LOG_LENGTH, ptr
       length = ptr.unpack('L')[0]
 
       if length > 0
         log = ' '*length
-        glGetProgramInfoLog @program, length, ptr, log
+        GL.GetProgramInfoLog @program, length, ptr, log
         log.unpack("A#{length}")[0]
       else
         ''
@@ -86,14 +86,14 @@ module Mittsu
       log_info = program_info_log
 
       if !link_status
-        puts "ERROR: Mittsu::OpenGLProgram: shader error: #{glGetError}, GL_INVALID_STATUS, #{glGetProgramParameter(program, GL_VALIDATE_STATUS)}, glGetProgramParameterInfoLog, #{log_info}"
+        puts "ERROR: Mittsu::OpenGLProgram: shader error: #{GL.GetError}, GL::INVALID_STATUS, #{GL.GetProgramParameter(program, GL::VALIDATE_STATUS)}, GL.GetProgramParameterInfoLog, #{log_info}"
       end
 
       if !log_info.empty?
-        puts "WARNING: Mittsu::OpenGLProgram: glGetProgramInfoLog, #{log_info}"
+        puts "WARNING: Mittsu::OpenGLProgram: GL.GetProgramInfoLog, #{log_info}"
         # TODO: useless in OpenGL ???
-        # puts "WARNING: #{glGetExtension( 'OPENGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader )}"
-        # puts "WARNING: #{glGetExtension( 'OPENGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader )}"
+        # puts "WARNING: #{GL.GetExtension( 'OPENGL_debug_shaders' ).getTranslatedShaderSource( GL.VertexShader )}"
+        # puts "WARNING: #{GL.GetExtension( 'OPENGL_debug_shaders' ).getTranslatedShaderSource( GL.FragmentShader )}"
       end
     end
 
@@ -165,11 +165,11 @@ module Mittsu
         prefix_fragment = File.read(File.expand_path('../../shaders/shader_templates/fragment.glsl.erb', __FILE__))
       end
 
-      @vertex_shader = OpenGLShader.new(GL_VERTEX_SHADER, compile_shader_template(prefix_vertex + material.shader[:vertex_shader], binding))
-      @fragment_shader = OpenGLShader.new(GL_FRAGMENT_SHADER, compile_shader_template(prefix_fragment + material.shader[:fragment_shader], binding))
+      @vertex_shader = OpenGLShader.new(GL::VERTEX_SHADER, compile_shader_template(prefix_vertex + material.shader[:vertex_shader], binding))
+      @fragment_shader = OpenGLShader.new(GL::FRAGMENT_SHADER, compile_shader_template(prefix_fragment + material.shader[:fragment_shader], binding))
 
-      glAttachShader(@program, @vertex_shader.shader)
-      glAttachShader(@program, @fragment_shader.shader)
+      GL.AttachShader(@program, @vertex_shader.shader)
+      GL.AttachShader(@program, @fragment_shader.shader)
     end
 
     def compile_shader_template(template, b)
@@ -177,8 +177,8 @@ module Mittsu
     end
 
     def post_link_clean_up
-      glDeleteShader(@vertex_shader.shader)
-      glDeleteShader(@fragment_shader.shader)
+      GL.DeleteShader(@vertex_shader.shader)
+      GL.DeleteShader(@fragment_shader.shader)
     end
 
     def cache_uniform_locations(uniforms, parameters)
@@ -212,7 +212,7 @@ module Mittsu
 
       @uniforms = {}
       identifiers.each do |id|
-        @uniforms[id] = glGetUniformLocation(program, id)
+        @uniforms[id] = GL.GetUniformLocation(program, id)
       end
     end
 
@@ -243,7 +243,7 @@ module Mittsu
 
       @attributes = {}
       identifiers.each do |id|
-        @attributes[id] = glGetAttribLocation(program, id)
+        @attributes[id] = GL.GetAttribLocation(program, id)
       end
     end
   end

@@ -1,7 +1,7 @@
 module Mittsu
   class PointCloud
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      glDrawArrays(GL_POINTS, 0, geometry_group.particle_count)
+      GL.DrawArrays(GL::POINTS, 0, geometry_group.particle_count)
 
       @renderer.info[:render][:calls] += 1
       @renderer.info[:render][:points] += geometry_group.particle_count
@@ -12,7 +12,7 @@ module Mittsu
 			custom_attributes_dirty = material.attributes &&  material.custom_attributes_dirty?
 
 			if geometry.vertices_need_update || geometry.colors_need_update || custom_attributes_dirty
-				geometry.set_particle_buffers(GL_DYNAMIC_DRAW)
+				geometry.set_particle_buffers(GL::DYNAMIC_DRAW)
 			end
 
 			geometry.vertices_need_update = false
