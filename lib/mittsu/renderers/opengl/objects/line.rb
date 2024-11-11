@@ -1,22 +1,22 @@
 module Mittsu
   class Line
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      opengl_mode = mode == LineStrip ? GL_LINE_STRIP : GL_LINES
+      opengl_mode = mode == LineStrip ? GL::LINE_STRIP : GL::LINES
 
       @renderer.state.set_line_width(material.line_width * @renderer.pixel_ratio)
 
-      glDrawArrays(opengl_mode, 0, geometry_group.line_count)
+      GL.DrawArrays(opengl_mode, 0, geometry_group.line_count)
 
       @renderer.info[:render][:calls] += 1
     end
 
     def update
-      # TODO: glBindVertexArray ???
+      # TODO: GL.BindVertexArray ???
       material = buffer_material(geometry)
       custom_attributes_dirty = material.attributes && material.custom_attributes_dirty?
 
       if geometry.vertices_need_update || geometry.colors_need_update || geometry.line_distances_need_update || custom_attributes_dirty
-        geometry.set_line_buffers(GL_DYNAMIC_DRAW)
+        geometry.set_line_buffers(GL::DYNAMIC_DRAW)
       end
 
       geometry.vertices_need_update = false

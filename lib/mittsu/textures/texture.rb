@@ -39,7 +39,7 @@ module Mittsu
       @generate_mipmaps = true
       @premultiply_alpha = false
       @filp_y = true
-      @unpack_alignment = 4 # valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+      @unpack_alignment = 4 # valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/GL.PixelStorei.xml)
 
       @_needs_update = false
       @on_update = nil

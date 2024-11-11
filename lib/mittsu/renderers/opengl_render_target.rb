@@ -97,45 +97,45 @@ module Mittsu
 
       add_event_listener(:dispose, @renderer.method(:on_render_target_dispose))
 
-      @opengl_texture = glCreateTexture
+      @opengl_texture = GL.CreateTexture
 
       @renderer.info[:memory][:textures] += 1
 
       # Setup texture, create render and frame buffers
 
       is_target_power_of_two = Math.power_of_two?(@width) && Math.power_of_two?(@height)
-      gl_format = GL_MITTSU_PARAMS[@format]
-      gl_type = GL_MITTSU_PARAMS[@type]
+      gl_format = GL::MITTSU_PARAMS[@format]
+      gl_type = GL::MITTSU_PARAMS[@type]
 
       if is_cube
         # TODO
       else
-        @framebuffer = glCreateFramebuffer
+        @framebuffer = GL.CreateFramebuffer
 
         if @share_depth_from
           @renderbuffer = share_depth_from.renderbuffer
         else
-          @renderbuffer = glCreateRenderbuffer
+          @renderbuffer = GL.CreateRenderbuffer
         end
 
-        glBindTexture(GL_TEXTURE_2D, @opengl_texture)
-        set_parameters(GL_TEXTURE_2D, is_target_power_of_two)
+        GL.BindTexture(GL::TEXTURE_2D, @opengl_texture)
+        set_parameters(GL::TEXTURE_2D, is_target_power_of_two)
 
-        glTexImage2D(GL_TEXTURE_2D, 0, gl_format, @width, @height, 0, gl_format, gl_type, nil)
+        GL.TexImage2D(GL::TEXTURE_2D, 0, gl_format, @width, @height, 0, gl_format, gl_type, nil)
 
-        setup_framebuffer(GL_TEXTURE_2D)
+        setup_framebuffer(GL::TEXTURE_2D)
 
         if @share_depth_from
           if @depth_buffer && !@stencil_buffer
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, @renderbuffer)
+            GL.FramebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT, GL::RENDERBUFFER, @renderbuffer)
           elsif @depth_buffer && @stencil_buffer
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, @renderbuffer)
+            GL.FramebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT, GL::RENDERBUFFER, @renderbuffer)
           end
         else
           setup_renderbuffer
         end
 
-        glGenerateMipmap(GL_TEXTURE_2D) if is_target_power_of_two
+        GL.GenerateMipmap(GL::TEXTURE_2D) if is_target_power_of_two
       end
 
       # Release everything
@@ -143,16 +143,16 @@ module Mittsu
       if is_cube
         # TODO
       else
-        glBindTexture(GL_TEXTURE_2D, 0)
+        GL.BindTexture(GL::TEXTURE_2D, 0)
       end
 
-      glBindRenderbuffer(GL_RENDERBUFFER, 0)
-      glBindFramebuffer(GL_FRAMEBUFFER, 0)
+      GL.BindRenderbuffer(GL::RENDERBUFFER, 0)
+      GL.BindFramebuffer(GL::FRAMEBUFFER, 0)
     end
 
     def use
-      glBindFramebuffer(GL_FRAMEBUFFER, @framebuffer)
-      glViewport(0, 0, @width, @height)
+      GL.BindFramebuffer(GL::FRAMEBUFFER, @framebuffer)
+      GL.Viewport(0, 0, @width, @height)
     end
 
     def dispose
@@ -162,27 +162,27 @@ module Mittsu
     def update_mipmap
       return if !@generate_mipmaps || @min_filter == NearestFilter || @min_filter == LinearFilter
       # TODO: when OpenGLRenderTargetCube exists
-  		# 	glBindTexture(GL_TEXTURE_CUBE_MAP, @opengl_texture)
-  		# 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP)
-  		# 	glBindTexture(GL_TEXTURE_CUBE_MAP, nil)
-			glBindTexture(GL_TEXTURE_2D, @opengl_texture)
-			glGenerateMipmap(GL_TEXTURE_2D)
-			glBindTexture(GL_TEXTURE_2D, nil)
+  		# 	GL.BindTexture(GL::TEXTURE_CUBE_MAP, @opengl_texture)
+  		# 	GL.GenerateMipmap(GL::TEXTURE_CUBE_MAP)
+  		# 	GL.BindTexture(GL::TEXTURE_CUBE_MAP, nil)
+			GL.BindTexture(GL::TEXTURE_2D, @opengl_texture)
+			GL.GenerateMipmap(GL::TEXTURE_2D)
+			GL.BindTexture(GL::TEXTURE_2D, nil)
     end
 
     private
 
     def setup_framebuffer(texture_target)
-      glBindFramebuffer(GL_FRAMEBUFFER, @framebuffer)
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture_target, @opengl_texture, 0)
+      GL.BindFramebuffer(GL::FRAMEBUFFER, @framebuffer)
+      GL.FramebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, texture_target, @opengl_texture, 0)
     end
 
     def setup_renderbuffer
-      glBindRenderbuffer(GL_RENDERBUFFER, @renderbuffer)
+      GL.BindRenderbuffer(GL::RENDERBUFFER, @renderbuffer)
 
       if @depth_buffer && !@stencil_buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, @width, @height)
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, @renderbuffer)
+        GL.RenderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_COMPONENT16, @width, @height)
+        GL.FramebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT, GL::RENDERBUFFER, @renderbuffer)
 
         # TODO: investigate this (?):
     		# THREE.js - For some reason this is not working. Defaulting to RGBA4.
@@ -191,10 +191,10 @@ module Mittsu
     		# 	_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
     		# 	_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
       elsif @depth_buffer && @stencil_buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_STENCIL, @width, @height)
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, @renderbuffer)
+        GL.RenderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_STENCIL, @width, @height)
+        GL.FramebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT, GL::RENDERBUFFER, @renderbuffer)
       else
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, @width, @height)
+        GL.RenderbufferStorage(GL::RENDERBUFFER, GL::RGBA4, @width, @height)
       end
     end
   end

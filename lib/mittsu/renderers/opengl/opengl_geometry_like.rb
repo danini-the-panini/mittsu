@@ -34,13 +34,13 @@ module Mittsu
                   :renderer
 
     def bind_vertex_array_object
-      glBindVertexArray(@vertex_array_object) if @vertex_array_object
+      GL.BindVertexArray(@vertex_array_object) if @vertex_array_object
     end
 
     def update_vertex_buffer(attribute)
-      glBindBuffer(GL_ARRAY_BUFFER, @vertex_buffer)
+      GL.BindBuffer(GL::ARRAY_BUFFER, @vertex_buffer)
       @renderer.state.enable_attribute(attribute)
-      glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, 0, 0)
+      GL.VertexAttribPointer(attribute, 3, GL::FLOAT, GL::FALSE, 0, 0)
     end
 
     def update_other_buffers(object, material, attributes)
@@ -69,7 +69,7 @@ module Mittsu
       if object.geometry.colors.length > 0 || object.geometry.faces.length > 0
         update_attribute(attribute, @color_buffer, 3)
       elsif material.default_attribute_values
-        glVertexAttrib3fv(attribute, material.default_attribute_values.color)
+        GL.VertexAttrib3fv(attribute, material.default_attribute_values.color)
       end
     end
 
@@ -94,7 +94,7 @@ module Mittsu
         update_attribute(attribute, buffer, 2)
       else
         # TODO default_attribute_value ???
-        # glVertexAttrib2fv(attribute, default_attribute_value)
+        # GL.VertexAttrib2fv(attribute, default_attribute_value)
       end
     end
 
@@ -124,9 +124,9 @@ module Mittsu
     end
 
     def update_attribute(attribute, buffer, size)
-      glBindBuffer(GL_ARRAY_BUFFER, buffer)
+      GL.BindBuffer(GL::ARRAY_BUFFER, buffer)
       @renderer.state.enable_attribute(attribute)
-      glVertexAttribPointer(attribute, size, GL_FLOAT, GL_FALSE, 0, 0)
+      GL.VertexAttribPointer(attribute, size, GL::FLOAT, GL::FALSE, 0, 0)
     end
   end
 end

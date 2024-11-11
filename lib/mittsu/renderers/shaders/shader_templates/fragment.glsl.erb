@@ -97,7 +97,7 @@
 <% if parameters[:logarithmic_depth_buffer] %>
   #define USE_LOGDEPTHBUF
 <% end %>
-// @renderer._glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+// @renderer._GL.ExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 uniform mat4 viewMatrix;
 uniform vec3 cameraPosition;

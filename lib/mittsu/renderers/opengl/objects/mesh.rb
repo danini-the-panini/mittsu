@@ -3,19 +3,19 @@ module Mittsu
     attr_accessor :renderer
 
     def render_buffer(camera, lights, fog, material, geometry_group, update_buffers)
-      type = GL_UNSIGNED_INT # geometry_group.type_array == Uint32Array ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT
+      type = GL::UNSIGNED_INT # geometry_group.type_array == Uint32Array ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT
 
       # wireframe
       if material.wireframe
         @renderer.state.set_line_width(material.wireframe_linewidth * @renderer.pixel_ratio)
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.line_buffer) if update_buffers
-        glDrawElements(GL_LINES, geometry_group.line_count, type, 0)
+        GL.BindBuffer(GL::ELEMENT_ARRAY_BUFFER, geometry_group.line_buffer) if update_buffers
+        GL.DrawElements(GL::LINES, geometry_group.line_count, type, 0)
 
       # triangles
       else
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry_group.face_buffer) if update_buffers
-        glDrawElements(GL_TRIANGLES, geometry_group.face_count, type, 0)
+        GL.BindBuffer(GL::ELEMENT_ARRAY_BUFFER, geometry_group.face_buffer) if update_buffers
+        GL.DrawElements(GL::TRIANGLES, geometry_group.face_count, type, 0)
       end
 
       @renderer.info[:render][:calls] += 1
@@ -28,13 +28,13 @@ module Mittsu
       mat = nil
       geometry.groups.each do |geometry_group|
         # TODO: place to put this???
-        # glBindVertexArray(geometry_group.vertex_array_object)
+        # GL.BindVertexArray(geometry_group.vertex_array_object)
         mat = buffer_material(geometry_group)
 
         custom_attributes_dirty = mat.attributes && mat.custom_attributes_dirty?
 
         if geometry.vertices_need_update || geometry.morph_targets_need_update || geometry.elements_need_update || geometry.uvs_need_update || geometry.normals_need_update || geometry.colors_need_update || geometry.tangents_need_update || custom_attributes_dirty
-          geometry_group.set_mesh_buffers(self, GL_DYNAMIC_DRAW, !geometry.dynamic, mat)
+          geometry_group.set_mesh_buffers(self, GL::DYNAMIC_DRAW, !geometry.dynamic, mat)
         end
       end
 

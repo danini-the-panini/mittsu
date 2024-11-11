@@ -63,16 +63,16 @@ module Mittsu
 
       # set GL state for depth map
 
-      glClearColor(1.0, 1.0, 1.0, 1.0)
-      glDisable(GL_BLEND)
+      GL.ClearColor(1.0, 1.0, 1.0, 1.0)
+      GL.Disable(GL::BLEND)
 
-      glEnable(GL_CULL_FACE)
-      glFrontFace(GL_CCW)
+      GL.Enable(GL::CULL_FACE)
+      GL.FrontFace(GL::CCW)
 
       if @renderer.shadow_map_cull_face = CullFaceFront
-        glCullFace(GL_FRONT)
+        GL.CullFace(GL::FRONT)
       else
-        glCullFace(GL_BACK)
+        GL.CullFace(GL::BACK)
       end
 
       @renderer.state.set_depth_test(true)
@@ -258,11 +258,11 @@ module Mittsu
       clear_color = @renderer.get_clear_color
       clear_alpha = @renderer.get_clear_alpha
 
-      glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_alpha)
-      glEnable(GL_BLEND)
+      GL.ClearColor(clear_color.r, clear_color.g, clear_color.b, clear_alpha)
+      GL.Enable(GL::BLEND)
 
       if @renderer.shadow_map_cull_face == CullFaceFront
-        glCullFace(GL_BACK)
+        GL.CullFace(GL::BACK)
       end
 
       @renderer.reset_gl_state
