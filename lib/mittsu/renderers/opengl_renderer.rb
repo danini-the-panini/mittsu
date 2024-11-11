@@ -7,9 +7,9 @@ opengl_lib = Mittsu::OpenGLLib.discover
 GL.load_lib(ENV["MITTSU_LIBGL_FILE"] || opengl_lib.file, ENV["MITTSU_LIBGL_PATH"] || opengl_lib.path)
 
 require 'mittsu/renderers/glfw_window'
+require 'mittsu/renderers/opengl/opengl_debug' if ENV['DEBUG']
 require 'mittsu/renderers/opengl/opengl_implementations'
 require 'mittsu/renderers/opengl/opengl_extensions'
-require 'mittsu/renderers/opengl/opengl_debug'
 require 'mittsu/renderers/opengl/opengl_helper'
 require 'mittsu/renderers/opengl/opengl_program'
 require 'mittsu/renderers/opengl/opengl_state'
@@ -21,8 +21,6 @@ require 'mittsu/renderers/opengl/plugins/shadow_map_plugin'
 require 'mittsu/renderers/opengl/plugins/sprite_plugin'
 require 'mittsu/renderers/shaders/shader_lib'
 require 'mittsu/renderers/shaders/uniforms_utils'
-
-require 'mittsu/renderers/opengl/debug' if ENV['DEBUG']
 include Mittsu::OpenGLHelper
 
 require 'mittsu/renderers/opengl/opengl_mittsu_params'
