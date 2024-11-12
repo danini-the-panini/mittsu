@@ -25,14 +25,12 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'opengl-bindings2'
   spec.add_runtime_dependency 'fiddle'
-  spec.add_runtime_dependency 'ffi'
   spec.add_runtime_dependency 'chunky_png'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'minitest-reporters'
-  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'benchmark-ips'
   spec.add_development_dependency 'simplecov', '0.17.1'
 end
