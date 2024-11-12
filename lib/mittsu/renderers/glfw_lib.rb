@@ -17,7 +17,9 @@ module Mittsu
         end
 
         def ldconfig
-          `ldconfig -p | grep 'libglfw3\\?\\.so'`.lines
+          out, stderr, _status = Open3.capture3("ldconfig -p | grep 'libglfw3\\?\\.so'")
+          puts stderr if DEBUG
+          out.lines
         rescue
           []
         end
