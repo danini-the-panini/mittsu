@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.requirements << 'OpenGL 3.3+ capable hardware and drivers'
 
   spec.add_runtime_dependency 'opengl-bindings2'
+  spec.add_runtime_dependency 'fiddle'
   spec.add_runtime_dependency 'ffi'
   spec.add_runtime_dependency 'chunky_png'
 
