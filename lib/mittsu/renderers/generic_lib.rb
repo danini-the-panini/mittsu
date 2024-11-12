@@ -1,3 +1,5 @@
+require 'open3'
+
 module Mittsu
   module GenericLib
     def discover
@@ -32,7 +34,8 @@ module Mittsu
 
       class << self
         def kernel_module_in_use
-          lspci_line = `lspci -nnk | grep -i vga -A3 | grep 'in use'`
+          lspci_line, stderr, _status = Open3.capture3("lspci -nnk | grep -i vga -A3 | grep 'in use'")
+          puts stderr if DEBUG
           /in use:\s*(\S+)/ =~ lspci_line && $1
         rescue
           ''
