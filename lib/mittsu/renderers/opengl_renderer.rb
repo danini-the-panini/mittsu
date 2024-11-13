@@ -4,7 +4,7 @@ require 'fiddle'
 
 require 'mittsu/renderers/opengl/opengl_lib'
 opengl_lib = Mittsu::OpenGLLib.discover
-GL.load_lib(ENV["MITTSU_LIBGL_FILE"] || opengl_lib.file, ENV["MITTSU_LIBGL_PATH"] || opengl_lib.path)
+GL.load_lib(ENV["MITTSU_LIBGL_PATH"] || opengl_lib.path, Mittsu.debug?)
 
 require 'mittsu/renderers/glfw_window'
 require 'mittsu/renderers/opengl/opengl_debug' if ENV['DEBUG']

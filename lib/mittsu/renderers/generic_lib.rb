@@ -18,18 +18,15 @@ module Mittsu
 
     class Base
       def path; nil; end
-      def file; nil; end
     end
 
     class Linux < Base
       def path
-        return nil if file_path.nil?
-        File.dirname file_path
-      end
-
-      def file
-        return nil if file_path.nil?
-        File.basename file_path
+        @_path ||= begin
+          ldconfig_lib || driver_specific_lib || sixtyfour_bit_lib || fallback_lib || give_up
+        end.tap do |result|
+          print_debug_info(result) if DEBUG
+        end
       end
 
       class << self
@@ -41,7 +38,7 @@ module Mittsu
           ''
         end
 
-        def libgl_paths
+        def lib_paths
           Dir.glob('/usr/lib*/**/libGL.so*')
         rescue
           []
@@ -59,13 +56,6 @@ module Mittsu
       end
 
       private
-        def file_path
-          @_file_path ||= begin
-            ldconfig_lib || driver_specific_lib || sixtyfour_bit_lib || fallback_lib || give_up
-          end.tap do |result|
-            print_debug_info(result) if DEBUG
-          end
-        end
 
         def ldconfig_lib
           return nil if ldconfig.empty?
@@ -107,7 +97,7 @@ module Mittsu
         end
 
         def libs
-          @_libs ||= @loader.libgl_paths.sort_by(&:length)
+          @_libs ||= @loader.lib_paths.sort_by(&:length)
         end
 
         def ldconfig

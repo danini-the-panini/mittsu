@@ -10,7 +10,7 @@ module Mittsu
       end
 
       class << self
-        def libgl_paths
+        def lib_paths
           Dir.glob('/usr/lib*/**/libglfw*.so*')
         rescue
           []
@@ -27,7 +27,7 @@ module Mittsu
     end
 
     class Windows < GenericLib::Base
-      def file
+      def path
         'glfw3.dll'
       end
     end
@@ -38,18 +38,10 @@ module Mittsu
                       '/opt/homebrew/**']
 
       def path
-        File.dirname(match.to_s)
-      end
-
-      def file
-        File.basename(match.to_s)
+        @_path ||= find_match&.to_s
       end
 
       private
-
-        def match
-          @match ||= find_match
-        end
 
         def find_match
           SEARCH_GLOBS.each do |glob|
