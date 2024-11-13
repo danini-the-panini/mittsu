@@ -9,17 +9,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 ]
 SimpleCov.start do
   add_filter "/test/"
-  add_group 'Cameras', 'lib/mittsu/cameras'
-  add_group 'Core', 'lib/mittsu/core'
-  add_group 'Extras', 'lib/mittsu/extras'
-  add_group 'Lights', 'lib/mittsu/lights'
-  add_group 'Loaders', 'lib/mittsu/loaders'
-  add_group 'Materials', 'lib/mittsu/materials'
-  add_group 'Math', 'lib/mittsu/math'
-  add_group 'Objects', 'lib/mittsu/objects'
   add_group 'Renderers', 'lib/mittsu/renderers'
-  add_group 'Scenes', 'lib/mittsu/scenes'
-  add_group 'Textures', 'lib/mittsu/textures'
 end
 
 require "minitest/reporters"
@@ -32,9 +22,10 @@ else
 end
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift File.expand_path('../../mittsu-core/lib', __dir__)
 require 'minitest'
 Dir[__dir__ + '/support/*.rb'].each {|file| require file }
-require 'mittsu'
+require 'mittsu-renderer-opengl'
 
 class Minitest::Test
   def assert_color_equal expected, actual
