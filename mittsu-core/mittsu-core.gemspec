@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'mittsu/version'
+require_relative '../lib/mittsu/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "mittsu-core"
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "bug_tracker" => "https://github.com/danini-the-panini/mittsu/issues"
   }
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples|renderers)/|\.sh$)}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{(^(test)/|\.sh$)}) }
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = '>= 2.0.0'

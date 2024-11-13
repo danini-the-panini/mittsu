@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'mittsu/version'
+require_relative '../lib/mittsu/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "mittsu-renderer-opengl"
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "bug_tracker" => "https://github.com/danini-the-panini/mittsu/issues"
   }
 
-  spec.files         = `git ls-files lib/mittsu/renderers -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples)/|\.sh$)}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{(^(test|examples|renderers)/|\.sh$)}) }
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = '>= 2.0.0'
@@ -26,4 +26,12 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'mittsu-core', Mittsu::VERSION
   spec.add_runtime_dependency 'opengl-bindings2'
   spec.add_runtime_dependency 'ffi'
+
+  spec.add_development_dependency "bundler"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency 'minitest'
+  spec.add_development_dependency 'minitest-reporters'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'benchmark-ips'
+  spec.add_development_dependency 'simplecov', '0.17.1'
 end

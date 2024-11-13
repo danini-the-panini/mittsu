@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gem "mittsu-core", path: "./mittsu-core"
-gem "mittsu-renderer-opengl", path: "./mittsu-renderer-opengl"
+gem "mittsu-core", path: "../mittsu-core"
 gemspec
 
 if /darwin/ === RUBY_PLATFORM
