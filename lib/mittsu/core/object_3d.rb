@@ -305,17 +305,13 @@ module Mittsu
     end
 
     def to_json
-      @_output = {
+      {
         metadata: {
           version: 4.3,
           type: 'Object',
           generator: 'ObjectExporter'
-        }
-      }
-      @_geometries = {}
-      @_materials = {}
-      @_output[:object] = self.jsonify
-      @_output
+        },
+      }.merge(jsonify)
     end
 
     def clone(object = nil, recursive = true)
@@ -346,46 +342,32 @@ module Mittsu
     protected
 
     def jsonify
-      data = {
-        uuid: @uuid,
-        type: @type,
-        matrix: @matrix.to_a
-      }
-      data[:name] = @name unless @name.nil? || @name.empty?
-      data[:user_data] = @user_data unless @user_data.nil? || @user_data.empty?
-      data[:visible] = @visible unless @visible
-
-      if !self.children.empty?
-        data[:children] = @children.map do |child|
-          child.to_json
-        end
-      end
-
-      # TODO: implement jsonify for PointCloud
-
-      data
+      children = @children.map(&:to_json)
+      {
+        object: {
+          uuid: @uuid,
+          type: @type,
+          matrix: @matrix.to_a,
+          geometry: @geometry&.uuid,
+          material: @material&.uuid,
+          name: @name&.empty? ? nil : @name,
+          user_data: @user_data&.empty? ? nil : @user_data,
+          visible: @visible ? nil : @visible,
+          children: children.map { |x| x[:object] }.flatten
+        }.reject { |k,v| v.nil? || v == [] },
+        geometries: ([jsonify_geometry] + children.map { |x| x[:geometries] }).flatten.compact,
+        materials: ([jsonify_material] + children.map { |x| x[:materials] }).flatten.compact
+      }.reject { |k,v| v.nil? || v == [] }
     end
 
-    def jsonify_geometry(geometry)
-      @_output[:geometries] ||= []
-      if @_geometries[geometry.uuid].nil?
-        json = geometry.to_json
-        json.delete :metadata
-        @_geometries[geometry.uuid] = json
-        @_output[:geometries] << json
-      end
-      geometry.uuid
+    def jsonify_geometry
+      return nil if @geometry.nil?
+      @geometry.to_json.delete_if {|k, v| k == :metadata }
     end
 
-    def jsonify_material(material)
-      @_output[:materials] ||= []
-      if @_materials[material.uuid].nil?
-        json = material.to_json
-        json.delete :metadata
-        @_materials[material.uuid] = json
-        @_output[:materials] << json
-      end
-      material.uuid
+    def jsonify_material
+      return nil if @material.nil?
+      @material.to_json.delete_if {|k, v| k == :metadata }
     end
   end
 end
