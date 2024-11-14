@@ -151,6 +151,40 @@ class TestObject3D < Minitest::Test
     }, object.to_json)
   end
 
+  def test_to_json_with_mesh_child
+    object = Mittsu::Object3D.new
+    geometry = Mittsu::BoxGeometry.new(1.0, 1.0, 1.0)
+    material = Mittsu::MeshBasicMaterial.new(color: 0x00ff00)
+    object.add(Mittsu::Mesh.new(geometry, material))
+    # Check object basics
+    json = object.to_json
+    assert_equal('Mesh', json[:object][:children][0][:type])
+    # Check geometry node and uuid references
+    assert_equal('BoxGeometry', json[:geometries][0][:type])
+    assert_equal(json[:object][:children][0][:geometry],
+      json[:geometries][0][:uuid])
+    # Check material node and uuid references
+    assert_equal('MeshBasicMaterial', json[:materials][0][:type])
+    assert_equal(json[:object][:children][0][:material],
+      json[:materials][0][:uuid])
+  end
+
+  def test_to_json_with_line_child
+    object = Mittsu::Object3D.new
+    object.add(Mittsu::Line.new)
+    # Check object basics
+    json = object.to_json
+    assert_equal('Line', json[:object][:children][0][:type])
+    # Check geometry node and uuid references
+    assert_equal('Geometry', json[:geometries][0][:type])
+    assert_equal(json[:object][:children][0][:geometry],
+      json[:geometries][0][:uuid])
+    # Check material node and uuid references
+    assert_equal('LineBasicMaterial', json[:materials][0][:type])
+    assert_equal(json[:object][:children][0][:material],
+      json[:materials][0][:uuid])
+  end
+
   def test_clone
     object = Mittsu::Object3D.new
     object.name = 'Foo'

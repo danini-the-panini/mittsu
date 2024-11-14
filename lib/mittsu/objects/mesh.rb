@@ -269,10 +269,7 @@ module Mittsu
     protected
 
     def jsonify
-      data = super
-      data[:geometry] = jsonify_geometry(@geometry)
-      data[:material] = jsonify_material(@material)
-      data
+      super
     end
   end
 end

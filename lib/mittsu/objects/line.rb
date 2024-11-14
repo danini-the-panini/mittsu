@@ -143,9 +143,7 @@ module Mittsu
 
     def jsonify
       data = super
-      data[:geometry] = jsonify_geometry(self.geometry)
-      data[:material] = jsonify_material(self.material)
-      data[:mode] = self.mode
+      data[:object][:mode] = self.mode
       data
     end
   end
