@@ -40,6 +40,7 @@ module Mittsu
       @camera_nz.look_at(Mittsu::Vector3.new(0.0, 0.0, -1.0))
       self.add(@camera_nz)
 
+      # TODO: somehow move this to mittsu-renderer-opengl or make it renderer agnostic
       @render_target = Mittsu::OpenGLRenderTargetCube(cube_resolution, cube_resolution, format: Mittsu::RGBFormat, mag_filter: Mittsu::LinearFilter, min_filter: Mittsu::LinearFilter)
     end
 

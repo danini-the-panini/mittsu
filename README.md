@@ -7,7 +7,7 @@
 
 3D Graphics Library for Ruby
 
-Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is based heavily off of [THREE.js](http://threejs.org). No more weird pointers and wondering about the difference between a VAO and a VBO (besides the letter). Simply think of something awesome and make it!
+Mittsu is a 3D Graphics Library for Ruby, based heavily on Three.js
 
 ## GIFs!
 
@@ -21,26 +21,7 @@ Mittsu makes 3D graphics easier by providing an abstraction over OpenGL, and is 
 
 Install the prerequisites:
 
-Mittsu depends on Ruby 2.x, OpenGL 3.3+, and GLFW 3.1.x
-
-```bash
-# OSX
-$ brew install glfw3
-
-# Ubuntu
-$ sudo apt install libglfw3
-
-# Fedora
-$ sudo dnf install glfw
-```
-
-**NOTE:** On Windows, you will have to manually specify the glfw3.dll path in an environment variable
-(you can download it [here](http://www.glfw.org/download.html))
-```bash
-# ex) set MITTSU_LIBGLFW_PATH=C:\Users\username\lib-mingw-w64
-> set MITTSU_LIBGLFW_PATH=C:\path\to\glfw3.dll
-> ruby your_awesome_mittsu_app.rb
-```
+Mittsu depends on Ruby 2.x
 
 Add this line to your application's Gemfile:
 
@@ -58,22 +39,14 @@ Or install it yourself as:
 
 ## Usage
 
-### tl;dr
-
-Copy-Paste and Run:
+Create a basic scene with a perspective camera and a green box:
 
 ```ruby
 require 'mittsu'
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-ASPECT = SCREEN_WIDTH.to_f / SCREEN_HEIGHT.to_f
-
-renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT, title: 'Hello, World!'
-
 scene = Mittsu::Scene.new
 
-camera = Mittsu::PerspectiveCamera.new(75.0, ASPECT, 0.1, 1000.0)
+camera = Mittsu::PerspectiveCamera.new(75.0, 1.0, 0.1, 1000.0)
 camera.position.z = 5.0
 
 box = Mittsu::Mesh.new(
@@ -82,110 +55,13 @@ box = Mittsu::Mesh.new(
 )
 
 scene.add(box)
-
-renderer.window.run do
-  box.rotation.x += 0.1
-  box.rotation.y += 0.1
-
-  renderer.render(scene, camera)
-end
 ```
-
-### Step by Step
-
-First, we need to require Mittsu in order to use it:
-```ruby
-require 'mittsu'
-```
-
-Then, we'll define some constants to help us with setting up our 3D environment:
-```ruby
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-ASPECT = SCREEN_WIDTH.to_f / SCREEN_HEIGHT.to_f
-```
-
-The aspect ratio will be used for setting up the camera later.
-
-Once we have all that we can create the canvas we will use to draw our graphics onto. In Mittsu this is called a renderer. It provides a window and an OpenGL context:
-
-```ruby
-renderer = Mittsu::OpenGLRenderer.new width: SCREEN_WIDTH, height: SCREEN_HEIGHT, title: 'Hello, World!'
-```
-This will give us an 800x600 window with the title `Hello, World!`.
-
-Now that we have our canvas, let's start setting up the scene we wish to draw onto it:
-
-```ruby
-scene = Mittsu::Scene.new
-```
-
-A scene is like a stage where all our 3D objects live and animate.
-
-We can't draw a 3D scene without knowing where we're looking:
-
-```ruby
-camera = Mittsu::PerspectiveCamera.new(75.0, ASPECT, 0.1, 1000.0)
-```
-
-This camera has a 75° field-of-view (FOV), the aspect ratio of the window (which we defined earlier), and shows everything between a distance of 0.1 to 1000.0 away from the camera.
-
-The camera starts off at the origin `[0,0,0]` and faces the negative Z-axis. We'll position it somewhere along the positive Z-axis so that it is looking at the center of the scene from a short distance:
-
-```ruby
-camera.position.z = 5.0
-```
-
-Our scene isn't going to be very exciting if there is nothing in it, so we'll create a box:
-
-```ruby
-box = Mittsu::Mesh.new(
-  Mittsu::BoxGeometry.new(1.0, 1.0, 1.0),
-  Mittsu::MeshBasicMaterial.new(color: 0x00ff00)
-)
-```
-
-A `Mesh` in Mittsu is the combination of a `Geometry` (the shape of the object) and a `Material` (the "look" of the object). Here we've created a 1x1x1 box that is colored green.
-
-Box in hand, we make it part of our scene:
-
-```ruby
-scene.add(box)
-```
-
-Here comes the fun part... the render loop!
-
-```ruby
-renderer.window.run do
-```
-
-The given block is called every frame. This is where you can tell the renderer what scene to draw, and do any updates to the objects in your scene.
-
-Just to make things a bit more interesting, we'll make the box rotate around its X and Y axes, so that it spins like crazy.
-
-```ruby
-box.rotation.x += 0.1
-box.rotation.y += 0.1
-```
-
-Last but not least, we tell the renderer to draw our scene this frame, which will tell the graphics processor to draw our green box with its updated rotation.
-
-```ruby
-renderer.render(scene, camera)
-```
-
-Easy peasy! :)
-
-```ruby
-end
-```
-
 
 ### More Resources
 
 Mittsu follows a similar structure to THREE.js, so you can generally use [the same documentation](http://threejs.org/docs/) for a description of the various classes and how they work.
 
-If you just want to see what Mittsu can do and how to do it, take a peek inside the `examples` folder.
+If you want to actually render scenes, you'll need a renderer. There is a reference opengl renderer [here](https://github.com/danini-the-panini/mittsu-renderer-opengl).
 
 ## Where you can help
 
