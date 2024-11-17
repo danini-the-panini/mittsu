@@ -469,7 +469,7 @@ module Mittsu
       end
       vertices = []
       @vertices.each do |vert|
-        vertices << vertex.x << vertex.y << vertex.z
+        vertices << vert.x << vert.y << vert.z
       end
       faces = []
       normals = []
@@ -507,7 +507,7 @@ module Mittsu
           faces << get_uv_index(face_vertex_uvs[2], uvs_hash, uvs)
         end
         if has_face_normal
-          faces << get_normal_index(face.normal)
+          faces << get_normal_index(face.normal, normals_hash, normals)
         end
         if has_face_vertex_normal
           vertex_normals = face.vertex_normals
