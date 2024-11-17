@@ -1,7 +1,5 @@
 ENV["MITTSU_ENV"] = 'test'
 
-require 'pry'
-
 require 'simplecov'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
