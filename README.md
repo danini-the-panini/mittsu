@@ -19,10 +19,6 @@ Mittsu is a 3D Graphics Library for Ruby, based heavily on Three.js
 
 ## Installation
 
-Install the prerequisites:
-
-Mittsu depends on Ruby 2.x
-
 Add this line to your application's Gemfile:
 
 ```ruby
@@ -57,17 +53,28 @@ box = Mittsu::Mesh.new(
 scene.add(box)
 ```
 
-### More Resources
+## More Resources
 
 Mittsu follows a similar structure to THREE.js, so you can generally use [the same documentation](http://threejs.org/docs/) for a description of the various classes and how they work.
 
-If you want to actually render scenes, you'll need a renderer. There is a reference opengl renderer [here](https://github.com/danini-the-panini/mittsu-renderer-opengl).
+If you want to actually render scenes, you'll need a renderer. There is a reference OpenGL renderer [here](https://github.com/danini-the-panini/mittsu-opengl).
+
+## See also
+
+- [Tank Demo](https://github.com/danini-the-panini/mittsu-tank-demo)
+- [OpenGL Renderer](https://github.com/danini-the-panini/mittsu-opengl)
+- [Mesh Analysis](https://github.com/manyfold3d/mittsu-mesh_analysis)
+- [3MF Support](https://github.com/manyfold3d/mittsu-3mf)
+
+## Where is Mittsu used?
+
+- [Manyfold](https://github.com/manyfold3d/manyfold) - A self-hosted digital asset manager for 3d print files.
 
 ## Where you can help
 
 1. Testing!
 
-    Currently the only unit tests are for most of the maths library, otherwise the library is tested by running the examples and checking that they look correct.
+    Currently the only unit tests are for most of the maths library.
 
 2. Refactoring!
 
