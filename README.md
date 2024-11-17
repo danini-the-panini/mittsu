@@ -1,8 +1,8 @@
 # Mittsu
 
 [![Gem Version](https://badge.fury.io/rb/mittsu.svg)](https://badge.fury.io/rb/mittsu)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/test_coverage)](https://codeclimate.com/github/danini-the-panini/mittsu/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/22be300984d81fa10af8/maintainability)](https://codeclimate.com/github/danini-the-panini/mittsu/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/339a016dc2e7fc51c82a/test_coverage)](https://codeclimate.com/github/danini-the-panini/mittsu/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/339a016dc2e7fc51c82a/maintainability)](https://codeclimate.com/github/danini-the-panini/mittsu/maintainability)
 [![Build Status](https://github.com/danini-the-panini/mittsu/workflows/Build/badge.svg)](https://github.com/danini-the-panini/mittsu/actions?query=workflow%3A%22Build%22)
 
 3D Graphics Library for Ruby
