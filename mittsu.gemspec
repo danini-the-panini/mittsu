@@ -24,10 +24,10 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'chunky_png'
 
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency 'minitest'
-  spec.add_development_dependency 'minitest-reporters'
-  spec.add_development_dependency 'benchmark-ips'
+  spec.add_development_dependency 'bundler', '~> 2.5'
+  spec.add_development_dependency 'rake', '~> 13.2'
+  spec.add_development_dependency 'minitest', '~> 5.25'
+  spec.add_development_dependency 'minitest-reporters', '~> 1.7'
+  spec.add_development_dependency 'benchmark-ips', '~> 2.14'
   spec.add_development_dependency 'simplecov', '0.17.1'
 end
