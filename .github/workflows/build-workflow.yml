@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: Linux
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
