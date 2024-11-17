@@ -1,7 +1,5 @@
 ENV["MITTSU_ENV"] = 'test'
 
-require 'pry'
-
 require 'simplecov'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
@@ -17,7 +15,6 @@ SimpleCov.start do
   add_group 'Materials', 'lib/mittsu/materials'
   add_group 'Math', 'lib/mittsu/math'
   add_group 'Objects', 'lib/mittsu/objects'
-  add_group 'Renderers', 'lib/mittsu/renderers'
   add_group 'Scenes', 'lib/mittsu/scenes'
   add_group 'Textures', 'lib/mittsu/textures'
 end

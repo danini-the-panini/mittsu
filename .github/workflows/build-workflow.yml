@@ -8,17 +8,14 @@ on:
       - main
 
 jobs:
-  linux:
-    name: Linux
+  test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby: ['2.6', '2.7', '3.0', '3.1', '3.2', '3.3', 'head']
     steps:
       - uses: actions/checkout@v4
-      - uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: libglfw3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -33,35 +30,3 @@ jobs:
       - name: Test
         if: github.event_name != 'push'
         run: bundle exec rake test
-
-  macos:
-    name: macOS
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        ruby: ['2.6', '2.7', '3.0', '3.1', '3.2', '3.3', 'head']
-    steps:
-      - uses: actions/checkout@v4
-      - run: brew install glfw
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-      - run: bundle exec rake test
-
-  windows:
-    name: Windows
-    runs-on: windows-latest
-    env:
-      MITTSU_LIBGLFW_PATH: c:\projects\mittsu\glfw-3.3.1.bin.WIN32\lib-mingw
-    strategy:
-      matrix:
-        ruby: ['2.6', '2.7', '3.0', '3.1', '3.2', '3.3', 'head']
-    steps:
-      - uses: actions/checkout@v4
-      - run: .\install-glfw.ps1
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-      - run: bundle exec rake test
