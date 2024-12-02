@@ -647,7 +647,7 @@ module Mittsu
     end
 
     def clone
-      geometry = Mittsu::BufferGeometry.news
+      geometry = Mittsu::BufferGeometry.new
 
       @attributes.each do |key, attribute|
         geometry[key] = attribute.clone
