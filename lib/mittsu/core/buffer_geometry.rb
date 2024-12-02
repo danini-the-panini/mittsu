@@ -181,7 +181,7 @@ module Mittsu
 
         @bounding_sphere.radius = ::Math.sqrt(max_radius_sq)
 
-        if @bounding_radius.nan?
+        if @bounding_sphere.radius.nan?
           puts 'ERROR: Mittsu::BufferGeometry#computeBoundingSphere: Computed radius is NaN. The "position" attribute is likely to have NaN values.'
         end
       end
