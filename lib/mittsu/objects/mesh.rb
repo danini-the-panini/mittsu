@@ -16,6 +16,7 @@ module Mittsu
     end
 
     def update_morph_targets
+      return unless @geometry.respond_to?(:morph_targets)
       if !@geometry.morph_targets.nil? && !@geometry.morph_targets.empty?
         @morph_targets_base = -1
         @morph_target_forced_order = []
