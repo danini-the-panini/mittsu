@@ -16,6 +16,8 @@ module Mittsu
     end
 
     def update_morph_targets
+      return unless @geometry.respond_to?(:morph_targets)
+
       if !@geometry.morph_targets.nil? && !@geometry.morph_targets.empty?
         @morph_targets_base = -1
         @morph_target_forced_order = []
@@ -26,14 +28,14 @@ module Mittsu
           @morph_targets_influences << 0
           @morph_targets_dictionary[target.name] = m
         end
+      end
 
-        def morph_target_index_by_name(name)
-          morph_target_index = @morph_targets_dictionary[name]
-          return morph_target_index unless morph_target_index.nil?
+      def morph_target_index_by_name(name)
+        morph_target_index = @morph_targets_dictionary[name]
+        return morph_target_index unless morph_target_index.nil?
 
-          puts "WARNING: Mittsu::Mest#morph_target_index_by_name: morph target #{name} does not exist. Returning 0."
-          0
-        end
+        puts "WARNING: Mittsu::Mesh#morph_target_index_by_name: morph target #{name} does not exist. Returning 0."
+        0
       end
     end
 
