@@ -30,4 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest-reporters', '~> 1.7'
   spec.add_development_dependency 'benchmark-ips', '~> 2.14'
   spec.add_development_dependency 'simplecov', '0.17.1'
+  spec.add_development_dependency 'rubocop', '~> 1.69'
+  spec.add_development_dependency 'rubocop-performance', '~> 1.23'
 end
