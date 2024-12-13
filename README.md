@@ -65,6 +65,7 @@ If you want to actually render scenes, you'll need a renderer. There is a refere
 - [OpenGL Renderer](https://github.com/danini-the-panini/mittsu-opengl)
 - [Mesh Analysis](https://github.com/manyfold3d/mittsu-mesh_analysis)
 - [3MF Support](https://github.com/manyfold3d/mittsu-3mf)
+- [GLTF Support](https://github.com/manyfold3d/mittsu-gltf)
 
 ## Where is Mittsu used?
 
